@@ -46,8 +46,12 @@ public class ZoomHandler {
             if (modifiedZoom > 170.0D) {
                 modifiedZoom = 170.0D;
             }
-            cachedFov = modifiedZoom;
-            return (modifiedZoom);
+
+            double lerpAmount = 0.1; // Adjust this value to control the speed of the zoom
+            // In this modified version of the handleZoom() method, we use a lerp function to interpolate between the current field of view and the modified/zoomed field of view. We set the lerp amount to 0.1, which means that the interpolation will take 10 frames to complete. You can adjust this value to control the speed of the zoom.
+            // Additionnal fix : using Universal Tween Engine to make the zoom smoother
+            cachedFov = cachedFov + (modifiedZoom - cachedFov) * lerpAmount;
+            return cachedFov;
 
         } else {
 
@@ -63,9 +67,9 @@ public class ZoomHandler {
 
         cachedFov = fov;
 
-        return fov;
+    return fov;
 
-    }
+}
 
     @SubscribeEvent
     public void onMouseScroll(InputEvent.MouseScrollingEvent e) {
