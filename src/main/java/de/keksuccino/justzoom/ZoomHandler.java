@@ -11,6 +11,7 @@ public class ZoomHandler {
 
     public static boolean isZoomed = false;
     public static double zoomFactor = JustZoom.config.getOrDefault("base_zoom_factor", 0.25D);
+    public static double lerpAmount = JustZoom.config.getOrDefault("lerp_amount", 0.1D);
 
     private static double cachedFov;
     private static double cachedDefaultFov;
@@ -47,8 +48,6 @@ public class ZoomHandler {
                 modifiedZoom = 170.0D;
             }
 
-            double lerpAmount = 0.1; // Adjust this value to control the speed of the zoom
-            // In this modified version of the handleZoom() method, we use a lerp function to interpolate between the current field of view and the modified/zoomed field of view. We set the lerp amount to 0.1, which means that the interpolation will take 10 frames to complete. You can adjust this value to control the speed of the zoom.
             // Additionnal fix : using Universal Tween Engine to make the zoom smoother
             cachedFov = cachedFov + (modifiedZoom - cachedFov) * lerpAmount;
             return cachedFov;
@@ -56,13 +55,25 @@ public class ZoomHandler {
         } else {
 
             if (isZoomed) {
-                mc.options.smoothCamera = cachedSmoothCamera;
-                isZoomed = false;
-                if (JustZoom.config.getOrDefault("reset_zoom_factor", true)) {
-                    zoomFactor = JustZoom.config.getOrDefault("base_zoom_factor", 0.25D);
+                // Use Lerp function to smoothly transition to the default FOV
+                cachedFov = cachedFov + (cachedDefaultFov - cachedFov) * lerpAmount;
+                // Theorically < 0.01 is perfect but that value is never reached so we cheat (using it keeps a weird FOV with a non-existing Zoom, unplayable)
+                // Any value strictly under 1 makes that weird effect. The lower the value, the easier that effect is here. For some reason, spamming the zoom key twice gets rid of that effect
+                // Problems :
+                // - On key release, there's a short gap near the end where the zoom isn't fluid anymore
+                // - When scrolling back to "default" FOV, the weird effect will exist. Zooming again removes it
+                // Fixes ? :
+                // - Using a lerpAmount bigger and bigger (0.1 -> 1) as we are from 1 to 0.5 may do the job, however this isn't guaranteed
+                if (Math.abs(cachedFov - cachedDefaultFov) < 1) {
+                    cachedFov = cachedDefaultFov;
+                    mc.options.smoothCamera = cachedSmoothCamera;
+                    isZoomed = false;
+                    if (JustZoom.config.getOrDefault("reset_zoom_factor", true)) {
+                        zoomFactor = JustZoom.config.getOrDefault("base_zoom_factor", 0.25D);
+                    }
                 }
+                return cachedFov;
             }
-
         }
 
         cachedFov = fov;
@@ -89,7 +100,5 @@ public class ZoomHandler {
                 }
             }
         }
-
     }
-
 }

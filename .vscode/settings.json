@@ -1,0 +1,7 @@
+{
+	"java.configuration.updateBuildConfiguration": "interactive",
+	"workbench.colorCustomizations": {
+
+	},
+	"java.compile.nullAnalysis.mode": "automatic"
+}

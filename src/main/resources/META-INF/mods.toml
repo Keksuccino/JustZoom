@@ -9,7 +9,7 @@ license="DSMSL (DON'T SNATCH MA STUFF LICENSE)"
 # The modid of the mod
 modId="justzoom" #mandatory
 # The version number of the mod - there's a few well known ${} variables useable here or just hardcode it
-version="1.0.1" #mandatory
+version="1.0.2" #mandatory
  # A display name for the mod
 displayName="Just Zoom" #mandatory
 # A text field displayed in the mod UI
@@ -19,7 +19,7 @@ description='''To Infinity, And Beyond!
 
 COPYRIGHT:
 
-> Just Zoom © Copyright 2021-2022 Keksuccino.
+> Just Zoom © Copyright 2021-2023 Keksuccino.
   Just Zoom is licensed under DSMSL (DON'T SNATCH MA STUFF LICENSE).
   See https://github.com/Keksuccino/JustZoom/blob/master/LICENSE.md for more information about this license.
 '''
