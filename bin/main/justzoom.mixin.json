@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "package": "de.keksuccino.justzoom.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "client": [
+    "MixinGameRenderer"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "refmap": "justzoom.mixin-refmap.json",
+  "minVersion": "0.8"
+}

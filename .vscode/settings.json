@@ -1,7 +1,6 @@
 {
 	"java.configuration.updateBuildConfiguration": "interactive",
-	"workbench.colorCustomizations": {
-
-	},
-	"java.compile.nullAnalysis.mode": "automatic"
+	"workbench.colorCustomizations": {},
+	"java.compile.nullAnalysis.mode": "automatic",
+	"java.dependency.syncWithFolderExplorer": false
 }

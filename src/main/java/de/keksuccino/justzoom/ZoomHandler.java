@@ -17,10 +17,9 @@ public class ZoomHandler {
     private static double cachedDefaultFov;
     private static boolean cachedSmoothCamera;
 
-    // Try to fix issues with the FOV acting weird on certain zooms
-    private static int iteration = 0;
-    private static int totalIteration = 0;
-    private static double diff;
+    private static int iteration = 0; // 0-4, for going through lerps array
+    private static int totalIteration = 0; // gets incremented every tick when zooming out
+    private static double diff; // difference between cachedFov and cachedDefaultFov
     private static double[] lerps = divideToFive(lerpAmount);
 
     public static void init() {
@@ -76,15 +75,7 @@ public class ZoomHandler {
 
             if (isZoomed) {
                 totalIteration++;
-                // Use Lerp function to smoothly transition to the default FOV
                 cachedFov = cachedFov + (cachedDefaultFov - cachedFov) * lerpAmount;
-                // Theorically < 0.01 is perfect but that value is never reached so we cheat (using it keeps a weird FOV with a non-existing Zoom, unplayable)
-                // Any value strictly under 1 makes that weird effect. The lower the value, the easier that effect is here. For some reason, spamming the zoom key twice gets rid of that effect
-                // Problems :
-                // - On key release, there's a short gap near the end where the zoom isn't fluid anymore
-                // - When scrolling back to "default" FOV, the weird effect will exist. Zooming again removes it
-                // Fixes ? :
-                // - Using a lerpAmount bigger and bigger (0.1 -> 1) as we are from 1 to 0.5 may do the job, however this isn't guaranteed
                 if (Math.abs(cachedFov - cachedDefaultFov) < 1 || totalIteration >= diff) {
                     if (iteration < 4 && !(totalIteration >= diff)) {
                         lerpAmount = lerps[iteration];
