@@ -17,6 +17,12 @@ public class ZoomHandler {
     private static double cachedDefaultFov;
     private static boolean cachedSmoothCamera;
 
+    // Try to fix issues with the FOV acting weird on certain zooms
+    private static int iteration = 0;
+    private static int totalIteration = 0;
+    private static double diff;
+    private static double[] lerps = divideToFive(lerpAmount);
+
     public static void init() {
 
         KeyBindings.init();
@@ -24,6 +30,20 @@ public class ZoomHandler {
         MinecraftForge.EVENT_BUS.register(new ZoomHandler());
 
     }
+
+    public static double[] divideToFive(double value) {
+
+        double[] result = new double[5];
+        double step = (1.0 - value) / 4.0;
+
+        for (int i = 0; i < 5; i++) {
+            result[i] = value + (step * i);
+        }
+
+        return result;
+
+    }
+
 
     /**
      * Returns the modified/zoomed FOV.
@@ -48,13 +68,14 @@ public class ZoomHandler {
                 modifiedZoom = 170.0D;
             }
 
-            // Additionnal fix : using Universal Tween Engine to make the zoom smoother
             cachedFov = cachedFov + (modifiedZoom - cachedFov) * lerpAmount;
+            diff = Math.abs(cachedFov - cachedDefaultFov);
             return cachedFov;
 
         } else {
 
             if (isZoomed) {
+                totalIteration++;
                 // Use Lerp function to smoothly transition to the default FOV
                 cachedFov = cachedFov + (cachedDefaultFov - cachedFov) * lerpAmount;
                 // Theorically < 0.01 is perfect but that value is never reached so we cheat (using it keeps a weird FOV with a non-existing Zoom, unplayable)
@@ -64,12 +85,22 @@ public class ZoomHandler {
                 // - When scrolling back to "default" FOV, the weird effect will exist. Zooming again removes it
                 // Fixes ? :
                 // - Using a lerpAmount bigger and bigger (0.1 -> 1) as we are from 1 to 0.5 may do the job, however this isn't guaranteed
-                if (Math.abs(cachedFov - cachedDefaultFov) < 1) {
-                    cachedFov = cachedDefaultFov;
-                    mc.options.smoothCamera = cachedSmoothCamera;
-                    isZoomed = false;
-                    if (JustZoom.config.getOrDefault("reset_zoom_factor", true)) {
-                        zoomFactor = JustZoom.config.getOrDefault("base_zoom_factor", 0.25D);
+                if (Math.abs(cachedFov - cachedDefaultFov) < 1 || totalIteration >= diff) {
+                    if (iteration < 4 && !(totalIteration >= diff)) {
+                        lerpAmount = lerps[iteration];
+                        cachedFov = cachedFov + (cachedDefaultFov - cachedFov) * lerpAmount;
+                        iteration++;
+                    } else {
+                        cachedFov = cachedDefaultFov;
+                        mc.options.smoothCamera = cachedSmoothCamera;
+                        isZoomed = false;
+                        if (JustZoom.config.getOrDefault("reset_zoom_factor", true)) {
+                            zoomFactor = JustZoom.config.getOrDefault("base_zoom_factor", 0.25D);
+                        }
+                        lerpAmount = JustZoom.config.getOrDefault("lerp_amount", 0.1D);
+                        diff = 0D;
+                        totalIteration = 0;
+                        iteration = 0;
                     }
                 }
                 return cachedFov;
@@ -77,10 +108,9 @@ public class ZoomHandler {
         }
 
         cachedFov = fov;
+        return fov;
 
-    return fov;
-
-}
+    }
 
     @SubscribeEvent
     public void onMouseScroll(InputEvent.MouseScrollingEvent e) {
