@@ -69,18 +69,26 @@ public class ZoomHandler {
 
             cachedFov = cachedFov + (modifiedZoom - cachedFov) * lerpAmount;
             diff = Math.abs(cachedFov - cachedDefaultFov);
+            System.out.println("isDown(cachedFov = " + cachedFov  + ", modifiedZoom = " + modifiedZoom + ", diff = " + diff + ")");
+            // To prevent having wrong values if the player unzoom/zooms
+            totalIteration = 0;
             return cachedFov;
 
         } else {
 
             if (isZoomed) {
                 totalIteration++;
-                cachedFov = cachedFov + (cachedDefaultFov - cachedFov) * lerpAmount;
-                if (Math.abs(cachedFov - cachedDefaultFov) < 1 || totalIteration >= diff) {
-                    if (iteration < 4 && !(totalIteration >= diff)) {
+                if (iteration == 0) {
+                    cachedFov = cachedFov + (cachedDefaultFov - cachedFov) * lerpAmount;
+                    System.out.println("isUp0(totalIteration = " + totalIteration + ", cachedFov + " + cachedFov + ")");
+                }
+                if (Math.abs(cachedFov - cachedDefaultFov) < 1 || totalIteration > diff) {
+                    // && !(totalIteration > diff)
+                    if (iteration < 4) {
                         lerpAmount = lerps[iteration];
                         cachedFov = cachedFov + (cachedDefaultFov - cachedFov) * lerpAmount;
                         iteration++;
+                        System.out.println("isUp1(lerpAmount = " + lerpAmount + ", cachedFov = " + cachedFov + ", iteration = " + iteration + ", totalIteration = " + totalIteration + ")");
                     } else {
                         cachedFov = cachedDefaultFov;
                         mc.options.smoothCamera = cachedSmoothCamera;
@@ -92,6 +100,7 @@ public class ZoomHandler {
                         diff = 0D;
                         totalIteration = 0;
                         iteration = 0;
+                        System.out.println("isUp2(" + cachedFov + ")");
                     }
                 }
                 return cachedFov;
