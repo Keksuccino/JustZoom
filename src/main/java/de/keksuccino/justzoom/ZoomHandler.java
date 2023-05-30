@@ -51,6 +51,9 @@ public class ZoomHandler {
             }
 
             cachedFov = cachedFov + (modifiedZoom - cachedFov) * lerpAmount;
+            if (cachedFov > cachedDefaultFov) {
+                cachedFov = cachedDefaultFov;
+            }
             return cachedFov;
 
         } else {
@@ -59,7 +62,7 @@ public class ZoomHandler {
                 if (!lastFov) {
                     cachedFov = cachedFov + (cachedDefaultFov - cachedFov) * lerpAmount;
                 }
-                if (Math.abs(cachedFov - cachedDefaultFov) < 1 && !lastFov) {
+                if ((Math.abs(cachedFov - cachedDefaultFov) < 1 || (cachedFov - cachedDefaultFov) >= 0) && !lastFov) {
                     if (cachedFov < cachedDefaultFov) {
                         cachedFov += 1;
                     }
@@ -77,7 +80,6 @@ public class ZoomHandler {
                 }
                 return cachedFov;
             }
-            mc.options.smoothCamera = cachedSmoothCamera;
         }
 
         cachedFov = fov;
