@@ -73,9 +73,11 @@ public class ZoomHandler {
                         zoomFactor = JustZoom.config.getOrDefault("base_zoom_factor", 0.25D);
                     }
                     lerpAmount = JustZoom.config.getOrDefault("lerp_amount", 0.1D);
+                    lastFov = false;
                 }
                 return cachedFov;
             }
+            mc.options.smoothCamera = cachedSmoothCamera;
         }
 
         cachedFov = fov;
