@@ -1,53 +1,60 @@
 buildscript {
     repositories {
-        maven { url = 'https://files.minecraftforge.net/maven' }
-		maven { url = 'https://repo.spongepowered.org/maven' }
+        maven { url = 'https://maven.minecraftforge.net' }
+        maven { url = 'https://repo.spongepowered.org/maven' }
         mavenCentral()
     }
     dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '4.1.+', changing: true
-		classpath 'org.spongepowered:mixingradle:0.7-SNAPSHOT'
+        classpath group: 'org.spongepowered', name: 'mixingradle', version: '0.7-SNAPSHOT'
     }
 }
-apply plugin: 'net.minecraftforge.gradle'
-apply plugin: 'eclipse'
-apply plugin: 'maven-publish'
+
+plugins {
+    id 'eclipse'
+    id 'maven-publish'
+    id 'net.minecraftforge.gradle' version '5.1.+'
+}
+
 apply plugin: 'org.spongepowered.mixin'
 
 version = '1.0.0'
 group = 'de.keksuccino'
 archivesBaseName = 'justzoom'
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(8)
-compileJava {
-	[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
-}
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
-println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
-
+println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
 minecraft {
 
-	mappings channel: 'snapshot', version: '20210309-1.16.5'
+    mappings channel: 'official', version: '1.16.5'
 
     runs {
         client {
             workingDirectory project.file('run')
             arg "-mixin.config=justzoom.mixin.json"
+            mods {
+                justzoom {
+                    source sourceSets.main
+                }
+            }
         }
     }
-
 }
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
+repositories {
+    
+}
+
 dependencies {
 
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-
-    minecraft 'net.minecraftforge:forge:1.16.5-36.0.1'
+    minecraft 'net.minecraftforge:forge:1.16.5-36.2.39'
 	
-	annotationProcessor 'org.spongepowered:mixin:0.8.2:processor'
-	testAnnotationProcessor 'org.spongepowered:mixin:0.8.2:processor'
+	implementation fileTree('libs') { include '*.jar' }
+
+    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+    testAnnotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 
 }
 
@@ -71,7 +78,23 @@ jar {
             "MixinConfigs" : "justzoom.mixin.json"
         ])
     }
-	
 }
 
-jar.finalizedBy('reobfJar') 
+jar.finalizedBy('reobfJar')
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifact jar
+        }
+    }
+    repositories {
+        maven {
+            url "file://${project.projectDir}/mcmodsrepo"
+        }
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
+}

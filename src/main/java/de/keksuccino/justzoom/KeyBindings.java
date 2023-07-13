@@ -2,7 +2,6 @@ package de.keksuccino.justzoom;
 
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
-import org.lwjgl.glfw.GLFW;
 
 public class KeyBindings {
 
@@ -10,7 +9,8 @@ public class KeyBindings {
 
     public static void init() {
 
-        keyToggleZoom = new KeyBinding("Toggle Zoom", GLFW.GLFW_KEY_Z, "Just Zoom");
+        keyToggleZoom = new KeyBinding("justzoom.keybinds.keybind.zoom", 90, "justzoom.keybinds.category");
+
         ClientRegistry.registerKeyBinding(keyToggleZoom);
 
     }

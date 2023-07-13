@@ -1,6 +1,7 @@
 package de.keksuccino.justzoom.mixin;
 
 import de.keksuccino.justzoom.ZoomHandler;
+import net.minecraft.client.renderer.ActiveRenderInfo;
 import net.minecraft.client.renderer.GameRenderer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -10,8 +11,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(GameRenderer.class)
 public class MixinGameRenderer {
 
-    @Inject(at = @At("RETURN"), method = "getFOVModifier", cancellable = true)
-    public void onGetFOVModifier(CallbackInfoReturnable<Double> info) {
+    @Inject(at = @At("RETURN"), method = "getFov", cancellable = true)
+    public void onGetFOVModifier(ActiveRenderInfo c, float partial, boolean useFOVSetting, CallbackInfoReturnable<Double> info) {
 
         double defaultFOV = info.getReturnValue();
         info.setReturnValue(ZoomHandler.handleZoom(defaultFOV));
