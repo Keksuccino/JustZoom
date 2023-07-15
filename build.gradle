@@ -21,7 +21,7 @@ version = '1.0.0'
 group = 'de.keksuccino'
 archivesBaseName = 'justzoom'
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+java.toolchain.languageVersion = JavaLanguageVersion.of(8)
 
 println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
 minecraft {
@@ -49,12 +49,12 @@ repositories {
 
 dependencies {
 
-    minecraft 'net.minecraftforge:forge:1.16.5-36.2.39'
+    minecraft 'net.minecraftforge:forge:1.16.5-36.2.34'
 	
 	implementation fileTree('libs') { include '*.jar' }
 
-    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
-    testAnnotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+    annotationProcessor 'org.spongepowered:mixin:0.8.4:processor'
+    testAnnotationProcessor 'org.spongepowered:mixin:0.8.4:processor'
 
 }
 
