@@ -1,0 +1,6 @@
+
+- Just Zoom is now also available for Fabric and NeoForge (was only Forge before)
+- Zooming now correctly works when in third-person (not mirrored third-person)
+- It will not zoom anymore while in mirrored third-person
+- Smooth zoom in/out now works better (uses Vanilla's smooth FOV changing now)
+- 
