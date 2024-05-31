@@ -1,0 +1,19 @@
+{
+  "required": true,
+  "package": "de.keksuccino.justzoom.mixin.mixins.common",
+  "compatibilityLevel": "JAVA_17",
+  "client": [
+    "client.MixinAbstractClientPlayer",
+    "client.MixinCameraType",
+    "client.MixinGameRenderer",
+    "client.MixinMouseHandler"
+  ],
+  "mixins": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "refmap": "justzoom.refmap.json",
+  "plugin": "de.keksuccino.justzoom.mixin.JustZoomMixinPlugin",
+  "minVersion": "0.8"
+}
