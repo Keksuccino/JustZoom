@@ -1,7 +1,15 @@
 
+CHANGELOG | JUST ZOOM v2.0.0
+
+This is a full rewrite of Just Zoom! There can be bugs, but in general everything should work much better now!
+
 - Just Zoom is now also available for Fabric and NeoForge (was only Forge before)
 - Zooming now correctly works when in third-person (not mirrored third-person)
 - It will not zoom anymore while in mirrored third-person
 - Smooth zoom in/out now works better (uses Vanilla's smooth FOV changing now)
 - The mod now normalizes the mouse sensitivity when zooming (can be turned off)
 - You can turn off the cinematic/smooth camera movement when zooming now
+
+
+
+
