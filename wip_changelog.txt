@@ -3,4 +3,5 @@
 - Zooming now correctly works when in third-person (not mirrored third-person)
 - It will not zoom anymore while in mirrored third-person
 - Smooth zoom in/out now works better (uses Vanilla's smooth FOV changing now)
-- 
+- The mod now normalizes the mouse sensitivity when zooming (can be turned off)
+- You can turn off the cinematic/smooth camera movement when zooming now
