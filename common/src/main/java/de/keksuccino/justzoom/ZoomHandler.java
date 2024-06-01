@@ -10,6 +10,8 @@ public class ZoomHandler {
     private static final Logger LOGGER = LogManager.getLogger();
 
     public static float zoomModifier = JustZoom.getOptions().baseZoomFactor.getValue();
+    public static double cachedNormalFov = 0.0F;
+    public static double cachedModifiedFov = 0.0F;
 
     public static boolean isZooming() {
         if (Minecraft.getInstance().options.getCameraType().isMirrored()) return false;

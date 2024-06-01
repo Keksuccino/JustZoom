@@ -24,11 +24,13 @@ public class MixinGameRenderer {
 
         if (ZoomHandler.isZooming()) {
             double finalFov = info.getReturnValue();
+            ZoomHandler.cachedNormalFov = finalFov;
             if (!ZoomHandler.shouldZoomInOutSmooth()) {
                 finalFov = finalFov * ZoomHandler.getFovModifier();
             }
             if (finalFov > 170.0D) finalFov = 170.0D;
             if (finalFov < 1.0D) finalFov = 1.0D;
+            ZoomHandler.cachedModifiedFov = finalFov;
             info.setReturnValue(finalFov);
         }
 
