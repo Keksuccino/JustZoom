@@ -9,9 +9,7 @@ import java.io.File;
 
 public class JustZoom {
 
-    //TODO options screen implementieren
-
-    //TODO mouse sensitivity wird nicht normalisiert, wenn smooth zoom in/out aktiv !!!!!!!!!!!!!
+    //TODO options screen implementieren 
 
     private static final Logger LOGGER = LogManager.getLogger();
 
