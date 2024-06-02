@@ -23,15 +23,20 @@ public class MixinGameRenderer {
     private void return_getFov_JustZoom(Camera c, float partial, boolean useFOVSetting, CallbackInfoReturnable<Double> info) {
 
         if (ZoomHandler.isZooming()) {
-            double finalFov = info.getReturnValue();
-            ZoomHandler.cachedNormalFov = finalFov;
+            double normalFov = info.getReturnValue();
+            if (normalFov > 170.0D) normalFov = 170.0D;
+            if (normalFov < 1.0D) normalFov = 1.0D;
+            double modifiedFov = normalFov;
+            ZoomHandler.cachedNormalFov = normalFov;
+            modifiedFov = modifiedFov * ZoomHandler.getFovModifier();
+            if (modifiedFov > 170.0D) modifiedFov = 170.0D;
+            if (modifiedFov < 1.0D) modifiedFov = 1.0D;
+            ZoomHandler.cachedModifiedFov = modifiedFov;
             if (!ZoomHandler.shouldZoomInOutSmooth()) {
-                finalFov = finalFov * ZoomHandler.getFovModifier();
+                info.setReturnValue(modifiedFov);
+            } else {
+                info.setReturnValue(normalFov);
             }
-            if (finalFov > 170.0D) finalFov = 170.0D;
-            if (finalFov < 1.0D) finalFov = 1.0D;
-            ZoomHandler.cachedModifiedFov = finalFov;
-            info.setReturnValue(finalFov);
         }
 
     }
