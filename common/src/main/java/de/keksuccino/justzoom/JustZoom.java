@@ -9,8 +9,6 @@ import java.io.File;
 
 public class JustZoom {
 
-    //TODO options screen implementieren 
-
     private static final Logger LOGGER = LogManager.getLogger();
 
     public static final String VERSION = "2.0.0";

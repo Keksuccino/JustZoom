@@ -6,7 +6,8 @@
     "client.MixinAbstractClientPlayer",
     "client.MixinCameraType",
     "client.MixinGameRenderer",
-    "client.MixinMouseHandler"
+    "client.MixinMouseHandler",
+    "client.MixinPauseScreen"
   ],
   "mixins": [
   ],

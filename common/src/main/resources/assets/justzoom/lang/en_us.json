@@ -1,4 +1,19 @@
 {
   "justzoom.keybinds.category": "Just Zoom",
-  "justzoom.keybinds.keybind.zoom": "Zoom"
+  "justzoom.keybinds.keybind.zoom": "Zoom",
+  "justzoom.options": "Just Zoom Options",
+  "justzoom.options.base_zoom_modifier": "Base FOV Modifier:",
+  "justzoom.options.base_zoom_modifier.desc": "The FOV modifier the mod should start with when zooming.\nThis should be a floating point value between 0.0 and 1.0.\nA smaller value means a more zoomed view.",
+  "justzoom.options.zoom_in_change_modifier_per_scroll": "Zoom-In Modifier Change Per Scroll:",
+  "justzoom.options.zoom_in_change_modifier_per_scroll.desc": "How much the FOV modifier should change when scrolling.\nA bigger value means less smooth zooming.",
+  "justzoom.options.zoom_out_change_modifier_per_scroll": "Zoom-Out Modifier Change Per Scroll:",
+  "justzoom.options.zoom_out_change_modifier_per_scroll.desc": "How much the FOV modifier should change when scrolling.\nA bigger value means less smooth zooming.",
+  "justzoom.options.smooth_zoom_in_out": "Smooth Zooming: %s",
+  "justzoom.options.smooth_zoom_in_out.desc": "If the FOV should change smoothly when zooming in/out.",
+  "justzoom.options.smooth_camera_movement_on_zoom": "Smooth Camera Movement: %s",
+  "justzoom.options.smooth_camera_movement_on_zoom.desc": "If the camera should move smoothly (cinematic) when zooming.",
+  "justzoom.options.normalize_mouse_sensitivity_on_zoom": "Normalize Mouse Sensitivity: %s",
+  "justzoom.options.normalize_mouse_sensitivity_on_zoom.desc": "If the mouse sensitivity should adjust itself to the zoomed view,\nso it feels normal and not too fast when moving the mouse while zooming.",
+  "justzoom.options.toggle.enabled": "Enabled",
+  "justzoom.options.toggle.disabled": "Disabled"
 }
