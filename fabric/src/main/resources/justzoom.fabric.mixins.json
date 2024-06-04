@@ -5,6 +5,7 @@
   "mixins": [
   ],
   "client": [
+    "client.MixinFabricGameRenderer"
   ],
   "injectors": {
     "defaultRequire": 1

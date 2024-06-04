@@ -2,8 +2,8 @@ package de.keksuccino.justzoom.mixin.mixins.common.client;
 
 import de.keksuccino.justzoom.OptionsScreen;
 import de.keksuccino.justzoom.util.gui.ItemButton;
+import de.keksuccino.justzoom.util.gui.Tooltips;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -15,7 +15,6 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import java.util.function.Supplier;
 
 @Mixin(PauseScreen.class)
 public class MixinPauseScreen extends Screen {
@@ -34,9 +33,8 @@ public class MixinPauseScreen extends Screen {
 
             this.addRenderableWidget(new ItemButton(20, this.height - 40, Component.translatable("justzoom.options"), button -> {
                         Minecraft.getInstance().setScreen(new OptionsScreen(this));
-                    }, Supplier::get, new ItemStack(Items.SPYGLASS)))
-                    .setItemPositionOffset(2, 2)
-                    .setTooltip(Tooltip.create(Component.translatable("justzoom.options")));
+                    }, Tooltips.create(Component.translatable("justzoom.options"), this), new ItemStack(Items.SPYGLASS)))
+                    .setItemPositionOffset(2, 2);
 
         }
 

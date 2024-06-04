@@ -25,9 +25,8 @@ dependencies {
     implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
     implementation project(":common")
     include(implementation(annotationProcessor("io.github.llamalad7:mixinextras-fabric:0.3.2")))
-    //modImplementation "maven.modrinth:konkrete:1.8.0-1.20.4-fabric"
-    modImplementation "flatdir:konkrete:1.9.1"
-    modImplementation "maven.modrinth:modmenu:9.0.0"
+    modImplementation "maven.modrinth:konkrete:1.8.0-1.19.1-1.19.2-fabric"
+    modImplementation "maven.modrinth:modmenu:4.1.2"
 }
 
 loom {

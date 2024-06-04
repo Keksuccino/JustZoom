@@ -25,18 +25,18 @@ public abstract class AbstractOptions {
         protected void register() {
             boolean unsupported = false;
             try {
-                if (this.defaultValue instanceof Integer) {
-                    this.config.registerValue(this.key, (int) this.defaultValue, this.category);
-                } else if (this.defaultValue instanceof Double) {
-                    this.config.registerValue(this.key, (double) this.defaultValue, this.category);
-                } else if (this.defaultValue instanceof Long) {
-                    this.config.registerValue(this.key, (long) this.defaultValue, this.category);
-                } else if (this.defaultValue instanceof Float) {
-                    this.config.registerValue(this.key, (float) this.defaultValue, this.category);
-                } else if (this.defaultValue instanceof Boolean) {
-                    this.config.registerValue(this.key, (boolean) this.defaultValue, this.category);
-                } else if (this.defaultValue instanceof String) {
-                    this.config.registerValue(this.key, (String) this.defaultValue, this.category);
+                if (this.defaultValue instanceof Integer i) {
+                    this.config.registerValue(this.key, i, this.category);
+                } else if (this.defaultValue instanceof Double d) {
+                    this.config.registerValue(this.key, d, this.category);
+                } else if (this.defaultValue instanceof Long l) {
+                    this.config.registerValue(this.key, l, this.category);
+                } else if (this.defaultValue instanceof Float f) {
+                    this.config.registerValue(this.key, f, this.category);
+                } else if (this.defaultValue instanceof Boolean b) {
+                    this.config.registerValue(this.key, b, this.category);
+                } else if (this.defaultValue instanceof String s) {
+                    this.config.registerValue(this.key, s, this.category);
                 } else {
                     unsupported = true;
                 }
@@ -54,18 +54,18 @@ public abstract class AbstractOptions {
         public Option<T> setValue(T value) {
             try {
                 if (value == null) value = this.getDefaultValue();
-                if (value instanceof Integer) {
-                    this.config.setValue(this.key, (int) value);
-                } else if (value instanceof Double) {
-                    this.config.setValue(this.key, (double) value);
-                } else if (value instanceof Long) {
-                    this.config.setValue(this.key, (long) value);
-                } else if (value instanceof Float) {
-                    this.config.setValue(this.key, (float) value);
-                } else if (value instanceof Boolean) {
-                    this.config.setValue(this.key, (boolean) value);
-                } else if (value instanceof String) {
-                    this.config.setValue(this.key, (String) value);
+                if (value instanceof Integer i) {
+                    this.config.setValue(this.key, i);
+                } else if (value instanceof Double d) {
+                    this.config.setValue(this.key, d);
+                } else if (value instanceof Long l) {
+                    this.config.setValue(this.key, l);
+                } else if (value instanceof Float f) {
+                    this.config.setValue(this.key, f);
+                } else if (value instanceof Boolean b) {
+                    this.config.setValue(this.key, b);
+                } else if (value instanceof String s) {
+                    this.config.setValue(this.key, s);
                 }
             } catch (Exception ex) {
                 ex.printStackTrace();
