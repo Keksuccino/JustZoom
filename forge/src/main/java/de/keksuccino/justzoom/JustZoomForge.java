@@ -1,9 +1,9 @@
 package de.keksuccino.justzoom;
 
 import de.keksuccino.justzoom.platform.Services;
-import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.client.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 @Mod(JustZoom.MOD_ID)
@@ -15,17 +15,14 @@ public class JustZoomForge {
 
         if (Services.PLATFORM.isOnClient()) {
 
-            FMLJavaModLoadingContext.get().getModEventBus().register(JustZoomForge.class);
+            FMLJavaModLoadingContext.get().getModEventBus().addListener(this::doClientInit);
 
         }
         
     }
 
-    @SubscribeEvent
-    public static void onRegisterKeybinds(RegisterKeyMappingsEvent e) {
-
-        e.register(KeyMappings.KEY_TOGGLE_ZOOM);
-
+    private void doClientInit(final FMLClientSetupEvent e) {
+        ClientRegistry.registerKeyBinding(KeyMappings.KEY_TOGGLE_ZOOM);
     }
 
 }

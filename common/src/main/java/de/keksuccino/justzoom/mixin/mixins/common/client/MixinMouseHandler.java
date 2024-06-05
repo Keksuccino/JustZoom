@@ -6,7 +6,6 @@ import de.keksuccino.justzoom.JustZoom;
 import de.keksuccino.justzoom.ZoomHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.MouseHandler;
-import net.minecraft.client.OptionInstance;
 import net.minecraft.client.Options;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -22,8 +21,8 @@ public class MixinMouseHandler {
     @Inject(method = "onScroll", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;isSpectator()Z"), cancellable = true)
     private void before_isSpectator_in_onScroll_JustZoom(long $$0, double $$1, double $$2, CallbackInfo info) {
 
-        boolean discreteScroll = Minecraft.getInstance().options.discreteMouseScroll().get();
-        double sensitivity = Minecraft.getInstance().options.mouseWheelSensitivity().get();
+        boolean discreteScroll = Minecraft.getInstance().options.discreteMouseScroll;
+        double sensitivity = Minecraft.getInstance().options.mouseWheelSensitivity;
         double deltaX = (discreteScroll ? Math.signum($$1) : $$1) * sensitivity;
         double deltaY = (discreteScroll ? Math.signum($$2) : $$2) * sensitivity;
 
@@ -36,14 +35,12 @@ public class MixinMouseHandler {
     /**
      * @reason This is to normalize the mouse sensitivity when zooming with Just Zoom (if the option for that is enabled).
      */
-    @WrapOperation(method = "turnPlayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/OptionInstance;get()Ljava/lang/Object;"))
-    private Object wrap_get_sensitivity_in_turnPlayer_JustZoom(OptionInstance<?> instance, Operation<?> original) {
-        if ((instance == Minecraft.getInstance().options.sensitivity()) && ZoomHandler.isZooming() && JustZoom.getOptions().normalizeMouseSensitivityOnZoom.getValue()) {
-            Object sensitivityObj = original.call(instance);
-            if (sensitivityObj instanceof Double sensitivity) {
-                double scale = Math.tan(Math.toRadians(ZoomHandler.cachedModifiedFov / 2)) / Math.tan(Math.toRadians(ZoomHandler.cachedNormalFov / 2));
-                return sensitivity * scale; //adjusted sensitivity
-            }
+    @WrapOperation(method = "turnPlayer", at = @At(value = "FIELD", target = "Lnet/minecraft/client/Options;sensitivity:D"))
+    private double wrap_sensitivity_in_turnPlayer_JustZoom(Options instance, Operation<Double> original) {
+        if (ZoomHandler.isZooming() && JustZoom.getOptions().normalizeMouseSensitivityOnZoom.getValue()) {
+            double sensitivity = original.call(instance);
+            double scale = Math.tan(Math.toRadians(ZoomHandler.cachedModifiedFov / 2)) / Math.tan(Math.toRadians(ZoomHandler.cachedNormalFov / 2));
+            return sensitivity * scale; //adjusted sensitivity
         }
         return original.call(instance);
     }

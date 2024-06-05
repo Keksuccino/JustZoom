@@ -2,6 +2,7 @@ package de.keksuccino.justzoom;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import de.keksuccino.justzoom.util.AbstractOptions;
+import de.keksuccino.justzoom.util.gui.Components;
 import de.keksuccino.justzoom.util.gui.StringWidget;
 import de.keksuccino.justzoom.util.gui.TooltipEditBox;
 import de.keksuccino.justzoom.util.gui.Tooltips;
@@ -22,7 +23,7 @@ public class OptionsScreen extends Screen {
     protected Screen parent;
 
     public OptionsScreen(@Nullable Screen parent) {
-        super(Component.translatable("justzoom.options"));
+        super(Components.translatable("justzoom.options"));
         this.parent = parent;
     }
 
@@ -66,13 +67,13 @@ public class OptionsScreen extends Screen {
         int centerX = this.width / 2;
         int buttonWidth = 200;
 
-        Component enabled = Component.translatable(labelBaseKey, Component.translatable("justzoom.options.toggle.enabled").withStyle(Style.EMPTY.withColor(ChatFormatting.GREEN)));
-        Component disabled = Component.translatable(labelBaseKey, Component.translatable("justzoom.options.toggle.disabled").withStyle(Style.EMPTY.withColor(ChatFormatting.RED)));
+        Component enabled = Components.translatable(labelBaseKey, Components.translatable("justzoom.options.toggle.enabled").withStyle(Style.EMPTY.withColor(ChatFormatting.GREEN)));
+        Component disabled = Components.translatable(labelBaseKey, Components.translatable("justzoom.options.toggle.disabled").withStyle(Style.EMPTY.withColor(ChatFormatting.RED)));
 
         return new Button(centerX - (buttonWidth / 2), y, buttonWidth, 20, option.getValue() ? enabled : disabled, button -> {
             option.setValue(!option.getValue());
             button.setMessage(option.getValue() ? enabled : disabled);
-        }, Tooltips.create(Component.translatable(labelBaseKey + ".desc"), this));
+        }, Tooltips.create(Components.translatable(labelBaseKey + ".desc"), this));
 
     }
 
@@ -80,18 +81,18 @@ public class OptionsScreen extends Screen {
 
         int centerX = this.width / 2;
 
-        StringWidget zoomOutPerScrollText = this.addRenderableWidget(new StringWidget(Component.translatable(labelBaseKey), this.font));
+        StringWidget zoomOutPerScrollText = this.addRenderableWidget(new StringWidget(Components.translatable(labelBaseKey), this.font));
         zoomOutPerScrollText.setX(centerX - 5 - zoomOutPerScrollText.getWidth());
         zoomOutPerScrollText.setY(y + 10 - (this.font.lineHeight / 2));
-        zoomOutPerScrollText.setTooltip(Tooltips.create(Component.translatable(labelBaseKey + ".desc"), this));
-        TooltipEditBox zoomOutPerScroll = this.addRenderableWidget(new TooltipEditBox(this.font, centerX + 5, y, 150, 20, Component.translatable(labelBaseKey)));
+        zoomOutPerScrollText.setTooltip(Tooltips.create(Components.translatable(labelBaseKey + ".desc"), this));
+        TooltipEditBox zoomOutPerScroll = this.addRenderableWidget(new TooltipEditBox(this.font, centerX + 5, y, 150, 20, Components.translatable(labelBaseKey)));
         zoomOutPerScroll.setValue("" + option.getValue());
         zoomOutPerScroll.setResponder(s -> {
             if (MathUtils.isFloat(s)) {
                 option.setValue(Float.parseFloat(s));
             }
         });
-        zoomOutPerScroll.setTooltip(Tooltips.create(Component.translatable(labelBaseKey + ".desc"), this));
+        zoomOutPerScroll.setTooltip(Tooltips.create(Components.translatable(labelBaseKey + ".desc"), this));
 
     }
 

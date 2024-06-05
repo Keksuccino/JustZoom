@@ -1,12 +1,12 @@
 package de.keksuccino.justzoom.mixin.mixins.common.client;
 
 import de.keksuccino.justzoom.OptionsScreen;
+import de.keksuccino.justzoom.util.gui.Components;
 import de.keksuccino.justzoom.util.gui.ItemButton;
 import de.keksuccino.justzoom.util.gui.Tooltips;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import org.spongepowered.asm.mixin.Final;
@@ -23,7 +23,7 @@ public class MixinPauseScreen extends Screen {
 
     //unused dummy constructor
     private MixinPauseScreen() {
-        super(Component.empty());
+        super(Components.empty());
     }
 
     @Inject(method = "init", at = @At("RETURN"))
@@ -31,9 +31,9 @@ public class MixinPauseScreen extends Screen {
 
         if (this.showPauseMenu) {
 
-            this.addRenderableWidget(new ItemButton(20, this.height - 40, Component.translatable("justzoom.options"), button -> {
+            this.addRenderableWidget(new ItemButton(20, this.height - 40, Components.translatable("justzoom.options"), button -> {
                         Minecraft.getInstance().setScreen(new OptionsScreen(this));
-                    }, Tooltips.create(Component.translatable("justzoom.options"), this), new ItemStack(Items.SPYGLASS)))
+                    }, Tooltips.create(Components.translatable("justzoom.options"), this), new ItemStack(Items.SPYGLASS)))
                     .setItemPositionOffset(2, 2);
 
         }

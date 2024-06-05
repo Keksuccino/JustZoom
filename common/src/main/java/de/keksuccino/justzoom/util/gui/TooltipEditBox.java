@@ -32,7 +32,7 @@ public class TooltipEditBox extends EditBox {
     @Override
     public void renderToolTip(@NotNull PoseStack $$0, int $$1, int $$2) {
         if (this.tooltip != null) {
-            this.tooltip.onTooltip(new Button(this.x, this.y, this.width, this.height, Component.empty(), var1 -> {}), $$0, $$1, $$2);
+            this.tooltip.onTooltip(new Button(this.x, this.y, this.width, this.height, Components.empty(), var1 -> {}), $$0, $$1, $$2);
         }
     }
 
