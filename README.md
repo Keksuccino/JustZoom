@@ -23,4 +23,4 @@ See `LICENSE.md` for more information.
 
 ## Copyright
 
-- Just Zoom Copyright © 2021-2022 Keksuccino.<br>
+- Just Zoom Copyright © 2021-2024 Keksuccino.<br>
