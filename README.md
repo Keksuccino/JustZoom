@@ -16,11 +16,8 @@ Source code for the Just Zoom Minecraft mod.
 
 Just Zoom is available on [CurseForge](https://www.curseforge.com/minecraft/mc-mods/just-zoom-forge)!
 
-## Licensing
+## Copyright & Licensing
 
-Just Zoom is licensed under DSMSL (DON'T SNATCH MA STUFF LICENSE).<br>
+Just Zoom Copyright © 2021-2024 Keksuccino.<br>
+Just Zoom is licensed under DSMSLv2 (DON'T SNATCH MA STUFF LICENSE V2).<br>
 See `LICENSE.md` for more information.
-
-## Copyright
-
-- Just Zoom Copyright © 2021-2024 Keksuccino.<br>
