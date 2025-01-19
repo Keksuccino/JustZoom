@@ -1,3 +1,12 @@
+
+CHANGELOG | JUST ZOOM v2.0.1
+
+- Added support for MC 1.21.4
+ 
+%changelog:end%
+
+
+
 CHANGELOG | JUST ZOOM v2.0.0
 
 This is a full rewrite of Just Zoom! There can be bugs, but in general everything should work much better now!
