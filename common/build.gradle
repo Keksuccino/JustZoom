@@ -15,11 +15,11 @@ minecraft {
 }
 
 dependencies {
-    compileOnly 'io.github.llamalad7:mixinextras-common:0.3.2'
+    compileOnly(annotationProcessor('io.github.llamalad7:mixinextras-common:0.4.1'))
     compileOnly group:'org.spongepowered', name:'mixin', version:'0.8.5'
-    compileOnly fileTree('libs') { include '*.jar' }
-    implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
-    implementation group: 'org.ow2.asm', name: 'asm-tree', version: '9.3'
+	compileOnly "maven.modrinth:konkrete:1.9.9-1.21.4-forge"
+    implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.2'
+    implementation group: 'org.ow2.asm', name: 'asm-tree', version: '9.7'
 }
 
 publishing {
