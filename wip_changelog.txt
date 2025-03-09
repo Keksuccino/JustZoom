@@ -4,6 +4,7 @@ CHANGELOG | JUST ZOOM v2.1.0 [ W I P !!! NOT PUBLIC YET !!! ]
 - Added option to hide the player's hands when zooming (#40)
 - Added option to be able to zoom in mirrored third-person view
 - Added option to reset zoom factor when stop zooming (#34)
+- Improved "Normalize Mouse Sensitivity" logic to normalize the sensitivity better on high zoom levels
 - Fixed zooming sometimes working while in screens (like inventory or when editing a sign) (#32)
 
 
