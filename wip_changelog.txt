@@ -6,6 +6,7 @@ CHANGELOG | JUST ZOOM v2.1.0 [ W I P !!! NOT PUBLIC YET !!! ]
 - Added option to reset zoom factor when stop zooming (#34)
 - Added option to set the corner of the Pause screen Just Zoom's options button should render in
 - Added "show_options_button_in_pause_screen" config option to the "/config/justzoom/config.txt" file to disable Just Zoom's options button in the Pause screen
+- Just Zoom now has a Mod Menu integration on Fabric, so you can open its options via Mod Menu
 - Improved "Normalize Mouse Sensitivity" logic to normalize the sensitivity better on high zoom levels
 - Fixed zooming sometimes working while in screens (like inventory or when editing a sign) (#32)
 
