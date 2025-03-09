@@ -2,7 +2,7 @@
 CHANGELOG | JUST ZOOM v2.1.0 [ W I P !!! NOT PUBLIC YET !!! ]
 
 - Added option to hide the player's hands when zooming
-- Added option to be able to zoom in mirrored first-person view
+- Added option to be able to zoom in mirrored third-person view
 
 
 
