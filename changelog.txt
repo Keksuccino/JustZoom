@@ -1,4 +1,27 @@
 
+CHANGELOG | JUST ZOOM v2.1.1
+
+- Fixed crash in Forge on 1.20.1, 1.19.2, 1.18.2
+
+%changelog:end%
+
+
+
+CHANGELOG | JUST ZOOM v2.1.0
+
+- Added option to hide the player's hands when zooming (#40)
+- Added option to be able to zoom in mirrored third-person view
+- Added option to reset zoom factor when stop zooming (#34)
+- Added option to set the corner of the Pause screen Just Zoom's options button should render in
+- Added "show_options_button_in_pause_screen" config option to the "/config/justzoom/config.txt" file to disable Just Zoom's options button in the Pause screen
+- Just Zoom now has a Mod Menu integration on Fabric, so you can open its options via Mod Menu
+- Improved "Normalize Mouse Sensitivity" logic to normalize the sensitivity better on high zoom levels
+- Fixed zooming sometimes working while in screens (like inventory or when editing a sign) (#32)
+
+%changelog:end%
+
+
+
 CHANGELOG | JUST ZOOM v2.0.1
 
 - Added support for MC 1.21.4
