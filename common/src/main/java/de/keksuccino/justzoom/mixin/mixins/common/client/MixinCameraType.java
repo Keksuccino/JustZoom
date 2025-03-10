@@ -2,6 +2,7 @@ package de.keksuccino.justzoom.mixin.mixins.common.client;
 
 import de.keksuccino.justzoom.ZoomHandler;
 import net.minecraft.client.CameraType;
+import net.minecraft.client.Minecraft;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -12,7 +13,9 @@ public class MixinCameraType {
 
     @Inject(method = "isFirstPerson", at = @At("HEAD"), cancellable = true)
     private void head_isFirstPerson_JustZoom(CallbackInfoReturnable<Boolean> info) {
-        if (ZoomHandler.isZooming()) info.setReturnValue(true);
+        if (ZoomHandler.isZooming() && !Minecraft.getInstance().options.getCameraType().isMirrored()) {
+            info.setReturnValue(true);
+        }
     }
 
 }

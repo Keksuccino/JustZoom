@@ -34,15 +34,35 @@ public class MixinMouseHandler {
     }
 
     /**
-     * @reason This is to normalize the mouse sensitivity when zooming with Just Zoom (if the option for that is enabled).
+     * @reason This implements a highly aggressive mouse sensitivity normalization for Just Zoom
+     * to ensure consistent feel at all zoom levels, especially at extreme zoom.
      */
     @WrapOperation(method = "turnPlayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/OptionInstance;get()Ljava/lang/Object;"))
     private Object wrap_get_sensitivity_in_turnPlayer_JustZoom(OptionInstance<?> instance, Operation<?> original) {
         if ((instance == Minecraft.getInstance().options.sensitivity()) && ZoomHandler.isZooming() && JustZoom.getOptions().normalizeMouseSensitivityOnZoom.getValue()) {
             Object sensitivityObj = original.call(instance);
             if (sensitivityObj instanceof Double sensitivity) {
-                double scale = Math.tan(Math.toRadians(ZoomHandler.cachedModifiedFov / 2)) / Math.tan(Math.toRadians(ZoomHandler.cachedNormalFov / 2));
-                return sensitivity * scale; //adjusted sensitivity
+                // Calculate zoom ratio (smaller = more zoomed in)
+                double zoomRatio = ZoomHandler.getFovModifier(); // This is the actual zoom factor
+
+                // Use a direct linear relationship with the zoom factor
+                // This is the simplest and most predictable approach
+                double scale = zoomRatio;
+
+                // Apply additional quadratic scaling for extreme zoom levels
+                // This makes the sensitivity reduction much more aggressive as zoom increases
+                if (zoomRatio < 0.5) {
+                    // Square the zoom ratio for a stronger effect at high zoom levels
+                    scale = zoomRatio * zoomRatio;
+                }
+
+                // For very extreme zoom (near maximum zoom), apply even more aggressive reduction
+                if (zoomRatio < 0.1) {
+                    // Apply cubic scaling for extreme zoom
+                    scale = Math.pow(zoomRatio, 3);
+                }
+
+                return sensitivity * scale; // Dramatically reduced sensitivity at high zoom
             }
         }
         return original.call(instance);
