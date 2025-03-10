@@ -1,6 +1,6 @@
 package de.keksuccino.justzoom.mixin.mixins.common.client;
 
-import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
+import com.llamalad7.mixinextras.injector.WrapWithCondition;
 import de.keksuccino.justzoom.JustZoom;
 import de.keksuccino.justzoom.ZoomHandler;
 import net.minecraft.client.Camera;
