@@ -1,11 +1,14 @@
 package de.keksuccino.justzoom.mixin.mixins.common.client;
 
+import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
+import de.keksuccino.justzoom.JustZoom;
 import de.keksuccino.justzoom.ZoomHandler;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.world.entity.Entity;
+import org.joml.Matrix4f;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -37,6 +40,8 @@ public class MixinGameRenderer {
             } else {
                 info.setReturnValue(normalFov);
             }
+        } else if (JustZoom.getOptions().resetZoomFactorOnStopZooming.getValue()) {
+            ZoomHandler.zoomModifier = JustZoom.getOptions().baseZoomFactor.getValue();
         }
 
     }
@@ -59,6 +64,11 @@ public class MixinGameRenderer {
 
         }
 
+    }
+
+    @WrapWithCondition(method = "renderLevel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GameRenderer;renderItemInHand(Lnet/minecraft/client/Camera;FLorg/joml/Matrix4f;)V"))
+    private boolean wrap_renderItemInHand_JustZoom(GameRenderer instance, Camera camera, float f, Matrix4f matrix4f) {
+        return !ZoomHandler.shouldHideArmsWhenZooming();
     }
 
 }
