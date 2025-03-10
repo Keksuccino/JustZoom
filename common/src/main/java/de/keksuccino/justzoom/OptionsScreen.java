@@ -4,6 +4,7 @@ import de.keksuccino.justzoom.util.AbstractOptions;
 import de.keksuccino.konkrete.math.MathUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.StringWidget;
@@ -141,6 +142,12 @@ public class OptionsScreen extends Screen {
         });
         zoomOutPerScroll.setTooltip(Tooltip.create(Component.translatable(labelBaseKey + ".desc")));
 
+    }
+
+    @Override
+    public void render(GuiGraphics $$0, int $$1, int $$2, float $$3) {
+        this.renderBackground($$0);
+        super.render($$0, $$1, $$2, $$3);
     }
 
     @Override

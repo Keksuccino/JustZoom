@@ -1,6 +1,7 @@
 package de.keksuccino.justzoom.mixin.mixins.common.client;
 
 import com.llamalad7.mixinextras.injector.WrapWithCondition;
+import com.mojang.blaze3d.vertex.PoseStack;
 import de.keksuccino.justzoom.JustZoom;
 import de.keksuccino.justzoom.ZoomHandler;
 import net.minecraft.client.Camera;
@@ -66,8 +67,8 @@ public class MixinGameRenderer {
 
     }
 
-    @WrapWithCondition(method = "renderLevel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GameRenderer;renderItemInHand(Lnet/minecraft/client/Camera;FLorg/joml/Matrix4f;)V"))
-    private boolean wrap_renderItemInHand_JustZoom(GameRenderer instance, Camera camera, float f, Matrix4f matrix4f) {
+    @WrapWithCondition(method = "renderLevel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GameRenderer;renderItemInHand(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/Camera;F)V"))
+    private boolean wrap_renderItemInHand_JustZoom(GameRenderer instance, PoseStack $$0, Camera $$1, float $$2) {
         return !ZoomHandler.shouldHideArmsWhenZooming();
     }
 
