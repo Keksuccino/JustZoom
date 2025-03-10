@@ -14,7 +14,12 @@ public class ZoomHandler {
     public static float cachedModifiedFov = 0.0F;
 
     public static boolean isZooming() {
-        if (Minecraft.getInstance().options.getCameraType().isMirrored()) return false;
+        if (Minecraft.getInstance().screen != null) {
+            return false;
+        }
+        if (Minecraft.getInstance().options.getCameraType().isMirrored() && !JustZoom.getOptions().allowZoomInMirroredView.getValue()) {
+            return false;
+        }
         return KeyMappings.KEY_TOGGLE_ZOOM.isDown();
     }
 
@@ -22,14 +27,14 @@ public class ZoomHandler {
         return JustZoom.getOptions().smoothZoomInOut.getValue();
     }
 
+    public static boolean shouldHideArmsWhenZooming() {
+        return isZooming() && JustZoom.getOptions().hideArmsWhenZooming.getValue();
+    }
+
     /**
      * Returns the FOV modifier for zooming.
      */
     public static float getFovModifier() {
-
-        if (!isZooming()) {
-            zoomModifier = JustZoom.getOptions().baseZoomFactor.getValue();
-        }
 
         //To not zoom out further than normal FOV
         if (zoomModifier > 1.0F) zoomModifier = 1.0F;
