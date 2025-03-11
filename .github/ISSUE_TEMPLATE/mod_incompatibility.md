@@ -19,7 +19,7 @@ If screenshots would help to explain the issue, please include these.
 
 **Basic Informations (please complete the following information):**
  - OS: [e.g. Windows]
- - FancyMenu Version [e.g. 0.2]
+ - Just Zoom Version [e.g. 0.2]
  - Forge/Fabric Version [e.g. 31.2.24]
  - Minecraft Version [e.g. 1.15.1]
  - Active Mods [e.g. Optifine, 5zig, TooManyItems]
