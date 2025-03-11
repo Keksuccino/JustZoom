@@ -18,7 +18,10 @@
       "de.keksuccino.justzoom.JustZoomFabric"
     ],
     "client": [],
-    "server": []
+    "server": [],
+    "modmenu": [
+      "de.keksuccino.justzoom.ModMenuIntegration"
+    ]
   },
   "mixins": [
     "${mod_id}.mixins.json",

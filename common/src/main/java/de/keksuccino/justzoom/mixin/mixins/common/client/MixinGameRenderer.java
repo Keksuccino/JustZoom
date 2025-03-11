@@ -1,5 +1,8 @@
 package de.keksuccino.justzoom.mixin.mixins.common.client;
 
+import com.llamalad7.mixinextras.injector.WrapWithCondition;
+import com.mojang.blaze3d.vertex.PoseStack;
+import de.keksuccino.justzoom.JustZoom;
 import de.keksuccino.justzoom.ZoomHandler;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
@@ -37,6 +40,8 @@ public class MixinGameRenderer {
             } else {
                 info.setReturnValue(normalFov);
             }
+        } else if (JustZoom.getOptions().resetZoomFactorOnStopZooming.getValue()) {
+            ZoomHandler.zoomModifier = JustZoom.getOptions().baseZoomFactor.getValue();
         }
 
     }
@@ -59,6 +64,11 @@ public class MixinGameRenderer {
 
         }
 
+    }
+
+    @WrapWithCondition(method = "renderLevel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GameRenderer;renderItemInHand(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/Camera;F)V"))
+    private boolean wrap_renderItemInHand_JustZoom(GameRenderer instance, PoseStack $$0, Camera $$1, float $$2) {
+        return !ZoomHandler.shouldHideArmsWhenZooming();
     }
 
 }

@@ -1,8 +1,9 @@
 package de.keksuccino.justzoom.mixin.mixins.common.client;
 
+import de.keksuccino.justzoom.JustZoom;
 import de.keksuccino.justzoom.OptionsScreen;
 import de.keksuccino.justzoom.util.gui.ItemButton;
-import de.keksuccino.justzoom.util.gui.Tooltips;
+import de.keksuccino.justzoom.util.gui.TooltipHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.Screen;
@@ -29,12 +30,39 @@ public class MixinPauseScreen extends Screen {
     @Inject(method = "init", at = @At("RETURN"))
     private void return_init_JustZoom(CallbackInfo info) {
 
-        if (this.showPauseMenu) {
+        if (this.showPauseMenu && JustZoom.getOptions().showOptionsButtonInPauseScreen.getValue()) {
 
-            this.addRenderableWidget(new ItemButton(20, this.height - 40, Component.translatable("justzoom.options"), button -> {
+            int buttonX, buttonY;
+            // Get corner option from JustZoom.getOptions()
+            int corner = JustZoom.getOptions().optionsButtonCorner.getValue();
+
+            switch (corner) {
+                case 1: // BOTTOM_RIGHT
+                    buttonX = this.width - 40;
+                    buttonY = this.height - 40;
+                    break;
+                case 2: // TOP_LEFT
+                    buttonX = 20;
+                    buttonY = 20;
+                    break;
+                case 3: // TOP_RIGHT
+                    buttonX = this.width - 40;
+                    buttonY = 20;
+                    break;
+                case 0: // BOTTOM_LEFT
+                default:
+                    buttonX = 20;
+                    buttonY = this.height - 40;
+                    break;
+            }
+
+            TooltipHandler.clearAll();
+
+            ItemButton itemButton = this.addRenderableWidget(new ItemButton(buttonX, buttonY, Component.translatable("justzoom.options"), button -> {
                         Minecraft.getInstance().setScreen(new OptionsScreen(this));
-                    }, Tooltips.create(Component.translatable("justzoom.options"), this), new ItemStack(Items.SPYGLASS)))
+                    }, new ItemStack(Items.SPYGLASS)))
                     .setItemPositionOffset(2, 2);
+            TooltipHandler.putTooltip("justzoom_options", TooltipHandler.Tooltip.widget(itemButton, "justzoom.options"));
 
         }
 

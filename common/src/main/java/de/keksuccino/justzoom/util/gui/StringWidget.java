@@ -1,43 +1,32 @@
 package de.keksuccino.justzoom.util.gui;
 
+import java.util.Objects;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.AbstractWidget;
-import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public class StringWidget extends AbstractWidget {
 
-    @NotNull
-    protected Font font;
-    @Nullable
-    protected Button.OnTooltip tooltip;
+    private float alignX;
+    private final Font font;
+    private int color = -1;
 
-    public StringWidget(@NotNull Component text, @NotNull Font font) {
-        this(0, 0, text, font);
+    public StringWidget(@NotNull Component message, @NotNull Font font) {
+        this(0, 0, font.width(message.getVisualOrderText()), 9, message, font);
     }
 
-    public StringWidget(int x, int y, @NotNull Component text, @NotNull Font font) {
-        super(x, y, 0, 0, text);
+    public StringWidget(int width, int height, @NotNull Component message, @NotNull Font font) {
+        this(0, 0, width, height, message, font);
+    }
+
+    public StringWidget(int x, int y, int width, int height, @NotNull Component message, @NotNull Font font) {
+        super(x, y, width, height, message);
+        this.alignX = 0.5F;
+        this.active = false;
         this.font = font;
-        this.height = this.font.lineHeight;
-        this.width = this.font.width(text);
-    }
-
-    @Override
-    public void render(@NotNull PoseStack pose, int mouseX, int mouseY, float partial) {
-        this.isHovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
-        this.font.drawShadow(pose, this.getMessage(), (float)this.x, (float)this.y, -1);
-        if (this.isHovered) {
-            this.renderToolTip(pose, mouseX, mouseY);
-        }
-    }
-
-    @Override
-    public void updateNarration(@NotNull NarrationElementOutput output) {
     }
 
     public void setX(int x) {
@@ -48,15 +37,50 @@ public class StringWidget extends AbstractWidget {
         this.y = y;
     }
 
-    @Override
-    public void renderToolTip(@NotNull PoseStack $$0, int $$1, int $$2) {
-        if (this.tooltip != null) {
-            this.tooltip.onTooltip(new Button(this.x, this.y, this.width, this.height, Component.empty(), var1 -> {}), $$0, $$1, $$2);
-        }
+    protected final Font getFont() {
+        return this.font;
     }
 
-    public void setTooltip(@Nullable Button.OnTooltip tooltip) {
-        this.tooltip = tooltip;
+    public StringWidget setColor(int color) {
+        this.color = color;
+        return this;
     }
-    
+
+    protected final int getColor() {
+        return this.color;
+    }
+
+    private StringWidget horizontalAlignment(float horizontalAlignment) {
+        this.alignX = horizontalAlignment;
+        return this;
+    }
+
+    public StringWidget alignLeft() {
+        return this.horizontalAlignment(0.0F);
+    }
+
+    public StringWidget alignCenter() {
+        return this.horizontalAlignment(0.5F);
+    }
+
+    public StringWidget alignRight() {
+        return this.horizontalAlignment(1.0F);
+    }
+
+    @Override
+    public void renderButton(@NotNull PoseStack pose, int mouseX, int mouseY, float partial) {
+        Component component = this.getMessage();
+        Font font = this.getFont();
+        int i = this.x + Math.round(this.alignX * (float)(this.getWidth() - font.width(component)));
+        int var10000 = this.y;
+        int var10001 = this.getHeight();
+        Objects.requireNonNull(font);
+        int j = var10000 + (var10001 - 9) / 2;
+        this.font.drawShadow(pose, component, i, j, this.getColor());
+    }
+
+    @Override
+    public void updateNarration(NarrationElementOutput narrationElementOutput) {
+    }
+
 }
