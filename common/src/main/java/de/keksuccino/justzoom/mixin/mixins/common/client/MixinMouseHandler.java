@@ -39,8 +39,27 @@ public class MixinMouseHandler {
     private double wrap_sensitivity_in_turnPlayer_JustZoom(Options instance, Operation<Double> original) {
         if (ZoomHandler.isZooming() && JustZoom.getOptions().normalizeMouseSensitivityOnZoom.getValue()) {
             double sensitivity = original.call(instance);
-            double scale = Math.tan(Math.toRadians(ZoomHandler.cachedModifiedFov / 2)) / Math.tan(Math.toRadians(ZoomHandler.cachedNormalFov / 2));
-            return sensitivity * scale; //adjusted sensitivity
+            // Calculate zoom ratio (smaller = more zoomed in)
+            double zoomRatio = ZoomHandler.getFovModifier(); // This is the actual zoom factor
+
+            // Use a direct linear relationship with the zoom factor
+            // This is the simplest and most predictable approach
+            double scale = zoomRatio;
+
+            // Apply additional quadratic scaling for extreme zoom levels
+            // This makes the sensitivity reduction much more aggressive as zoom increases
+            if (zoomRatio < 0.5) {
+                // Square the zoom ratio for a stronger effect at high zoom levels
+                scale = zoomRatio * zoomRatio;
+            }
+
+            // For very extreme zoom (near maximum zoom), apply even more aggressive reduction
+            if (zoomRatio < 0.1) {
+                // Apply cubic scaling for extreme zoom
+                scale = Math.pow(zoomRatio, 3);
+            }
+
+            return sensitivity * scale; // Dramatically reduced sensitivity at high zoom
         }
         return original.call(instance);
     }

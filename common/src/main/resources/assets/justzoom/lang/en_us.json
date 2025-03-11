@@ -2,7 +2,7 @@
   "justzoom.keybinds.category": "Just Zoom",
   "justzoom.keybinds.keybind.zoom": "Zoom",
   "justzoom.options": "Just Zoom Options",
-  "justzoom.options.base_zoom_modifier": "Base FOV Modifier:",
+  "justzoom.options.base_zoom_modifier": "Base Zoom Factor:",
   "justzoom.options.base_zoom_modifier.desc": "The FOV modifier the mod should start with when zooming.\nThis should be a floating point value between 0.0 and 1.0.\nA smaller value means a more zoomed view.",
   "justzoom.options.zoom_in_change_modifier_per_scroll": "Zoom-In Modifier Change Per Scroll:",
   "justzoom.options.zoom_in_change_modifier_per_scroll.desc": "How much the FOV modifier should change when scrolling.\nA bigger value means less smooth zooming.",
@@ -14,6 +14,18 @@
   "justzoom.options.smooth_camera_movement_on_zoom.desc": "If the camera should move smoothly (cinematic) when zooming.",
   "justzoom.options.normalize_mouse_sensitivity_on_zoom": "Normalize Mouse Sensitivity: %s",
   "justzoom.options.normalize_mouse_sensitivity_on_zoom.desc": "If the mouse sensitivity should adjust itself to the zoomed view,\nso it feels normal and not too fast when moving the mouse while zooming.",
+  "justzoom.options.allow_zoom_in_mirrored_view": "Allow Zoom in Mirrored View: %s",
+  "justzoom.options.allow_zoom_in_mirrored_view.desc": "If enabled, zooming will be possible in the mirrored view (when you see yourself).",
+  "justzoom.options.hide_arms_when_zooming": "Hide Arms: %s",
+  "justzoom.options.hide_arms_when_zooming.desc": "If enabled, the player's arms will be invisible while zooming.",
+  "justzoom.options.reset_zoom_factor_when_stop_zooming": "Reset Zoom Factor: %s",
+  "justzoom.options.reset_zoom_factor_when_stop_zooming.desc": "If enabled, the zoom factor will be reset to the base value when you start zooming,\ninstead of continuing from the last zoom level.",
   "justzoom.options.toggle.enabled": "Enabled",
-  "justzoom.options.toggle.disabled": "Disabled"
+  "justzoom.options.toggle.disabled": "Disabled",
+  "justzoom.options.options_button_corner": "Options Button Position: %s",
+  "justzoom.options.options_button_corner.desc": "The corner of the Pause screen where the Just Zoom options button should appear.\n\nYou can completely hide the button in Just Zoom's config.txt file.",
+  "justzoom.options.corner.bottom_left": "Bottom Left",
+  "justzoom.options.corner.bottom_right": "Bottom Right",
+  "justzoom.options.corner.top_left": "Top Left",
+  "justzoom.options.corner.top_right": "Top Right"
 }

@@ -16,8 +16,8 @@ public class ItemButton extends Button {
     protected int itemOffsetX = 0;
     protected int itemOffsetY = 0;
 
-    public ItemButton(int x, int y, Component message, OnPress onPress, OnTooltip onTooltip, @NotNull ItemStack itemStack) {
-        super(x, y, 20, 20, message, onPress, onTooltip);
+    public ItemButton(int x, int y, Component message, OnPress onPress, @NotNull ItemStack itemStack) {
+        super(x, y, 20, 20, message, onPress);
         this.itemStack = itemStack;
     }
 
