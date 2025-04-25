@@ -9,13 +9,13 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 @Mod(JustZoom.MOD_ID)
 public class JustZoomForge {
     
-    public JustZoomForge() {
+    public JustZoomForge(FMLJavaModLoadingContext context) {
 
-        JustZoom.init();
+        // JustZoom.init() got moved to MixinMinecraft
 
         if (Services.PLATFORM.isOnClient()) {
 
-            FMLJavaModLoadingContext.get().getModEventBus().register(JustZoomForge.class);
+            context.getModEventBus().register(JustZoomForge.class);
 
         }
         

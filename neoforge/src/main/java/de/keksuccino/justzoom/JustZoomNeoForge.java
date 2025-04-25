@@ -12,7 +12,7 @@ public class JustZoomNeoForge {
     
     public JustZoomNeoForge(@NotNull IEventBus eventBus) {
 
-        JustZoom.init();
+        // JustZoom.init() got moved to MixinMinecraft
 
         if (Services.PLATFORM.isOnClient()) {
 
