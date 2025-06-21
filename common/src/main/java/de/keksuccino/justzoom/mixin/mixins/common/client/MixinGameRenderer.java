@@ -70,8 +70,8 @@ public class MixinGameRenderer {
 
     }
 
-    @WrapWithCondition(method = "renderLevel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GameRenderer;renderItemInHand(Lnet/minecraft/client/Camera;FLorg/joml/Matrix4f;)V"))
-    private boolean wrap_renderItemInHand_JustZoom(GameRenderer instance, Camera camera, float f, Matrix4f matrix4f) {
+    @WrapWithCondition(method = "renderLevel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GameRenderer;renderItemInHand(FZLorg/joml/Matrix4f;)V"))
+    private boolean wrap_renderItemInHand_JustZoom(GameRenderer instance, float matrix4fstack, boolean b, Matrix4f p_109123_) {
         return !ZoomHandler.shouldHideArmsWhenZooming();
     }
 
