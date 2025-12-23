@@ -3,30 +3,28 @@ plugins {
     id 'java'
     id 'idea'
     id 'maven-publish'
-    id 'fabric-loom' version '1.11-SNAPSHOT'
+    id "fabric-loom" version "$fabric_loom_version"
 }
 
 base {
     archivesName = "${mod_id}"
 }
 
-repositories {
-    flatDir { dirs 'libs' }
-}
-
 dependencies {
+
     minecraft "com.mojang:minecraft:${minecraft_version}"
     mappings loom.layered() {
         officialMojangMappings()
-        parchment("org.parchmentmc.data:parchment-1.21.5:2025.04.19@zip")
+        parchment("org.parchmentmc.data:parchment-${parchment_mc_version}:${parchment_version}@zip")
     }
     modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
     implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
     implementation project(":common")
-    include(implementation(annotationProcessor("io.github.llamalad7:mixinextras-fabric:0.4.1")))
-    modImplementation "maven.modrinth:konkrete:1.9.13-1.21.10-fabric"
-    modImplementation "maven.modrinth:modmenu:16.0.0-rc.1"
+    include(implementation(annotationProcessor("io.github.llamalad7:mixinextras-fabric:${mixin_extras_version}")))
+    modImplementation "maven.modrinth:konkrete:1.9.14-1.21.11-fabric"
+    modImplementation "maven.modrinth:modmenu:17.0.0-beta.1"
+
 }
 
 loom {
@@ -34,6 +32,7 @@ loom {
         accessWidenerPath.set(project(":common").file("src/main/resources/${mod_id}.accesswidener"))
     }
     mixin {
+        useLegacyMixinAp = true
         defaultRefmapName.set("${mod_id}.refmap.json")
     }
     runs {
@@ -57,6 +56,10 @@ tasks.withType(JavaCompile).configureEach {
 }
 tasks.withType(Javadoc).configureEach {
     source(project(":common").sourceSets.main.allJava)
+}
+tasks.withType(Test).configureEach {
+    // Allow builds when there are test sources but no matching tests.
+    failOnNoDiscoveredTests = false
 }
 tasks.named("sourcesJar", Jar) {
     from(project(":common").sourceSets.main.allSource)
