@@ -29,12 +29,16 @@
   ],
   "depends": {
     "fabricloader": ">=${fabric_loader_version}",
-    "fabric": ">=${fabric_short_version}",
-    "konkrete": ">=1.8.0",
+    "fabric-api": ">=${fabric_short_version}",
+    "konkrete": ">=1.9.19",
     "minecraft": ">=${minecraft_version}",
-    "java": ">=17"
+    "java": ">=${java_version}"
   },
   "breaks": {
   },
-  "accessWidener": "${mod_id}.accesswidener"
+  "custom": {
+    "modmenu": {
+      "badges": [ "library" ]
+    }
+  }
 }

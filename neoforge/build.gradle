@@ -10,13 +10,6 @@ base {
     archivesName = "${mod_id}"
 }
 
-// Automatically enable neoforge AccessTransformers if the file exists
-// This location is hardcoded in FML and can not be changed.
-// https://github.com/neoforged/FancyModLoader/blob/a952595eaaddd571fbc53f43847680b00894e0c1/loader/src/main/java/net/neoforged/fml/loading/moddiscovery/ModFile.java#L118
-if (file('src/main/resources/META-INF/accesstransformer.cfg').exists()) {
-    minecraft.accessTransformers.file file('src/main/resources/META-INF/accesstransformer.cfg')
-}
-
 runs {
     configureEach {
         modSource project.sourceSets.main
@@ -45,12 +38,12 @@ sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 jarJar.enable()
 
-subsystems {
-    parchment {
-        minecraftVersion = "${parchment_mc_version}"
-        mappingsVersion = "${parchment_version}"
-    }
-}
+//subsystems {
+//    parchment {
+//        minecraftVersion = "${parchment_mc_version}"
+//        mappingsVersion = "${parchment_version}"
+//    }
+//}
 
 dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.2")
@@ -60,7 +53,7 @@ dependencies {
 //    implementation(jarJar("com.github.DhyanB:Open-Imaging:317b2cb6e5")) {
 //        jarJar.ranged(it, "[317b2cb6e5,)")
 //    }
-    implementation "maven.modrinth:konkrete:1.9.14-1.21.11-neoforge"
+    implementation "maven.modrinth:konkrete:1.9.19-26.1.1-neoforge"
     compileOnly project(":common")
 }
 

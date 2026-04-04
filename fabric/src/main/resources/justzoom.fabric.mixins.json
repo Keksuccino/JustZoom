@@ -10,7 +10,6 @@
     "defaultRequire": 1
   },
   "plugin": "de.keksuccino.justzoom.mixin.JustZoomMixinPlugin",
-  "minVersion": "0.8",
-  "refmap": "justzoom.refmap.json"
+  "minVersion": "0.8"
 }
   

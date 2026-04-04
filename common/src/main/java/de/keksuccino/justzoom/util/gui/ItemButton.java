@@ -1,6 +1,6 @@
 package de.keksuccino.justzoom.util.gui;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
@@ -19,9 +19,9 @@ public class ItemButton extends Button {
     }
 
     @Override
-    protected void renderContents(@NotNull GuiGraphics graphics, int mouseX, int mouseY, float partial) {
-        this.renderDefaultSprite(graphics);
-        graphics.renderFakeItem(this.itemStack, this.getX() + this.itemOffsetX, this.getY() + this.itemOffsetY);
+    protected void extractContents(@NotNull GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partial) {
+        this.extractDefaultSprite(graphics);
+        graphics.fakeItem(this.itemStack, this.getX() + this.itemOffsetX, this.getY() + this.itemOffsetY);
     }
 
     public ItemButton setItemPositionOffset(int x, int y) {
