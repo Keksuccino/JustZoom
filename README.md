@@ -18,6 +18,6 @@ Just Zoom is available on [CurseForge](https://www.curseforge.com/minecraft/mc-m
 
 ## Copyright & Licensing
 
-Just Zoom Copyright © 2021-2025 Keksuccino.<br>
+Just Zoom Copyright © 2021-2026 Keksuccino.<br>
 Just Zoom is licensed under DSMSLv3 (DON'T SNATCH MA STUFF LICENSE V3).<br>
 See `LICENSE.md` for more information.
