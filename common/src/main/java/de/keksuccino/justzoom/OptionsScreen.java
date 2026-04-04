@@ -17,6 +17,10 @@ import org.jetbrains.annotations.Nullable;
 
 public class OptionsScreen extends Screen {
 
+    protected static final int BUTTON_HEIGHT = 20;
+    protected static final int BUTTON_ROW_GAP = 10;
+    protected static final int BUTTON_ROW_MAX_WIDTH = 410;
+
     @Nullable
     protected Screen parent;
 
@@ -29,64 +33,46 @@ public class OptionsScreen extends Screen {
     protected void init() {
 
         int centerX = this.width / 2;
-        // Define a fixed top position for the first option
-        int topY = 50; // Starting position for the first option
-        int spacing = 25; // Consistent spacing between elements
+        int topY = 50;
+        int spacing = 25;
 
         StringWidget titleWidget = this.addRenderableWidget(new StringWidget(this.getTitle(), this.font));
         titleWidget.setX(centerX - (titleWidget.getWidth() / 2));
         titleWidget.setY(20);
 
-        int currentY = topY; // Start from the top position
+        int currentY = topY;
 
-        //Base Zoom Modifier
         this.addFloatInput(JustZoom.getOptions().baseZoomFactor, currentY, "justzoom.options.base_zoom_modifier");
         currentY += spacing;
 
-        //Zoom In Per Scroll
         this.addFloatInput(JustZoom.getOptions().zoomInPerScroll, currentY, "justzoom.options.zoom_in_change_modifier_per_scroll");
         currentY += spacing;
 
-        //Zoom Out Per Scroll
         this.addFloatInput(JustZoom.getOptions().zoomOutPerScroll, currentY, "justzoom.options.zoom_out_change_modifier_per_scroll");
         currentY += spacing;
 
-        //Smooth Zooming
-        this.addRenderableWidget(this.buildToggleButton(JustZoom.getOptions().smoothZoomInOut, currentY, "justzoom.options.smooth_zoom_in_out"));
+        this.addButtonRow(currentY,
+                this.buildToggleButton(JustZoom.getOptions().smoothZoomInOut, "justzoom.options.smooth_zoom_in_out"),
+                this.buildToggleButton(JustZoom.getOptions().smoothCameraOnZoom, "justzoom.options.smooth_camera_movement_on_zoom"));
         currentY += spacing;
 
-        //Smooth Camera Movement
-        this.addRenderableWidget(this.buildToggleButton(JustZoom.getOptions().smoothCameraOnZoom, currentY, "justzoom.options.smooth_camera_movement_on_zoom"));
+        this.addButtonRow(currentY,
+                this.buildToggleButton(JustZoom.getOptions().normalizeMouseSensitivityOnZoom, "justzoom.options.normalize_mouse_sensitivity_on_zoom"),
+                this.buildToggleButton(JustZoom.getOptions().allowZoomInMirroredView, "justzoom.options.allow_zoom_in_mirrored_view"));
         currentY += spacing;
 
-        //Normalize Mouse Sensitivity
-        this.addRenderableWidget(this.buildToggleButton(JustZoom.getOptions().normalizeMouseSensitivityOnZoom, currentY, "justzoom.options.normalize_mouse_sensitivity_on_zoom"));
+        this.addButtonRow(currentY,
+                this.buildToggleButton(JustZoom.getOptions().hideArmsWhenZooming, "justzoom.options.hide_arms_when_zooming"),
+                this.buildToggleButton(JustZoom.getOptions().resetZoomFactorOnStopZooming, "justzoom.options.reset_zoom_factor_when_stop_zooming"));
         currentY += spacing;
 
-        //Allow Zoom in Mirrored View
-        this.addRenderableWidget(this.buildToggleButton(JustZoom.getOptions().allowZoomInMirroredView, currentY, "justzoom.options.allow_zoom_in_mirrored_view"));
-        currentY += spacing;
+        this.addButtonRow(currentY, this.buildCornerButton(JustZoom.getOptions().optionsButtonCorner, "justzoom.options.options_button_corner"), null);
 
-        //Hide Arms When Zooming
-        this.addRenderableWidget(this.buildToggleButton(JustZoom.getOptions().hideArmsWhenZooming, currentY, "justzoom.options.hide_arms_when_zooming"));
-        currentY += spacing;
-
-        //Reset Zoom Factor When Stop Zooming
-        this.addRenderableWidget(this.buildToggleButton(JustZoom.getOptions().resetZoomFactorOnStopZooming, currentY, "justzoom.options.reset_zoom_factor_when_stop_zooming"));
-        currentY += spacing;
-
-        //Options Button Corner
-        this.addRenderableWidget(this.buildCornerButton(JustZoom.getOptions().optionsButtonCorner, currentY, "justzoom.options.options_button_corner"));
-
-        //DONE
-        this.addRenderableWidget(Button.builder(CommonComponents.GUI_DONE, button -> this.onClose()).bounds(centerX - 75, this.height - 40, 150, 20).build());
+        this.addRenderableWidget(Button.builder(CommonComponents.GUI_DONE, button -> this.onClose()).bounds(centerX - 75, this.height - 40, 150, BUTTON_HEIGHT).build());
 
     }
 
-    protected Button buildToggleButton(@NotNull AbstractOptions.Option<Boolean> option, int y, @NotNull String labelBaseKey) {
-
-        int centerX = this.width / 2;
-        int buttonWidth = 200;
+    protected Button buildToggleButton(@NotNull AbstractOptions.Option<Boolean> option, @NotNull String labelBaseKey) {
 
         Component enabled = Component.translatable(labelBaseKey, Component.translatable("justzoom.options.toggle.enabled").withStyle(Style.EMPTY.withColor(ChatFormatting.GREEN)));
         Component disabled = Component.translatable(labelBaseKey, Component.translatable("justzoom.options.toggle.disabled").withStyle(Style.EMPTY.withColor(ChatFormatting.RED)));
@@ -94,15 +80,12 @@ public class OptionsScreen extends Screen {
         return Button.builder(option.getValue() ? enabled : disabled, button -> {
                     option.setValue(!option.getValue());
                     button.setMessage(option.getValue() ? enabled : disabled);
-                }).bounds(centerX - (buttonWidth / 2), y, buttonWidth, 20)
+                }).bounds(0, 0, this.getButtonWidth(), BUTTON_HEIGHT)
                 .tooltip(Tooltip.create(Component.translatable(labelBaseKey + ".desc"))).build();
 
     }
 
-    protected Button buildCornerButton(@NotNull AbstractOptions.Option<Integer> option, int y, @NotNull String labelBaseKey) {
-
-        int centerX = this.width / 2;
-        int buttonWidth = 200;
+    protected Button buildCornerButton(@NotNull AbstractOptions.Option<Integer> option, @NotNull String labelBaseKey) {
 
         String[] cornerKeys = new String[] {
                 "justzoom.options.corner.bottom_left",
@@ -115,13 +98,36 @@ public class OptionsScreen extends Screen {
         Component buttonText = Component.translatable(labelBaseKey, Component.translatable(cornerKeys[currentValue]).withStyle(Style.EMPTY.withColor(ChatFormatting.GOLD)));
 
         return Button.builder(buttonText, button -> {
-                    // Cycle through corners (0-3)
                     int newValue = (option.getValue() + 1) % 4;
                     option.setValue(newValue);
                     button.setMessage(Component.translatable(labelBaseKey, Component.translatable(cornerKeys[newValue]).withStyle(Style.EMPTY.withColor(ChatFormatting.GOLD))));
-                }).bounds(centerX - (buttonWidth / 2), y, buttonWidth, 20)
+                }).bounds(0, 0, this.getButtonWidth(), BUTTON_HEIGHT)
                 .tooltip(Tooltip.create(Component.translatable(labelBaseKey + ".desc"))).build();
 
+    }
+
+    protected void addButtonRow(int y, @NotNull Button leftButton, @Nullable Button rightButton) {
+        int buttonWidth = this.getButtonWidth();
+        int leftX = this.getLeftButtonX(buttonWidth);
+        leftButton.setPosition(rightButton == null ? (this.width / 2) - (buttonWidth / 2) : leftX, y);
+        this.addRenderableWidget(leftButton);
+
+        if (rightButton != null) {
+            rightButton.setPosition(leftX + buttonWidth + BUTTON_ROW_GAP, y);
+            this.addRenderableWidget(rightButton);
+        }
+    }
+
+    protected int getButtonWidth() {
+        return (this.getButtonRowWidth() - BUTTON_ROW_GAP) / 2;
+    }
+
+    protected int getButtonRowWidth() {
+        return Math.min(BUTTON_ROW_MAX_WIDTH, this.width - 40);
+    }
+
+    protected int getLeftButtonX(int buttonWidth) {
+        return (this.width / 2) - buttonWidth - (BUTTON_ROW_GAP / 2);
     }
 
     protected void addFloatInput(@NotNull AbstractOptions.Option<Float> option, int y, @NotNull String labelBaseKey) {
