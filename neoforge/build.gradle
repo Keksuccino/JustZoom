@@ -59,7 +59,7 @@ dependencies {
 //    implementation(jarJar("com.github.DhyanB:Open-Imaging:317b2cb6e5")) {
 //        jarJar.ranged(it, "[317b2cb6e5,)")
 //    }
-    implementation "maven.modrinth:konkrete:1.9.19-26.1.1-neoforge"
+    implementation "maven.modrinth:konkrete:1.11.0-26.2-neoforge"
     compileOnly project(":common")
 }
 

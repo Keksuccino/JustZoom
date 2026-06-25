@@ -14,7 +14,7 @@ public class ZoomHandler {
     public static float cachedModifiedFov = 0.0F;
 
     public static boolean isZooming() {
-        if (Minecraft.getInstance().screen != null) {
+        if (Minecraft.getInstance().gui.screen() != null) {
             return false;
         }
         if (Minecraft.getInstance().options.getCameraType().isMirrored() && !JustZoom.getOptions().allowZoomInMirroredView.getValue()) {

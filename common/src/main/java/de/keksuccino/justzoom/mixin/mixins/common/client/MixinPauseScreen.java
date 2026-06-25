@@ -56,7 +56,7 @@ public class MixinPauseScreen extends Screen {
             }
 
             this.addRenderableWidget(new ItemButton(buttonX, buttonY, Component.translatable("justzoom.options"), button -> {
-                        Minecraft.getInstance().setScreen(new OptionsScreen(this));
+                        Minecraft.getInstance().gui.setScreen(new OptionsScreen(this));
                     }, Supplier::get, new ItemStack(Items.SPYGLASS)))
                     .setItemPositionOffset(2, 2)
                     .setTooltip(Tooltip.create(Component.translatable("justzoom.options")));
