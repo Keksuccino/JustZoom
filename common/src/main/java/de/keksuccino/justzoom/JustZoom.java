@@ -14,7 +14,7 @@ public class JustZoom {
     public static final String VERSION = "2.1.1";
     public static final String LOADER = Services.PLATFORM.getPlatformName().toUpperCase();
     public static final String MOD_ID = "justzoom";
-    public static final File MOD_DIR = createDirectory(new File(GameDirectoryUtils.getGameDirectory(), "/config/justzoom"));
+    public static final File MOD_DIR = new File(GameDirectoryUtils.getGameDirectory(), "/config/justzoom");
 
     private static Options options;
 
@@ -23,6 +23,7 @@ public class JustZoom {
         if (Services.PLATFORM.isOnClient()) {
 
             LOGGER.info("[JUST ZOOM] Starting version " + VERSION + " on " + Services.PLATFORM.getPlatformDisplayName() + "..");
+            createDirectory(MOD_DIR);
 
         } else {
 
