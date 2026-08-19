@@ -1,0 +1,25 @@
+{
+  "config_version": 1,
+  "projects": {
+    "justzoom": {
+      "changelog_url": "https://github.com/Keksuccino/JustZoom/blob/main/changelog.txt",
+      "curseforge_project_id": "561885",
+      "dependencies": {
+        "fabric": [
+          "fabric-api",
+          "konkrete"
+        ],
+        "neoforge": [
+          "konkrete"
+        ]
+      },
+      "mandatory_environments": [
+        "client"
+      ],
+      "modrinth_project_id": "iAiqcykM",
+      "supported_environments": [
+        "client"
+      ]
+    }
+  }
+}
