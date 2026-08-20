@@ -6,6 +6,7 @@ CHANGELOG | JUST ZOOM v2.2.0 [ W I P !!! NOT PUBLIC YET !!! ]
 - Removed the icon button in the Pause screen that opened the Settings screen (only way now is via the Mods menus).
 - Just Zoom now by default also replaces the normal logic of the spyglass with the Just Zoom logic (can be disabled in settings).
 - There's a setting now to disable the spyglass overlay (default = show overlay).
+- It's now possible to zoom in even more than before.
 - Fixed max zoom level is capped to the spyglass zoom level when smooth zooming is enabled.
 
 
