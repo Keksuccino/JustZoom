@@ -8,6 +8,7 @@
 /common/build/
 /fabric/.gradle/
 /fabric/build/
+/fabric/logs/
 /fabric/run_client/
 /fabric/run_server/
 /neoforge/.gradle/

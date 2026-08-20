@@ -1,15 +1,12 @@
 package de.keksuccino.justzoom;
 
 import net.minecraft.client.Minecraft;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 
 public class ZoomHandler {
 
-    private static final Logger LOGGER = LogManager.getLogger();
+    private static final ZoomLevelState ZOOM_LEVEL_STATE = new ZoomLevelState(JustZoom.getPersistenceData(), JustZoom.getOptions().baseZoomFactor.getValue(), !JustZoom.getOptions().resetZoomFactorOnStopZooming.getValue());
 
-    public static float zoomModifier = JustZoom.getOptions().baseZoomFactor.getValue();
     public static float cachedNormalFov = 0.0F;
     public static float cachedModifiedFov = 0.0F;
 
@@ -45,11 +42,7 @@ public class ZoomHandler {
      * Returns the FOV modifier for zooming.
      */
     public static float getFovModifier() {
-
-        zoomModifier = ZoomMath.clampFovModifier(zoomModifier);
-
-        return zoomModifier;
-
+        return ZOOM_LEVEL_STATE.getZoomModifier();
     }
 
     public static void onMouseScroll(@NotNull MouseScrollFeedback feedback, double deltaX, double deltaY) {
@@ -59,13 +52,17 @@ public class ZoomHandler {
             feedback.cancel = true;
 
             if (deltaY < 0) {
-                zoomModifier += JustZoom.getOptions().zoomOutPerScroll.getValue();
+                ZOOM_LEVEL_STATE.adjustZoomModifier(JustZoom.getOptions().zoomOutPerScroll.getValue());
             } else if (deltaY > 0) {
-                zoomModifier -= JustZoom.getOptions().zoomInPerScroll.getValue();
+                ZOOM_LEVEL_STATE.adjustZoomModifier(-JustZoom.getOptions().zoomInPerScroll.getValue());
             }
 
         }
 
+    }
+
+    public static void resetFovModifier() {
+        ZOOM_LEVEL_STATE.resetZoomModifier(JustZoom.getOptions().baseZoomFactor.getValue());
     }
 
     public static class MouseScrollFeedback {

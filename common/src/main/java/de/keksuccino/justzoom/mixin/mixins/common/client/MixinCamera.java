@@ -43,7 +43,7 @@ public class MixinCamera {
         }
 
         if (!zooming && JustZoom.getOptions().resetZoomFactorOnStopZooming.getValue()) {
-            ZoomHandler.zoomModifier = JustZoom.getOptions().baseZoomFactor.getValue();
+            ZoomHandler.resetFovModifier();
         }
 
     }

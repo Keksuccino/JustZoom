@@ -1,6 +1,7 @@
 package de.keksuccino.justzoom;
 
 import de.keksuccino.justzoom.platform.Services;
+import de.keksuccino.justzoom.persistence.PersistenceData;
 import de.keksuccino.justzoom.util.GameDirectoryUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -19,6 +20,7 @@ public class JustZoom {
     public static final File INSTANCE_PERSISTENCE_DATA = new File(INSTANCE_DATA_DIR, "/persistence_data.json");
 
     private static Options options;
+    private static PersistenceData persistenceData;
 
     public static void init() {
 
@@ -38,6 +40,12 @@ public class JustZoom {
     public static Options getOptions() {
         if (options == null) updateOptions();
         return options;
+    }
+
+    @NotNull
+    public static PersistenceData getPersistenceData() {
+        if (persistenceData == null) persistenceData = new PersistenceData(INSTANCE_PERSISTENCE_DATA);
+        return persistenceData;
     }
 
     private static File createDirectory(@NotNull File file) {
