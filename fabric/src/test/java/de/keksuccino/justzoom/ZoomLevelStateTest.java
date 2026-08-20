@@ -92,17 +92,79 @@ class ZoomLevelStateTest {
     }
 
     @Test
-    void smoothZoomMovesAtTheSameLogarithmicRateInBothDirections() {
+    void smoothToggleTransitionHasAFixedFourTickDurationAtHighMagnification() {
+        PersistenceData persistenceData = this.createPersistenceData();
+        persistenceData.lastMagnification.setValue(800.0F);
+        ZoomLevelState zoomLevelState = new ZoomLevelState(persistenceData, 4.0F, true);
+
+        zoomLevelState.tick(true, true, 1000.0D);
+        assertEquals(Math.pow(800.0D, 0.25D), zoomLevelState.getRenderedMagnification(true, true, 1.0F, 1000.0D), DOUBLE_TOLERANCE);
+        zoomLevelState.tick(true, true, 1000.0D);
+        assertEquals(Math.sqrt(800.0D), zoomLevelState.getRenderedMagnification(true, true, 1.0F, 1000.0D), DOUBLE_TOLERANCE);
+        zoomLevelState.tick(true, true, 1000.0D);
+        zoomLevelState.tick(true, true, 1000.0D);
+        assertEquals(800.0D, zoomLevelState.getRenderedMagnification(true, true, 1.0F, 1000.0D), DOUBLE_TOLERANCE);
+
+        zoomLevelState.tick(false, true, 1000.0D);
+        assertEquals(Math.pow(800.0D, 0.75D), zoomLevelState.getRenderedMagnification(false, true, 1.0F, 1000.0D), DOUBLE_TOLERANCE);
+        zoomLevelState.tick(false, true, 1000.0D);
+        zoomLevelState.tick(false, true, 1000.0D);
+        zoomLevelState.tick(false, true, 1000.0D);
+        assertEquals(ZoomMath.MIN_MAGNIFICATION, zoomLevelState.getRenderedMagnification(false, true, 1.0F, 1000.0D), DOUBLE_TOLERANCE);
+    }
+
+    @Test
+    void smoothWheelChangesKeepTheirOriginalLogarithmicRate() {
         ZoomLevelState zoomLevelState = new ZoomLevelState(this.createPersistenceData(), 4.0F, false);
 
         zoomLevelState.tick(true, true, 1000.0D);
-        assertEquals(1.2D, zoomLevelState.getRenderedMagnification(true, true, 1.0F, 1000.0D), DOUBLE_TOLERANCE);
+        zoomLevelState.tick(true, true, 1000.0D);
+        zoomLevelState.tick(true, true, 1000.0D);
+        zoomLevelState.tick(true, true, 1000.0D);
+        zoomLevelState.adjustMagnification(2.0D, 2.0D, 1000.0D);
 
         zoomLevelState.tick(true, true, 1000.0D);
-        assertEquals(1.44D, zoomLevelState.getRenderedMagnification(true, true, 1.0F, 1000.0D), DOUBLE_TOLERANCE);
+        assertEquals(4.8D, zoomLevelState.getRenderedMagnification(true, true, 1.0F, 1000.0D), DOUBLE_TOLERANCE);
+        zoomLevelState.tick(true, true, 1000.0D);
+        assertEquals(5.76D, zoomLevelState.getRenderedMagnification(true, true, 1.0F, 1000.0D), DOUBLE_TOLERANCE);
+    }
+
+    @Test
+    void releaseDuringWheelSmoothingFadesFromTheCurrentRenderedLevel() {
+        ZoomLevelState zoomLevelState = new ZoomLevelState(this.createPersistenceData(), 4.0F, false);
+        for (int tick = 0; tick < ZoomLevelState.TOGGLE_TRANSITION_TICKS; tick++) zoomLevelState.tick(true, true, 1000.0D);
+        zoomLevelState.adjustMagnification(2.0D, 2.0D, 1000.0D);
+        zoomLevelState.tick(true, true, 1000.0D);
 
         zoomLevelState.tick(false, true, 1000.0D);
-        assertEquals(1.2D, zoomLevelState.getRenderedMagnification(false, true, 1.0F, 1000.0D), DOUBLE_TOLERANCE);
+
+        assertEquals(Math.pow(4.8D, 0.75D), zoomLevelState.getRenderedMagnification(false, true, 1.0F, 1000.0D), DOUBLE_TOLERANCE);
+    }
+
+    @Test
+    void rapidToggleReversalContinuesFromTheCurrentTransition() {
+        ZoomLevelState zoomLevelState = new ZoomLevelState(this.createPersistenceData(), 16.0F, false);
+
+        zoomLevelState.tick(true, true, 1000.0D);
+        zoomLevelState.tick(true, true, 1000.0D);
+        assertEquals(4.0D, zoomLevelState.getRenderedMagnification(true, true, 1.0F, 1000.0D), DOUBLE_TOLERANCE);
+        zoomLevelState.tick(false, true, 1000.0D);
+        assertEquals(2.0D, zoomLevelState.getRenderedMagnification(false, true, 1.0F, 1000.0D), DOUBLE_TOLERANCE);
+        zoomLevelState.tick(true, true, 1000.0D);
+        assertEquals(4.0D, zoomLevelState.getRenderedMagnification(true, true, 1.0F, 1000.0D), DOUBLE_TOLERANCE);
+    }
+
+    @Test
+    void completedReleasePreloadsThePersistedTargetForImmediateReactivation() {
+        ZoomLevelState zoomLevelState = new ZoomLevelState(this.createPersistenceData(), 4.0F, false);
+        for (int tick = 0; tick < ZoomLevelState.TOGGLE_TRANSITION_TICKS; tick++) zoomLevelState.tick(true, true, 1000.0D);
+        zoomLevelState.adjustMagnification(2.0D, 2.0D, 1000.0D);
+        zoomLevelState.tick(true, true, 1000.0D);
+        for (int tick = 0; tick < ZoomLevelState.TOGGLE_TRANSITION_TICKS; tick++) zoomLevelState.tick(false, true, 1000.0D);
+
+        zoomLevelState.tick(true, true, 1000.0D);
+
+        assertEquals(2.0D, zoomLevelState.getRenderedMagnification(true, true, 1.0F, 1000.0D), DOUBLE_TOLERANCE);
     }
 
     @Test
@@ -111,7 +173,7 @@ class ZoomLevelStateTest {
 
         zoomLevelState.tick(true, true, 1000.0D);
 
-        assertEquals(Math.sqrt(1.2D), zoomLevelState.getRenderedMagnification(true, true, 0.5F, 1000.0D), DOUBLE_TOLERANCE);
+        assertEquals(Math.pow(4.0D, 0.125D), zoomLevelState.getRenderedMagnification(true, true, 0.5F, 1000.0D), DOUBLE_TOLERANCE);
     }
 
     private PersistenceData createPersistenceData() {
