@@ -99,9 +99,8 @@ public class OptionsScreen extends Screen {
     @NotNull
     protected OptionsTab buildGeneralTab() {
         OptionsTab tab = new OptionsTab(Component.translatable("justzoom.options.tab.general"));
-        this.addFloatInput(tab, JustZoom.getOptions().baseZoomFactor, "justzoom.options.base_zoom_modifier");
-        this.addFloatInput(tab, JustZoom.getOptions().zoomInPerScroll, "justzoom.options.zoom_in_change_modifier_per_scroll");
-        this.addFloatInput(tab, JustZoom.getOptions().zoomOutPerScroll, "justzoom.options.zoom_out_change_modifier_per_scroll");
+        this.addFloatInput(tab, JustZoom.getOptions().baseMagnification, "justzoom.options.base_magnification");
+        this.addFloatInput(tab, JustZoom.getOptions().scrollMagnificationMultiplier, "justzoom.options.scroll_magnification_multiplier");
         this.addFullWidthOption(tab, this.buildToggleButton(JustZoom.getOptions().smoothZoomInOut, "justzoom.options.smooth_zoom_in_out"), settings -> settings.paddingTop(OPTION_SECTION_PADDING_TOP));
         this.addFullWidthOption(tab, this.buildToggleButton(JustZoom.getOptions().smoothCameraOnZoom, "justzoom.options.smooth_camera_movement_on_zoom"));
         this.addFullWidthOption(tab, this.buildToggleButton(JustZoom.getOptions().normalizeMouseSensitivityOnZoom, "justzoom.options.normalize_mouse_sensitivity_on_zoom"));

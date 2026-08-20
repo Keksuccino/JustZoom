@@ -6,12 +6,14 @@ import de.keksuccino.justzoom.util.config.JsonConfig;
 
 public class Options extends JsonConfig {
 
+    public static final float DEFAULT_BASE_MAGNIFICATION = 4.0F;
+    public static final float DEFAULT_SCROLL_MAGNIFICATION_MULTIPLIER = 1.5F;
+
     private final ConfigSection zoom = this.section("zoom");
     private final ConfigSection spyglass = this.section("spyglass");
 
-    public final ConfigValue<Float> baseZoomFactor = this.zoom.option("base_zoom_modifier", 0.25F);
-    public final ConfigValue<Float> zoomInPerScroll = this.zoom.option("zoom_in_change_modifier_per_scroll", 0.05F);
-    public final ConfigValue<Float> zoomOutPerScroll = this.zoom.option("zoom_out_change_modifier_per_scroll", 0.05F);
+    public final ConfigValue<Float> baseMagnification = this.zoom.option("base_magnification", DEFAULT_BASE_MAGNIFICATION);
+    public final ConfigValue<Float> scrollMagnificationMultiplier = this.zoom.option("scroll_magnification_multiplier", DEFAULT_SCROLL_MAGNIFICATION_MULTIPLIER);
     public final ConfigValue<Boolean> smoothZoomInOut = this.zoom.option("smooth_zoom_in_out", true);
     public final ConfigValue<Boolean> smoothCameraOnZoom = this.zoom.option("smooth_camera_movement_on_zoom", false);
     public final ConfigValue<Boolean> normalizeMouseSensitivityOnZoom = this.zoom.option("normalize_mouse_sensitivity_on_zoom", true);

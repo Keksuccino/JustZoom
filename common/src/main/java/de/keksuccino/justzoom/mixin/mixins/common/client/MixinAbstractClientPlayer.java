@@ -6,25 +6,16 @@ import de.keksuccino.justzoom.ZoomHandler;
 import net.minecraft.client.player.AbstractClientPlayer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(AbstractClientPlayer.class)
 public class MixinAbstractClientPlayer {
 
     /**
-     * @reason The non-smooth Just Zoom path modifies the finished camera FOV. Suppressing only the spyglass check here preserves vanilla's other FOV modifiers while preventing its hard-coded 0.1 factor from being applied first.
+     * @reason Just Zoom modifies the finished camera FOV. Suppressing only the spyglass check here preserves vanilla's other FOV modifiers while preventing its hard-coded 0.1 factor from being applied first.
      */
     @WrapOperation(method = "getFieldOfViewModifier", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/AbstractClientPlayer;isScoping()Z"))
     private boolean wrap_isScoping_in_getFieldOfViewModifier_JustZoom(AbstractClientPlayer instance, Operation<Boolean> original) {
         return !ZoomHandler.shouldUseJustZoomForSpyglass() && original.call(instance);
-    }
-
-    @Inject(method = "getFieldOfViewModifier", at = @At("HEAD"), cancellable = true)
-    private void head_getFieldOfViewModifier_JustZoom(CallbackInfoReturnable<Float> info) {
-        if (ZoomHandler.isZooming() && ZoomHandler.shouldZoomInOutSmooth()) {
-            info.setReturnValue(ZoomHandler.getFovModifier());
-        }
     }
 
 }

@@ -7,7 +7,7 @@ import java.io.File;
 
 public final class PersistenceData extends JsonConfig {
 
-    public final ConfigValue<Float> lastZoomLevel = this.optional("last_zoom_level", Float.class);
+    public final ConfigValue<Float> lastMagnification = this.optional("last_magnification", Float.class);
 
     public PersistenceData(@NotNull File file) {
         super(file);
