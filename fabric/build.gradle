@@ -20,6 +20,8 @@ dependencies {
     include(implementation(annotationProcessor("io.github.llamalad7:mixinextras-fabric:${mixin_extras_version}")))
     implementation "maven.modrinth:konkrete:1.11.0-26.2-fabric"
     implementation "maven.modrinth:modmenu:20.0.0-beta.4"
+    testImplementation "org.junit.jupiter:junit-jupiter:5.10.2"
+    testRuntimeOnly "org.junit.platform:junit-platform-launcher:1.10.2"
 
 }
 
@@ -55,6 +57,7 @@ tasks.withType(Javadoc).configureEach {
 tasks.withType(Test).configureEach {
     // Allow builds when there are test sources but no matching tests.
     failOnNoDiscoveredTests = false
+    useJUnitPlatform()
 }
 tasks.named("sourcesJar", Jar) {
     from(project(":common").sourceSets.main.allSource)
