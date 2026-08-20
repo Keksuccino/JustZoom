@@ -23,6 +23,13 @@ dependencies {
     testImplementation "org.junit.jupiter:junit-jupiter:5.10.2"
     testRuntimeOnly "org.junit.platform:junit-platform-launcher:1.10.2"
 
+    implementation "maven.modrinth:AANobbMI:3QgJXuSK" // Sodium
+    implementation "maven.modrinth:PtjYWJkn:9M5lqgDj" // Sodium Extra
+    implementation "maven.modrinth:gvQqBUqZ:vy3clWg7" // Lithium
+    implementation "maven.modrinth:YL57xq9U:3uIIps8q" // Iris
+    implementation "maven.modrinth:5ZwdcRci:4r0uMdy5" // ImmediatelyFast
+    implementation "maven.modrinth:NNAgCjsB:iiF6U3Ne" // Entity Culling
+
 }
 
 loom {
