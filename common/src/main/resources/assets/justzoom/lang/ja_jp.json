@@ -25,6 +25,10 @@
   "justzoom.options.hide_arms_when_zooming.desc": "有効にすると、ズーム中にプレイヤーの腕が見えなくなります。",
   "justzoom.options.reset_zoom_factor_when_stop_zooming": "ズーム倍率リセット: %s",
   "justzoom.options.reset_zoom_factor_when_stop_zooming.desc": "有効にすると、ズーム開始時に倍率が基本値にリセットされ、\n前回のズームレベルから続きません。",
+  "justzoom.options.use_just_zoom_for_spyglass": "望遠鏡でJust Zoomを使用: %s",
+  "justzoom.options.use_just_zoom_for_spyglass.desc": "有効にすると、望遠鏡の使用時に通常のズームキーと同じズームモードになります。",
+  "justzoom.options.show_spyglass_overlay": "望遠鏡オーバーレイを表示: %s",
+  "justzoom.options.show_spyglass_overlay.desc": "無効にすると、望遠鏡のオーバーレイと黒い枠を非表示にし、画面全体を表示します。",
   "justzoom.options.toggle.enabled": "オン",
   "justzoom.options.toggle.disabled": "オフ"
 }

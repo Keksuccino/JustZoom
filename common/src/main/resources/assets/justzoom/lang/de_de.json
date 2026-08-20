@@ -25,6 +25,10 @@
   "justzoom.options.hide_arms_when_zooming.desc": "Falls aktiviert, werden deine Arme beim Zoomen unsichtbar.",
   "justzoom.options.reset_zoom_factor_when_stop_zooming": "Zoomfaktor zurücksetzen: %s",
   "justzoom.options.reset_zoom_factor_when_stop_zooming.desc": "Falls aktiviert, wird der Zoomfaktor beim Start des Zoomens auf den Basiswert zurückgesetzt,\nanstatt vom letzten Zoomlevel weiterzumachen.",
+  "justzoom.options.use_just_zoom_for_spyglass": "Just Zoom für Fernrohr verwenden: %s",
+  "justzoom.options.use_just_zoom_for_spyglass.desc": "Falls aktiviert, wird beim Benutzen eines Fernrohrs derselbe Zoommodus wie über die normale Zoom-Taste aktiviert.",
+  "justzoom.options.show_spyglass_overlay": "Fernrohr-Overlay anzeigen: %s",
+  "justzoom.options.show_spyglass_overlay.desc": "Falls deaktiviert, werden das Fernrohr-Overlay und sein schwarzer Rand ausgeblendet, damit der gesamte Bildschirm sichtbar bleibt.",
   "justzoom.options.toggle.enabled": "Aktiviert",
   "justzoom.options.toggle.disabled": "Deaktiviert"
 }

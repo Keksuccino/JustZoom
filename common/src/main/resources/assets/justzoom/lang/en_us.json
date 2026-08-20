@@ -25,6 +25,10 @@
   "justzoom.options.hide_arms_when_zooming.desc": "If enabled, the player's arms will be invisible while zooming.",
   "justzoom.options.reset_zoom_factor_when_stop_zooming": "Reset Zoom Factor: %s",
   "justzoom.options.reset_zoom_factor_when_stop_zooming.desc": "If enabled, the zoom factor will be reset to the base value when you start zooming,\ninstead of continuing from the last zoom level.",
+  "justzoom.options.use_just_zoom_for_spyglass": "Use Just Zoom for Spyglass: %s",
+  "justzoom.options.use_just_zoom_for_spyglass.desc": "If enabled, using a spyglass activates the same zoom mode as the normal zoom keybind.",
+  "justzoom.options.show_spyglass_overlay": "Show Spyglass Overlay: %s",
+  "justzoom.options.show_spyglass_overlay.desc": "If disabled, the spyglass overlay and its black border are hidden to keep the whole screen visible.",
   "justzoom.options.toggle.enabled": "Enabled",
   "justzoom.options.toggle.disabled": "Disabled"
 }

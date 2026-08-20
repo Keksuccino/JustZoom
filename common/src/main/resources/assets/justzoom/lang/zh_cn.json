@@ -25,6 +25,10 @@
   "justzoom.options.hide_arms_when_zooming.desc": "如果启用，缩放时玩家的手臂将不可见。",
   "justzoom.options.reset_zoom_factor_when_stop_zooming": "重置缩放倍率：%s",
   "justzoom.options.reset_zoom_factor_when_stop_zooming.desc": "如果启用，开始缩放时倍率将重置为基础值，\n而不是从上次的缩放级别继续。",
+  "justzoom.options.use_just_zoom_for_spyglass": "望远镜使用 Just Zoom：%s",
+  "justzoom.options.use_just_zoom_for_spyglass.desc": "启用后，使用望远镜会激活与普通缩放按键相同的缩放模式。",
+  "justzoom.options.show_spyglass_overlay": "显示望远镜遮罩：%s",
+  "justzoom.options.show_spyglass_overlay.desc": "禁用后会隐藏望远镜遮罩及其黑色边框，让整个屏幕保持可见。",
   "justzoom.options.toggle.enabled": "启用",
   "justzoom.options.toggle.disabled": "禁用"
 }

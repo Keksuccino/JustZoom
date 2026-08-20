@@ -25,6 +25,10 @@
   "justzoom.options.hide_arms_when_zooming.desc": "Si activé, les bras du joueur seront invisibles pendant le zoom.",
   "justzoom.options.reset_zoom_factor_when_stop_zooming": "Réinitialiser le facteur de zoom : %s",
   "justzoom.options.reset_zoom_factor_when_stop_zooming.desc": "Si activé, le facteur de zoom sera réinitialisé à la valeur de base au début du zoom,\nau lieu de continuer depuis le dernier niveau de zoom.",
+  "justzoom.options.use_just_zoom_for_spyglass": "Utiliser Just Zoom avec la longue-vue : %s",
+  "justzoom.options.use_just_zoom_for_spyglass.desc": "Si activé, utiliser une longue-vue déclenche le même mode de zoom que la touche de zoom normale.",
+  "justzoom.options.show_spyglass_overlay": "Afficher l'overlay de la longue-vue : %s",
+  "justzoom.options.show_spyglass_overlay.desc": "Si désactivé, l'overlay de la longue-vue et son contour noir sont masqués afin de garder tout l'écran visible.",
   "justzoom.options.toggle.enabled": "Activé",
   "justzoom.options.toggle.disabled": "Désactivé"
 }

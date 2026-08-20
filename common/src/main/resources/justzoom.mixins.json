@@ -7,6 +7,7 @@
     "client.MixinCamera",
     "client.MixinCameraType",
     "client.MixinGameRenderer",
+    "client.MixinHud",
     "client.MixinKeyMapping_Category",
     "client.MixinMouseHandler"
   ],

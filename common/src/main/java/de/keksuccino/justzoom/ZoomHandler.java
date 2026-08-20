@@ -14,13 +14,23 @@ public class ZoomHandler {
     public static float cachedModifiedFov = 0.0F;
 
     public static boolean isZooming() {
-        if (Minecraft.getInstance().gui.screen() != null) {
+        Minecraft minecraft = Minecraft.getInstance();
+        if (minecraft.gui.screen() != null) {
             return false;
         }
-        if (Minecraft.getInstance().options.getCameraType().isMirrored() && !JustZoom.getOptions().allowZoomInMirroredView.getValue()) {
+        if (minecraft.options.getCameraType().isMirrored() && !JustZoom.getOptions().allowZoomInMirroredView.getValue()) {
             return false;
         }
-        return KeyMappings.KEY_TOGGLE_ZOOM.isDown();
+        boolean spyglassScoping = minecraft.player != null && minecraft.player.isScoping();
+        return ZoomInput.isActive(KeyMappings.KEY_TOGGLE_ZOOM.isDown(), spyglassScoping, shouldUseJustZoomForSpyglass());
+    }
+
+    public static boolean shouldUseJustZoomForSpyglass() {
+        return JustZoom.getOptions().useJustZoomForSpyglass.getValue();
+    }
+
+    public static boolean shouldShowSpyglassOverlay() {
+        return JustZoom.getOptions().showSpyglassOverlay.getValue();
     }
 
     public static boolean shouldZoomInOutSmooth() {
@@ -64,6 +74,17 @@ public class ZoomHandler {
     public static class MouseScrollFeedback {
 
         public boolean cancel = false;
+
+    }
+
+    static final class ZoomInput {
+
+        private ZoomInput() {
+        }
+
+        static boolean isActive(boolean keybindDown, boolean spyglassScoping, boolean useJustZoomForSpyglass) {
+            return keybindDown || spyglassScoping && useJustZoomForSpyglass;
+        }
 
     }
 

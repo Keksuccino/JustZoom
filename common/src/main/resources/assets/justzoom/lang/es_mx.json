@@ -25,6 +25,10 @@
   "justzoom.options.hide_arms_when_zooming.desc": "Si está activado, los brazos del jugador serán invisibles al hacer zoom.",
   "justzoom.options.reset_zoom_factor_when_stop_zooming": "Reiniciar Factor de Zoom: %s",
   "justzoom.options.reset_zoom_factor_when_stop_zooming.desc": "Si está activado, el factor de zoom se reiniciará al valor base cuando empieces a hacer zoom,\nen lugar de continuar desde el último nivel de zoom.",
+  "justzoom.options.use_just_zoom_for_spyglass": "Usar Just Zoom con Catalejo: %s",
+  "justzoom.options.use_just_zoom_for_spyglass.desc": "Si está activado, usar un catalejo activa el mismo modo de zoom que la tecla normal de zoom.",
+  "justzoom.options.show_spyglass_overlay": "Mostrar Superposición del Catalejo: %s",
+  "justzoom.options.show_spyglass_overlay.desc": "Si está desactivado, la superposición del catalejo y su borde negro se ocultan para mantener visible toda la pantalla.",
   "justzoom.options.toggle.enabled": "Activado",
   "justzoom.options.toggle.disabled": "Desactivado"
 }

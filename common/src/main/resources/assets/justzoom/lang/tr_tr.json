@@ -25,6 +25,10 @@
   "justzoom.options.hide_arms_when_zooming.desc": "Etkinleştirilirse, yakınlaştırma yaparken oyuncunun kolları görünmez olur.",
   "justzoom.options.reset_zoom_factor_when_stop_zooming": "Yakınlaştırma Katsayısını Sıfırla: %s",
   "justzoom.options.reset_zoom_factor_when_stop_zooming.desc": "Etkinleştirilirse, yakınlaştırmaya başladığında katsayı temel değere sıfırlanır,\nson yakınlaştırma seviyesinden devam etmek yerine.",
+  "justzoom.options.use_just_zoom_for_spyglass": "Dürbün için Just Zoom Kullan: %s",
+  "justzoom.options.use_just_zoom_for_spyglass.desc": "Etkinleştirilirse dürbün kullanmak, normal yakınlaştırma tuşuyla aynı yakınlaştırma modunu etkinleştirir.",
+  "justzoom.options.show_spyglass_overlay": "Dürbün Kaplamasını Göster: %s",
+  "justzoom.options.show_spyglass_overlay.desc": "Devre dışı bırakılırsa dürbün kaplaması ve siyah kenarlığı gizlenir, böylece ekranın tamamı görünür kalır.",
   "justzoom.options.toggle.enabled": "Açık",
   "justzoom.options.toggle.disabled": "Kapalı"
 }

@@ -25,6 +25,10 @@
   "justzoom.options.hide_arms_when_zooming.desc": "Если включено, руки игрока будут невидимыми во время зума.",
   "justzoom.options.reset_zoom_factor_when_stop_zooming": "Сброс коэффициента зума: %s",
   "justzoom.options.reset_zoom_factor_when_stop_zooming.desc": "Если включено, коэффициент зума сбросится до базового значения при начале зума,\nвместо продолжения с последнего уровня зума.",
+  "justzoom.options.use_just_zoom_for_spyglass": "Использовать Just Zoom для подзорной трубы: %s",
+  "justzoom.options.use_just_zoom_for_spyglass.desc": "Если включено, использование подзорной трубы активирует тот же режим зума, что и обычная клавиша зума.",
+  "justzoom.options.show_spyglass_overlay": "Показывать оверлей подзорной трубы: %s",
+  "justzoom.options.show_spyglass_overlay.desc": "Если выключено, оверлей подзорной трубы и его чёрная рамка скрываются, чтобы весь экран оставался видимым.",
   "justzoom.options.toggle.enabled": "Включено",
   "justzoom.options.toggle.disabled": "Выключено"
 }

@@ -16,6 +16,8 @@ public class Options extends AbstractOptions {
     public final Option<Boolean> allowZoomInMirroredView = new Option<>(config, "allow_zoom_in_mirrored_view", false, "zoom");
     public final Option<Boolean> hideArmsWhenZooming = new Option<>(config, "hide_arms_when_zooming", false, "zoom");
     public final Option<Boolean> resetZoomFactorOnStopZooming = new Option<>(config, "reset_zoom_factor_when_stop_zooming", false, "zoom");
+    public final Option<Boolean> useJustZoomForSpyglass = new Option<>(config, "use_just_zoom_for_spyglass", false, "spyglass");
+    public final Option<Boolean> showSpyglassOverlay = new Option<>(config, "show_spyglass_overlay", true, "spyglass");
 
     public Options() {
         this.config.syncConfig();
