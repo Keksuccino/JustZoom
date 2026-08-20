@@ -4,7 +4,7 @@ CHANGELOG | JUST ZOOM v2.2.0 [ W I P !!! NOT PUBLIC YET !!! ]
 - Reworked the Settings screen.
 - The settings can now be opened via Mod Menu on Fabric (was already possible before), and on NeoForge via its Mods menu (was NOT possible before).
 - Removed the icon button in the Pause screen that opened the Settings screen (only way now is via the Mods menus).
-
+- Fixed max zoom level is capped to the spyglass zoom level when smooth zooming is enabled.
 
 
 
