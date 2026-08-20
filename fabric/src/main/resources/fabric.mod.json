@@ -35,10 +35,5 @@
     "java": ">=${java_version}"
   },
   "breaks": {
-  },
-  "custom": {
-    "modmenu": {
-      "badges": [ "client" ]
-    }
   }
 }
