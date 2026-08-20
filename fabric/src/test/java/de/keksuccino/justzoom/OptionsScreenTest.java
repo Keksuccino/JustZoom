@@ -5,6 +5,7 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.resources.Identifier;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -61,6 +62,24 @@ class OptionsScreenTest {
         zoom.setKey(InputConstants.Type.KEYSYM.getOrCreate(InputConstants.KEY_X));
 
         assertFalse(OptionsScreen.hasKeybindCollision(zoom, new KeyMapping[]{zoom}));
+    }
+
+    @Test
+    void floatInputFillsTheRemainingOptionRowWidth() {
+        OptionsScreen.FloatInputWidths widths = OptionsScreen.calculateFloatInputWidths(360, 100);
+
+        assertEquals(100, widths.labelWidth());
+        assertEquals(255, widths.inputWidth());
+        assertEquals(360, widths.labelWidth() + OptionsScreen.FLOAT_INPUT_GAP + widths.inputWidth());
+    }
+
+    @Test
+    void longFloatInputLabelLeavesTheInputUsable() {
+        OptionsScreen.FloatInputWidths widths = OptionsScreen.calculateFloatInputWidths(100, 100);
+
+        assertEquals(55, widths.labelWidth());
+        assertEquals(OptionsScreen.FLOAT_INPUT_MIN_WIDTH, widths.inputWidth());
+        assertEquals(100, widths.labelWidth() + OptionsScreen.FLOAT_INPUT_GAP + widths.inputWidth());
     }
 
     private static KeyMapping keyMapping(String suffix, int defaultKey) {

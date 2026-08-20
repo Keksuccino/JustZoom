@@ -43,8 +43,8 @@ public class OptionsScreen extends Screen {
     protected static final int BUTTON_HEIGHT = 20;
     protected static final int BUTTON_ROW_MAX_WIDTH = 360;
     protected static final int CYCLE_VALUE_COLOR = 0xFFAA00;
-    protected static final int FLOAT_INPUT_WIDTH = 100;
     protected static final int FLOAT_INPUT_GAP = 5;
+    protected static final int FLOAT_INPUT_MIN_WIDTH = 40;
     protected static final int KEYBIND_RESET_BUTTON_WIDTH = 50;
     protected static final int KEYBIND_GAP = 5;
     protected static final int OPTION_ROW_ADVANCE = 26;
@@ -126,7 +126,7 @@ public class OptionsScreen extends Screen {
         StringWidget labelWidget = new StringWidget(label, this.font);
         labelWidget.setTooltip(tooltip);
 
-        EditBox input = new EditBox(this.font, FLOAT_INPUT_WIDTH, BUTTON_HEIGHT, label);
+        EditBox input = new EditBox(this.font, FLOAT_INPUT_MIN_WIDTH, BUTTON_HEIGHT, label);
         input.setValue(Float.toString(option.getValue()));
         input.setResponder(value -> {
             if (MathUtils.isFloat(value)) {
@@ -138,7 +138,7 @@ public class OptionsScreen extends Screen {
         LinearLayout row = LinearLayout.horizontal().spacing(FLOAT_INPUT_GAP);
         row.addChild(labelWidget, settings -> settings.alignVerticallyMiddle());
         row.addChild(input);
-        this.floatInputControls.add(new FloatInputControl(labelWidget, input));
+        this.floatInputControls.add(new FloatInputControl(labelWidget, input, labelWidget.getWidth()));
         tab.addChild(row);
     }
 
@@ -191,11 +191,10 @@ public class OptionsScreen extends Screen {
         for (Button button : this.fullWidthOptionButtons) {
             button.setWidth(rowWidth);
         }
-        int inputWidth = Math.min(FLOAT_INPUT_WIDTH, Math.max(40, rowWidth / 3));
-        int labelMaxWidth = Math.max(1, rowWidth - inputWidth - FLOAT_INPUT_GAP);
         for (FloatInputControl control : this.floatInputControls) {
-            control.label().setMaxWidth(labelMaxWidth);
-            control.input().setWidth(inputWidth);
+            FloatInputWidths widths = calculateFloatInputWidths(rowWidth, control.preferredLabelWidth());
+            control.label().setWidth(widths.labelWidth());
+            control.input().setWidth(widths.inputWidth());
         }
         for (KeybindControl control : this.keybindControls) {
             control.keybindButton().setWidth(rowWidth - KEYBIND_RESET_BUTTON_WIDTH - KEYBIND_GAP);
@@ -285,6 +284,14 @@ public class OptionsScreen extends Screen {
         return false;
     }
 
+    @NotNull
+    static FloatInputWidths calculateFloatInputWidths(int rowWidth, int preferredLabelWidth) {
+        // Keep the complete row at the button width so its centered layout shares both button edges.
+        int availableWidth = Math.max(2, rowWidth - FLOAT_INPUT_GAP);
+        int labelWidth = Math.min(Math.max(1, preferredLabelWidth), Math.max(1, availableWidth - FLOAT_INPUT_MIN_WIDTH));
+        return new FloatInputWidths(labelWidth, availableWidth - labelWidth);
+    }
+
     protected void afterKeybindChanged() {
         this.waitingForKeybind = null;
         KeyMapping.resetMapping();
@@ -350,7 +357,10 @@ public class OptionsScreen extends Screen {
     protected record KeybindSetting(@NotNull KeyMapping keyMapping, @NotNull String labelKey, @NotNull String descriptionKey) {
     }
 
-    private record FloatInputControl(@NotNull StringWidget label, @NotNull EditBox input) {
+    static record FloatInputWidths(int labelWidth, int inputWidth) {
+    }
+
+    private record FloatInputControl(@NotNull StringWidget label, @NotNull EditBox input, int preferredLabelWidth) {
     }
 
     private record KeybindControl(@NotNull KeybindSetting setting, @NotNull Button keybindButton, @NotNull Button resetButton) {
