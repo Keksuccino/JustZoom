@@ -1,7 +1,7 @@
 package de.keksuccino.justzoom;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import de.keksuccino.justzoom.util.AbstractOptions;
+import de.keksuccino.justzoom.util.config.ConfigValue;
 import de.keksuccino.konkrete.math.MathUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.KeyMapping;
@@ -122,7 +122,7 @@ public class OptionsScreen extends Screen {
         return tab;
     }
 
-    protected void addFloatInput(@NotNull OptionsTab tab, @NotNull AbstractOptions.Option<Float> option, @NotNull String labelBaseKey) {
+    protected void addFloatInput(@NotNull OptionsTab tab, @NotNull ConfigValue<Float> option, @NotNull String labelBaseKey) {
         Component label = Component.translatable(labelBaseKey);
         Tooltip tooltip = Tooltip.create(Component.translatable(labelBaseKey + ".desc"));
         StringWidget labelWidget = new StringWidget(label, this.font);
@@ -155,7 +155,7 @@ public class OptionsScreen extends Screen {
     }
 
     @NotNull
-    protected Button buildToggleButton(@NotNull AbstractOptions.Option<Boolean> option, @NotNull String labelBaseKey) {
+    protected Button buildToggleButton(@NotNull ConfigValue<Boolean> option, @NotNull String labelBaseKey) {
         Button button = Button.builder(this.toggleMessage(option, labelBaseKey), pressedButton -> {
             option.setValue(!option.getValue());
             pressedButton.setMessage(this.toggleMessage(option, labelBaseKey));
@@ -214,7 +214,7 @@ public class OptionsScreen extends Screen {
     }
 
     @NotNull
-    protected Component toggleMessage(@NotNull AbstractOptions.Option<Boolean> option, @NotNull String labelBaseKey) {
+    protected Component toggleMessage(@NotNull ConfigValue<Boolean> option, @NotNull String labelBaseKey) {
         Component value = Component.translatable(option.getValue() ? "justzoom.options.toggle.enabled" : "justzoom.options.toggle.disabled").withStyle(Style.EMPTY.withColor(option.getValue() ? ChatFormatting.GREEN : ChatFormatting.RED));
         return Component.translatable(labelBaseKey, value);
     }

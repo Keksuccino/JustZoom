@@ -1,6 +1,5 @@
 package de.keksuccino.justzoom;
 
-import de.keksuccino.justzoom.persistence.PersistenceData;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import java.nio.file.Path;
@@ -15,7 +14,7 @@ class ZoomLevelStateTest {
     @Test
     void appliesPersistedZoomLevelWhenEnabled() {
         PersistenceData persistenceData = this.createPersistenceData();
-        persistenceData.set(PersistenceData.LAST_ZOOM_LEVEL, 0.4F);
+        persistenceData.lastZoomLevel.setValue(0.4F);
 
         ZoomLevelState zoomLevelState = new ZoomLevelState(persistenceData, 0.25F, true);
 
@@ -25,7 +24,7 @@ class ZoomLevelStateTest {
     @Test
     void usesBaseLevelWhenApplyingPersistedLevelIsDisabled() {
         PersistenceData persistenceData = this.createPersistenceData();
-        persistenceData.set(PersistenceData.LAST_ZOOM_LEVEL, 0.4F);
+        persistenceData.lastZoomLevel.setValue(0.4F);
 
         ZoomLevelState zoomLevelState = new ZoomLevelState(persistenceData, 0.25F, false);
 
@@ -35,7 +34,7 @@ class ZoomLevelStateTest {
     @Test
     void savesAdjustedLevelWhenApplyingPersistedLevelIsDisabled() {
         PersistenceData persistenceData = this.createPersistenceData();
-        persistenceData.set(PersistenceData.LAST_ZOOM_LEVEL, 0.6F);
+        persistenceData.lastZoomLevel.setValue(0.6F);
         ZoomLevelState zoomLevelState = new ZoomLevelState(persistenceData, 0.25F, false);
 
         zoomLevelState.adjustZoomModifier(-0.05F);
@@ -55,7 +54,7 @@ class ZoomLevelStateTest {
 
         assertEquals(0.25F, zoomLevelState.getZoomModifier());
         PersistenceData reloadedData = this.createPersistenceData();
-        assertEquals(0.4F, reloadedData.get(PersistenceData.LAST_ZOOM_LEVEL, 0.25F));
+        assertEquals(0.4F, reloadedData.lastZoomLevel.getValueOrDefault(0.25F));
     }
 
     @Test
@@ -67,7 +66,7 @@ class ZoomLevelStateTest {
 
         assertEquals(ZoomMath.MIN_FOV_MODIFIER, zoomLevelState.getZoomModifier());
         PersistenceData reloadedData = this.createPersistenceData();
-        assertEquals(ZoomMath.MIN_FOV_MODIFIER, reloadedData.get(PersistenceData.LAST_ZOOM_LEVEL, 0.25F));
+        assertEquals(ZoomMath.MIN_FOV_MODIFIER, reloadedData.lastZoomLevel.getValueOrDefault(0.25F));
     }
 
     private PersistenceData createPersistenceData() {

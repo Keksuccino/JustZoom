@@ -1,6 +1,5 @@
 package de.keksuccino.justzoom;
 
-import de.keksuccino.justzoom.persistence.PersistenceData;
 import org.jetbrains.annotations.NotNull;
 import java.util.Objects;
 
@@ -11,7 +10,7 @@ final class ZoomLevelState {
 
     ZoomLevelState(@NotNull PersistenceData persistenceData, float baseZoomModifier, boolean applyLastZoomLevel) {
         this.persistenceData = Objects.requireNonNull(persistenceData);
-        float lastZoomLevel = persistenceData.get(PersistenceData.LAST_ZOOM_LEVEL, baseZoomModifier);
+        float lastZoomLevel = persistenceData.lastZoomLevel.getValueOrDefault(baseZoomModifier);
         this.zoomModifier = normalize(applyLastZoomLevel ? lastZoomLevel : baseZoomModifier, baseZoomModifier);
     }
 
@@ -21,7 +20,7 @@ final class ZoomLevelState {
 
     void adjustZoomModifier(float adjustment) {
         this.zoomModifier = normalize(this.zoomModifier + adjustment, this.zoomModifier);
-        this.persistenceData.set(PersistenceData.LAST_ZOOM_LEVEL, this.zoomModifier);
+        this.persistenceData.lastZoomLevel.setValue(this.zoomModifier);
     }
 
     void resetZoomModifier(float baseZoomModifier) {

@@ -2,6 +2,7 @@ package de.keksuccino.justzoom.persistence;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import de.keksuccino.justzoom.PersistenceData;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import java.io.IOException;
@@ -22,7 +23,7 @@ class PersistenceDataTest {
     void returnsFallbackWhenFileDoesNotExist() {
         PersistenceData persistenceData = this.createPersistenceData();
 
-        assertEquals(0.25F, persistenceData.get(PersistenceData.LAST_ZOOM_LEVEL, 0.25F));
+        assertEquals(0.25F, persistenceData.lastZoomLevel.getValueOrDefault(0.25F));
         assertFalse(Files.exists(this.getPersistenceFile()));
     }
 
@@ -30,10 +31,10 @@ class PersistenceDataTest {
     void savesAndReloadsTypedValues() {
         PersistenceData persistenceData = this.createPersistenceData();
 
-        persistenceData.set(PersistenceData.LAST_ZOOM_LEVEL, 0.4F);
+        persistenceData.lastZoomLevel.setValue(0.4F);
 
         PersistenceData reloadedData = this.createPersistenceData();
-        assertEquals(0.4F, reloadedData.get(PersistenceData.LAST_ZOOM_LEVEL, 0.25F));
+        assertEquals(0.4F, reloadedData.lastZoomLevel.getValueOrDefault(0.25F));
     }
 
     @Test
@@ -41,7 +42,7 @@ class PersistenceDataTest {
         Files.writeString(this.getPersistenceFile(), "{\n  \"future_value\": true\n}\n", StandardCharsets.UTF_8);
         PersistenceData persistenceData = this.createPersistenceData();
 
-        persistenceData.set(PersistenceData.LAST_ZOOM_LEVEL, 0.3F);
+        persistenceData.lastZoomLevel.setValue(0.3F);
 
         JsonObject savedData = JsonParser.parseString(Files.readString(this.getPersistenceFile(), StandardCharsets.UTF_8)).getAsJsonObject();
         assertTrue(savedData.get("future_value").getAsBoolean());
@@ -53,11 +54,11 @@ class PersistenceDataTest {
         Files.writeString(this.getPersistenceFile(), "not valid json", StandardCharsets.UTF_8);
         PersistenceData persistenceData = this.createPersistenceData();
 
-        assertEquals(0.25F, persistenceData.get(PersistenceData.LAST_ZOOM_LEVEL, 0.25F));
-        persistenceData.set(PersistenceData.LAST_ZOOM_LEVEL, 0.2F);
+        assertEquals(0.25F, persistenceData.lastZoomLevel.getValueOrDefault(0.25F));
+        persistenceData.lastZoomLevel.setValue(0.2F);
 
         PersistenceData reloadedData = this.createPersistenceData();
-        assertEquals(0.2F, reloadedData.get(PersistenceData.LAST_ZOOM_LEVEL, 0.25F));
+        assertEquals(0.2F, reloadedData.lastZoomLevel.getValueOrDefault(0.25F));
     }
 
     @Test
@@ -65,7 +66,7 @@ class PersistenceDataTest {
         Files.writeString(this.getPersistenceFile(), "{\n  \"last_zoom_level\": \"invalid\"\n}\n", StandardCharsets.UTF_8);
         PersistenceData persistenceData = this.createPersistenceData();
 
-        assertEquals(0.25F, persistenceData.get(PersistenceData.LAST_ZOOM_LEVEL, 0.25F));
+        assertEquals(0.25F, persistenceData.lastZoomLevel.getValueOrDefault(0.25F));
     }
 
     @Test
@@ -74,13 +75,14 @@ class PersistenceDataTest {
         Files.writeString(blockedParent, "not a directory", StandardCharsets.UTF_8);
         PersistenceData persistenceData = new PersistenceData(blockedParent.resolve("persistence_data.json").toFile());
 
-        persistenceData.set(PersistenceData.LAST_ZOOM_LEVEL, 0.4F);
+        persistenceData.lastZoomLevel.setValue(0.4F);
+        assertEquals(0.25F, persistenceData.lastZoomLevel.getValueOrDefault(0.25F));
         Files.delete(blockedParent);
         Files.createDirectory(blockedParent);
-        persistenceData.set(PersistenceData.LAST_ZOOM_LEVEL, 0.4F);
+        persistenceData.lastZoomLevel.setValue(0.4F);
 
         PersistenceData reloadedData = new PersistenceData(blockedParent.resolve("persistence_data.json").toFile());
-        assertEquals(0.4F, reloadedData.get(PersistenceData.LAST_ZOOM_LEVEL, 0.25F));
+        assertEquals(0.4F, reloadedData.lastZoomLevel.getValueOrDefault(0.25F));
     }
 
     private PersistenceData createPersistenceData() {

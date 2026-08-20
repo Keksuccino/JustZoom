@@ -1,27 +1,29 @@
 package de.keksuccino.justzoom;
 
-import de.keksuccino.justzoom.util.AbstractOptions;
-import de.keksuccino.konkrete.config.Config;
+import de.keksuccino.justzoom.util.config.ConfigSection;
+import de.keksuccino.justzoom.util.config.ConfigValue;
+import de.keksuccino.justzoom.util.config.JsonConfig;
 
-public class Options extends AbstractOptions {
+public class Options extends JsonConfig {
 
-    protected final Config config = new Config(JustZoom.MOD_DIR.getAbsolutePath().replace("\\", "/") + "/config.txt");
+    private final ConfigSection zoom = this.section("zoom");
+    private final ConfigSection spyglass = this.section("spyglass");
 
-    public final Option<Float> baseZoomFactor = new Option<>(config, "base_zoom_modifier", 0.25F, "zoom");
-    public final Option<Float> zoomInPerScroll = new Option<>(config, "zoom_in_change_modifier_per_scroll", 0.05F, "zoom");
-    public final Option<Float> zoomOutPerScroll = new Option<>(config, "zoom_out_change_modifier_per_scroll", 0.05F, "zoom");
-    public final Option<Boolean> smoothZoomInOut = new Option<>(config, "smooth_zoom_in_out", true, "zoom");
-    public final Option<Boolean> smoothCameraOnZoom = new Option<>(config, "smooth_camera_movement_on_zoom", false, "zoom");
-    public final Option<Boolean> normalizeMouseSensitivityOnZoom = new Option<>(config, "normalize_mouse_sensitivity_on_zoom", true, "zoom");
-    public final Option<Boolean> allowZoomInMirroredView = new Option<>(config, "allow_zoom_in_mirrored_view", false, "zoom");
-    public final Option<Boolean> hideArmsWhenZooming = new Option<>(config, "hide_arms_when_zooming", false, "zoom");
-    public final Option<Boolean> resetZoomFactorOnStopZooming = new Option<>(config, "reset_zoom_factor_when_stop_zooming", false, "zoom");
-    public final Option<Boolean> useJustZoomForSpyglass = new Option<>(config, "use_just_zoom_for_spyglass", true, "spyglass");
-    public final Option<Boolean> showSpyglassOverlay = new Option<>(config, "show_spyglass_overlay", true, "spyglass");
+    public final ConfigValue<Float> baseZoomFactor = this.zoom.option("base_zoom_modifier", 0.25F);
+    public final ConfigValue<Float> zoomInPerScroll = this.zoom.option("zoom_in_change_modifier_per_scroll", 0.05F);
+    public final ConfigValue<Float> zoomOutPerScroll = this.zoom.option("zoom_out_change_modifier_per_scroll", 0.05F);
+    public final ConfigValue<Boolean> smoothZoomInOut = this.zoom.option("smooth_zoom_in_out", true);
+    public final ConfigValue<Boolean> smoothCameraOnZoom = this.zoom.option("smooth_camera_movement_on_zoom", false);
+    public final ConfigValue<Boolean> normalizeMouseSensitivityOnZoom = this.zoom.option("normalize_mouse_sensitivity_on_zoom", true);
+    public final ConfigValue<Boolean> allowZoomInMirroredView = this.zoom.option("allow_zoom_in_mirrored_view", false);
+    public final ConfigValue<Boolean> hideArmsWhenZooming = this.zoom.option("hide_arms_when_zooming", false);
+    public final ConfigValue<Boolean> resetZoomFactorOnStopZooming = this.zoom.option("reset_zoom_factor_when_stop_zooming", false);
+    public final ConfigValue<Boolean> useJustZoomForSpyglass = this.spyglass.option("use_just_zoom_for_spyglass", true);
+    public final ConfigValue<Boolean> showSpyglassOverlay = this.spyglass.option("show_spyglass_overlay", true);
 
     public Options() {
-        this.config.syncConfig();
-        this.config.clearUnusedValues();
+        super(JustZoom.OPTIONS_FILE, JustZoom.LEGACY_OPTIONS_FILE);
+        this.save();
     }
 
 }
