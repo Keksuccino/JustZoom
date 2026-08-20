@@ -46,10 +46,7 @@ public class ZoomHandler {
      */
     public static float getFovModifier() {
 
-        //To not zoom out further than normal FOV
-        if (zoomModifier > 1.0F) zoomModifier = 1.0F;
-        //To not break FOV calculations
-        if (zoomModifier <= 0.0F) zoomModifier = 0.0000000001F;
+        zoomModifier = ZoomMath.clampFovModifier(zoomModifier);
 
         return zoomModifier;
 
