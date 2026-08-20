@@ -64,9 +64,6 @@ public class OptionsScreen extends Screen {
         this.addButtonRow(currentY,
                 this.buildToggleButton(JustZoom.getOptions().hideArmsWhenZooming, "justzoom.options.hide_arms_when_zooming"),
                 this.buildToggleButton(JustZoom.getOptions().resetZoomFactorOnStopZooming, "justzoom.options.reset_zoom_factor_when_stop_zooming"));
-        currentY += spacing;
-
-        this.addButtonRow(currentY, this.buildCornerButton(JustZoom.getOptions().optionsButtonCorner, "justzoom.options.options_button_corner"), null);
 
         this.addRenderableWidget(Button.builder(CommonComponents.GUI_DONE, button -> this.onClose()).bounds(centerX - 75, this.height - 40, 150, BUTTON_HEIGHT).build());
 
@@ -85,37 +82,13 @@ public class OptionsScreen extends Screen {
 
     }
 
-    protected Button buildCornerButton(@NotNull AbstractOptions.Option<Integer> option, @NotNull String labelBaseKey) {
-
-        String[] cornerKeys = new String[] {
-                "justzoom.options.corner.bottom_left",
-                "justzoom.options.corner.bottom_right",
-                "justzoom.options.corner.top_left",
-                "justzoom.options.corner.top_right"
-        };
-
-        int currentValue = option.getValue();
-        Component buttonText = Component.translatable(labelBaseKey, Component.translatable(cornerKeys[currentValue]).withStyle(Style.EMPTY.withColor(ChatFormatting.GOLD)));
-
-        return Button.builder(buttonText, button -> {
-                    int newValue = (option.getValue() + 1) % 4;
-                    option.setValue(newValue);
-                    button.setMessage(Component.translatable(labelBaseKey, Component.translatable(cornerKeys[newValue]).withStyle(Style.EMPTY.withColor(ChatFormatting.GOLD))));
-                }).bounds(0, 0, this.getButtonWidth(), BUTTON_HEIGHT)
-                .tooltip(Tooltip.create(Component.translatable(labelBaseKey + ".desc"))).build();
-
-    }
-
-    protected void addButtonRow(int y, @NotNull Button leftButton, @Nullable Button rightButton) {
+    protected void addButtonRow(int y, @NotNull Button leftButton, @NotNull Button rightButton) {
         int buttonWidth = this.getButtonWidth();
         int leftX = this.getLeftButtonX(buttonWidth);
-        leftButton.setPosition(rightButton == null ? (this.width / 2) - (buttonWidth / 2) : leftX, y);
+        leftButton.setPosition(leftX, y);
         this.addRenderableWidget(leftButton);
-
-        if (rightButton != null) {
-            rightButton.setPosition(leftX + buttonWidth + BUTTON_ROW_GAP, y);
-            this.addRenderableWidget(rightButton);
-        }
+        rightButton.setPosition(leftX + buttonWidth + BUTTON_ROW_GAP, y);
+        this.addRenderableWidget(rightButton);
     }
 
     protected int getButtonWidth() {

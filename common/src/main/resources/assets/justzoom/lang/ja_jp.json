@@ -21,11 +21,5 @@
   "justzoom.options.reset_zoom_factor_when_stop_zooming": "ズーム倍率リセット: %s",
   "justzoom.options.reset_zoom_factor_when_stop_zooming.desc": "有効にすると、ズーム開始時に倍率が基本値にリセットされ、\n前回のズームレベルから続きません。",
   "justzoom.options.toggle.enabled": "オン",
-  "justzoom.options.toggle.disabled": "オフ",
-  "justzoom.options.options_button_corner": "設定ボタンの位置: %s",
-  "justzoom.options.options_button_corner.desc": "ポーズ画面でJust Zoom設定ボタンが表示される位置です。\n\nJust Zoomのconfig.txtでボタンを完全に非表示にできます。",
-  "justzoom.options.corner.bottom_left": "左下",
-  "justzoom.options.corner.bottom_right": "右下",
-  "justzoom.options.corner.top_left": "左上",
-  "justzoom.options.corner.top_right": "右上"
+  "justzoom.options.toggle.disabled": "オフ"
 }

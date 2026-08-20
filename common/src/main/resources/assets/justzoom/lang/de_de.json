@@ -21,11 +21,5 @@
   "justzoom.options.reset_zoom_factor_when_stop_zooming": "Zoomfaktor zurücksetzen: %s",
   "justzoom.options.reset_zoom_factor_when_stop_zooming.desc": "Falls aktiviert, wird der Zoomfaktor beim Start des Zoomens auf den Basiswert zurückgesetzt,\nanstatt vom letzten Zoomlevel weiterzumachen.",
   "justzoom.options.toggle.enabled": "Aktiviert",
-  "justzoom.options.toggle.disabled": "Deaktiviert",
-  "justzoom.options.options_button_corner": "Position des Optionen-Buttons: %s",
-  "justzoom.options.options_button_corner.desc": "Die Ecke im Pausenmenü, wo der Just Zoom Optionen-Button erscheinen soll.\n\nDu kannst den Button in der config.txt von Just Zoom komplett verstecken.",
-  "justzoom.options.corner.bottom_left": "Unten Links",
-  "justzoom.options.corner.bottom_right": "Unten Rechts",
-  "justzoom.options.corner.top_left": "Oben Links",
-  "justzoom.options.corner.top_right": "Oben Rechts"
+  "justzoom.options.toggle.disabled": "Deaktiviert"
 }

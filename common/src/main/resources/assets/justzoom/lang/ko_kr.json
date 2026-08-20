@@ -21,11 +21,5 @@
   "justzoom.options.reset_zoom_factor_when_stop_zooming": "줌 배율 초기화: %s",
   "justzoom.options.reset_zoom_factor_when_stop_zooming.desc": "활성화하면 줌을 시작할 때 배율이 기본값으로 재설정되며,\n마지막 줌 레벨에서 계속되지 않습니다.",
   "justzoom.options.toggle.enabled": "활성화됨",
-  "justzoom.options.toggle.disabled": "비활성화됨",
-  "justzoom.options.options_button_corner": "옵션 버튼 위치: %s",
-  "justzoom.options.options_button_corner.desc": "Just Zoom 옵션 버튼이 일시정지 화면의 어느 모서리에 나타날지 설정합니다.\n\nJust Zoom의 config.txt 파일에서 버튼을 완전히 숨길 수 있습니다.",
-  "justzoom.options.corner.bottom_left": "왼쪽 아래",
-  "justzoom.options.corner.bottom_right": "오른쪽 아래",
-  "justzoom.options.corner.top_left": "왼쪽 위",
-  "justzoom.options.corner.top_right": "오른쪽 위"
+  "justzoom.options.toggle.disabled": "비활성화됨"
 }

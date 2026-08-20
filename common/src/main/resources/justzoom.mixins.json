@@ -8,8 +8,7 @@
     "client.MixinCameraType",
     "client.MixinGameRenderer",
     "client.MixinKeyMapping_Category",
-    "client.MixinMouseHandler",
-    "client.MixinPauseScreen"
+    "client.MixinMouseHandler"
   ],
   "mixins": [
   ],

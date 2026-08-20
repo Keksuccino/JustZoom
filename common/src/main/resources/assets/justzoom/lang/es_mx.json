@@ -21,11 +21,5 @@
   "justzoom.options.reset_zoom_factor_when_stop_zooming": "Reiniciar Factor de Zoom: %s",
   "justzoom.options.reset_zoom_factor_when_stop_zooming.desc": "Si está activado, el factor de zoom se reiniciará al valor base cuando empieces a hacer zoom,\nen lugar de continuar desde el último nivel de zoom.",
   "justzoom.options.toggle.enabled": "Activado",
-  "justzoom.options.toggle.disabled": "Desactivado",
-  "justzoom.options.options_button_corner": "Posición del Botón de Opciones: %s",
-  "justzoom.options.options_button_corner.desc": "La esquina de la pantalla de pausa donde debe aparecer el botón de opciones de Just Zoom.\n\nPuedes ocultar completamente el botón en el archivo config.txt de Just Zoom.",
-  "justzoom.options.corner.bottom_left": "Abajo Izquierda",
-  "justzoom.options.corner.bottom_right": "Abajo Derecha",
-  "justzoom.options.corner.top_left": "Arriba Izquierda",
-  "justzoom.options.corner.top_right": "Arriba Derecha"
+  "justzoom.options.toggle.disabled": "Desactivado"
 }

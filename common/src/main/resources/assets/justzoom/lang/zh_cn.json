@@ -21,11 +21,5 @@
   "justzoom.options.reset_zoom_factor_when_stop_zooming": "重置缩放倍率：%s",
   "justzoom.options.reset_zoom_factor_when_stop_zooming.desc": "如果启用，开始缩放时倍率将重置为基础值，\n而不是从上次的缩放级别继续。",
   "justzoom.options.toggle.enabled": "启用",
-  "justzoom.options.toggle.disabled": "禁用",
-  "justzoom.options.options_button_corner": "选项按钮位置：%s",
-  "justzoom.options.options_button_corner.desc": "Just Zoom选项按钮应该出现在暂停界面的哪个角落。\n\n你可以在Just Zoom的config.txt文件中完全隐藏该按钮。",
-  "justzoom.options.corner.bottom_left": "左下角",
-  "justzoom.options.corner.bottom_right": "右下角",
-  "justzoom.options.corner.top_left": "左上角",
-  "justzoom.options.corner.top_right": "右上角"
+  "justzoom.options.toggle.disabled": "禁用"
 }

@@ -21,11 +21,5 @@
   "justzoom.options.reset_zoom_factor_when_stop_zooming": "Yakınlaştırma Katsayısını Sıfırla: %s",
   "justzoom.options.reset_zoom_factor_when_stop_zooming.desc": "Etkinleştirilirse, yakınlaştırmaya başladığında katsayı temel değere sıfırlanır,\nson yakınlaştırma seviyesinden devam etmek yerine.",
   "justzoom.options.toggle.enabled": "Açık",
-  "justzoom.options.toggle.disabled": "Kapalı",
-  "justzoom.options.options_button_corner": "Ayarlar Düğmesi Konumu: %s",
-  "justzoom.options.options_button_corner.desc": "Just Zoom ayarlar düğmesinin duraklatma ekranının hangi köşesinde görünmesi gerektiği.\n\nDüğmeyi Just Zoom'un config.txt dosyasından tamamen gizleyebilirsin.",
-  "justzoom.options.corner.bottom_left": "Sol Alt",
-  "justzoom.options.corner.bottom_right": "Sağ Alt",
-  "justzoom.options.corner.top_left": "Sol Üst",
-  "justzoom.options.corner.top_right": "Sağ Üst"
+  "justzoom.options.toggle.disabled": "Kapalı"
 }
