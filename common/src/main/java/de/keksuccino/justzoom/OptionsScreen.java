@@ -56,7 +56,6 @@ public class OptionsScreen extends Screen {
     protected static final int FLOAT_INPUT_GAP = 5;
     protected static final int FLOAT_INPUT_MIN_WIDTH = 40;
     protected static final int OPTION_ROW_ADVANCE = 26;
-    protected static final int OPTION_SECTION_PADDING_TOP = 10;
     protected static final int RESET_BUTTON_WIDTH = 50;
     protected static final Identifier TAB_HEADER_BACKGROUND = Identifier.withDefaultNamespace("textures/gui/tab_header_background.png");
     protected static final KeybindSetting ZOOM_KEYBIND = new KeybindSetting(KeyMappings.KEY_TOGGLE_ZOOM, "justzoom.options.zoom_keybind", "justzoom.options.zoom_keybind.desc");
@@ -125,7 +124,7 @@ public class OptionsScreen extends Screen {
         this.addToggleOption(tab, JustZoom.getOptions().hideArmsWhenZooming, "justzoom.options.hide_arms_when_zooming");
         this.addCycleOption(tab, JustZoom.getOptions().showHud, ShowHudMode::next, this::showHudMessage, "justzoom.options.show_hud.desc");
         this.addToggleOption(tab, JustZoom.getOptions().resetZoomFactorOnStopZooming, "justzoom.options.reset_zoom_factor_when_stop_zooming");
-        this.addToggleOption(tab, JustZoom.getOptions().useJustZoomForSpyglass, "justzoom.options.use_just_zoom_for_spyglass", settings -> settings.paddingTop(OPTION_SECTION_PADDING_TOP));
+        this.addToggleOption(tab, JustZoom.getOptions().useJustZoomForSpyglass, "justzoom.options.use_just_zoom_for_spyglass");
         this.addCycleOption(tab, JustZoom.getOptions().spyglassOverlay, SpyglassOverlayMode::next, this::spyglassOverlayMessage, "justzoom.options.spyglass_overlay.desc");
         this.addCycleOption(tab, JustZoom.getOptions().spyglassSounds, SpyglassSoundsMode::next, this::spyglassSoundsMessage, "justzoom.options.spyglass_sounds.desc");
         return tab;
