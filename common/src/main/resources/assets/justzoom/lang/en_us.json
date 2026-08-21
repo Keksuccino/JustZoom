@@ -25,8 +25,12 @@
   "justzoom.options.reset_zoom_factor_when_stop_zooming.desc": "If enabled, the zoom factor will be reset to the base value when you start zooming,\ninstead of continuing from the last zoom level.",
   "justzoom.options.use_just_zoom_for_spyglass": "Use Just Zoom for Spyglass: %s",
   "justzoom.options.use_just_zoom_for_spyglass.desc": "If enabled, using a spyglass activates the same zoom mode as the normal zoom keybind.",
-  "justzoom.options.show_spyglass_overlay": "Show Spyglass Overlay: %s",
-  "justzoom.options.show_spyglass_overlay.desc": "If disabled, the spyglass overlay and its black border are hidden to keep the whole screen visible.",
+  "justzoom.options.spyglass_overlay": "Spyglass Overlay: %s",
+  "justzoom.options.spyglass_overlay.desc": "Controls when the spyglass overlay and its black border are shown.",
+  "justzoom.options.spyglass_overlay.only_spyglass": "Only Spyglass",
+  "justzoom.options.spyglass_overlay.only_keybind_zoom": "Only Keybind Zoom",
+  "justzoom.options.spyglass_overlay.spyglass_and_keybind_zoom": "Spyglass & Keybind Zoom",
+  "justzoom.options.spyglass_overlay.disabled": "Disabled",
   "justzoom.options.toggle.enabled": "Enabled",
   "justzoom.options.toggle.disabled": "Disabled"
 }

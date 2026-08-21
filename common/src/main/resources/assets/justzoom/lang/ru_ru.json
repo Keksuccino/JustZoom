@@ -25,8 +25,12 @@
   "justzoom.options.reset_zoom_factor_when_stop_zooming.desc": "Если включено, коэффициент зума сбросится до базового значения при начале зума,\nвместо продолжения с последнего уровня зума.",
   "justzoom.options.use_just_zoom_for_spyglass": "Использовать Just Zoom для подзорной трубы: %s",
   "justzoom.options.use_just_zoom_for_spyglass.desc": "Если включено, использование подзорной трубы активирует тот же режим зума, что и обычная клавиша зума.",
-  "justzoom.options.show_spyglass_overlay": "Показывать оверлей подзорной трубы: %s",
-  "justzoom.options.show_spyglass_overlay.desc": "Если выключено, оверлей подзорной трубы и его чёрная рамка скрываются, чтобы весь экран оставался видимым.",
+  "justzoom.options.spyglass_overlay": "Оверлей подзорной трубы: %s",
+  "justzoom.options.spyglass_overlay.desc": "Определяет, когда показываются оверлей подзорной трубы и его чёрная рамка.",
+  "justzoom.options.spyglass_overlay.only_spyglass": "Только подзорная труба",
+  "justzoom.options.spyglass_overlay.only_keybind_zoom": "Только клавиша зума",
+  "justzoom.options.spyglass_overlay.spyglass_and_keybind_zoom": "Подзорная труба и клавиша зума",
+  "justzoom.options.spyglass_overlay.disabled": "Выключено",
   "justzoom.options.toggle.enabled": "Включено",
   "justzoom.options.toggle.disabled": "Выключено"
 }

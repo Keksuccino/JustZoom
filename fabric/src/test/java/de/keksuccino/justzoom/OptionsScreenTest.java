@@ -82,6 +82,14 @@ class OptionsScreenTest {
         assertEquals(100, widths.labelWidth() + OptionsScreen.FLOAT_INPUT_GAP + widths.inputWidth());
     }
 
+    @Test
+    void spyglassOverlayCycleUsesOrangeExceptWhenDisabled() {
+        assertEquals(OptionsScreen.CYCLE_VALUE_COLOR, OptionsScreen.spyglassOverlayValueColor(SpyglassOverlayMode.ONLY_SPYGLASS));
+        assertEquals(OptionsScreen.CYCLE_VALUE_COLOR, OptionsScreen.spyglassOverlayValueColor(SpyglassOverlayMode.ONLY_KEYBIND_ZOOM));
+        assertEquals(OptionsScreen.CYCLE_VALUE_COLOR, OptionsScreen.spyglassOverlayValueColor(SpyglassOverlayMode.SPYGLASS_AND_KEYBIND_ZOOM));
+        assertEquals(OptionsScreen.DISABLED_CYCLE_VALUE_COLOR, OptionsScreen.spyglassOverlayValueColor(SpyglassOverlayMode.DISABLED));
+    }
+
     private static KeyMapping keyMapping(String suffix, int defaultKey) {
         return new KeyMapping("justzoom.test." + suffix, defaultKey, CATEGORY);
     }

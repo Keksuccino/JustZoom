@@ -25,8 +25,12 @@
   "justzoom.options.reset_zoom_factor_when_stop_zooming.desc": "Si está activado, el factor de zoom se reiniciará al valor base cuando empieces a hacer zoom,\nen lugar de continuar desde el último nivel de zoom.",
   "justzoom.options.use_just_zoom_for_spyglass": "Usar Just Zoom con Catalejo: %s",
   "justzoom.options.use_just_zoom_for_spyglass.desc": "Si está activado, usar un catalejo activa el mismo modo de zoom que la tecla normal de zoom.",
-  "justzoom.options.show_spyglass_overlay": "Mostrar Superposición del Catalejo: %s",
-  "justzoom.options.show_spyglass_overlay.desc": "Si está desactivado, la superposición del catalejo y su borde negro se ocultan para mantener visible toda la pantalla.",
+  "justzoom.options.spyglass_overlay": "Superposición del Catalejo: %s",
+  "justzoom.options.spyglass_overlay.desc": "Controla cuándo se muestran la superposición del catalejo y su borde negro.",
+  "justzoom.options.spyglass_overlay.only_spyglass": "Solo Catalejo",
+  "justzoom.options.spyglass_overlay.only_keybind_zoom": "Solo Tecla de Zoom",
+  "justzoom.options.spyglass_overlay.spyglass_and_keybind_zoom": "Catalejo y Tecla de Zoom",
+  "justzoom.options.spyglass_overlay.disabled": "Desactivado",
   "justzoom.options.toggle.enabled": "Activado",
   "justzoom.options.toggle.disabled": "Desactivado"
 }

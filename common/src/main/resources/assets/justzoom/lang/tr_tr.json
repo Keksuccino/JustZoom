@@ -25,8 +25,12 @@
   "justzoom.options.reset_zoom_factor_when_stop_zooming.desc": "Etkinleştirilirse, yakınlaştırmaya başladığında katsayı temel değere sıfırlanır,\nson yakınlaştırma seviyesinden devam etmek yerine.",
   "justzoom.options.use_just_zoom_for_spyglass": "Dürbün için Just Zoom Kullan: %s",
   "justzoom.options.use_just_zoom_for_spyglass.desc": "Etkinleştirilirse dürbün kullanmak, normal yakınlaştırma tuşuyla aynı yakınlaştırma modunu etkinleştirir.",
-  "justzoom.options.show_spyglass_overlay": "Dürbün Kaplamasını Göster: %s",
-  "justzoom.options.show_spyglass_overlay.desc": "Devre dışı bırakılırsa dürbün kaplaması ve siyah kenarlığı gizlenir, böylece ekranın tamamı görünür kalır.",
+  "justzoom.options.spyglass_overlay": "Dürbün Kaplaması: %s",
+  "justzoom.options.spyglass_overlay.desc": "Dürbün kaplamasının ve siyah kenarlığının ne zaman gösterileceğini belirler.",
+  "justzoom.options.spyglass_overlay.only_spyglass": "Yalnızca Dürbün",
+  "justzoom.options.spyglass_overlay.only_keybind_zoom": "Yalnızca Yakınlaştırma Tuşu",
+  "justzoom.options.spyglass_overlay.spyglass_and_keybind_zoom": "Dürbün ve Yakınlaştırma Tuşu",
+  "justzoom.options.spyglass_overlay.disabled": "Kapalı",
   "justzoom.options.toggle.enabled": "Açık",
   "justzoom.options.toggle.disabled": "Kapalı"
 }

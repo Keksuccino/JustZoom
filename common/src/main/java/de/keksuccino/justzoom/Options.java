@@ -3,6 +3,9 @@ package de.keksuccino.justzoom;
 import de.keksuccino.justzoom.util.config.ConfigSection;
 import de.keksuccino.justzoom.util.config.ConfigValue;
 import de.keksuccino.justzoom.util.config.JsonConfig;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import java.io.File;
 
 public class Options extends JsonConfig {
 
@@ -21,10 +24,18 @@ public class Options extends JsonConfig {
     public final ConfigValue<Boolean> hideArmsWhenZooming = this.zoom.option("hide_arms_when_zooming", false);
     public final ConfigValue<Boolean> resetZoomFactorOnStopZooming = this.zoom.option("reset_zoom_factor_when_stop_zooming", false);
     public final ConfigValue<Boolean> useJustZoomForSpyglass = this.spyglass.option("use_just_zoom_for_spyglass", true);
-    public final ConfigValue<Boolean> showSpyglassOverlay = this.spyglass.option("show_spyglass_overlay", true);
+    public final ConfigValue<SpyglassOverlayMode> spyglassOverlay = this.spyglass.option("spyglass_overlay", SpyglassOverlayMode.ONLY_SPYGLASS);
+
+    private final ConfigValue<Boolean> legacyShowSpyglassOverlay = this.spyglass.optional("show_spyglass_overlay", Boolean.class);
 
     public Options() {
-        super(JustZoom.OPTIONS_FILE, JustZoom.LEGACY_OPTIONS_FILE);
+        this(JustZoom.OPTIONS_FILE, JustZoom.LEGACY_OPTIONS_FILE);
+    }
+
+    Options(@NotNull File file, @Nullable File legacyFile) {
+        super(file, legacyFile);
+        // This setting intentionally starts from its new default instead of migrating either value of the old boolean.
+        this.legacyShowSpyglassOverlay.remove();
         this.save();
     }
 

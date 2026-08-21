@@ -25,8 +25,12 @@
   "justzoom.options.reset_zoom_factor_when_stop_zooming.desc": "활성화하면 줌을 시작할 때 배율이 기본값으로 재설정되며,\n마지막 줌 레벨에서 계속되지 않습니다.",
   "justzoom.options.use_just_zoom_for_spyglass": "망원경에 Just Zoom 사용: %s",
   "justzoom.options.use_just_zoom_for_spyglass.desc": "활성화하면 망원경을 사용할 때 일반 줌 키와 동일한 줌 모드가 활성화됩니다.",
-  "justzoom.options.show_spyglass_overlay": "망원경 오버레이 표시: %s",
-  "justzoom.options.show_spyglass_overlay.desc": "비활성화하면 망원경 오버레이와 검은색 테두리를 숨겨 전체 화면이 보이도록 합니다.",
+  "justzoom.options.spyglass_overlay": "망원경 오버레이: %s",
+  "justzoom.options.spyglass_overlay.desc": "망원경 오버레이와 검은색 테두리가 표시되는 시기를 설정합니다.",
+  "justzoom.options.spyglass_overlay.only_spyglass": "망원경만",
+  "justzoom.options.spyglass_overlay.only_keybind_zoom": "줌 키만",
+  "justzoom.options.spyglass_overlay.spyglass_and_keybind_zoom": "망원경 및 줌 키",
+  "justzoom.options.spyglass_overlay.disabled": "비활성화됨",
   "justzoom.options.toggle.enabled": "활성화됨",
   "justzoom.options.toggle.disabled": "비활성화됨"
 }

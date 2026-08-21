@@ -25,8 +25,12 @@
   "justzoom.options.reset_zoom_factor_when_stop_zooming.desc": "Якщо увімкнено, коефіцієнт зуму скинеться до базового значення при початку зуму,\nзамість продовження з останнього рівня зуму.",
   "justzoom.options.use_just_zoom_for_spyglass": "Використовувати Just Zoom для підзорної труби: %s",
   "justzoom.options.use_just_zoom_for_spyglass.desc": "Якщо увімкнено, використання підзорної труби активує той самий режим зуму, що й звичайна клавіша зуму.",
-  "justzoom.options.show_spyglass_overlay": "Показувати оверлей підзорної труби: %s",
-  "justzoom.options.show_spyglass_overlay.desc": "Якщо вимкнено, оверлей підзорної труби та його чорна рамка приховуються, щоб увесь екран залишався видимим.",
+  "justzoom.options.spyglass_overlay": "Оверлей підзорної труби: %s",
+  "justzoom.options.spyglass_overlay.desc": "Визначає, коли показуються оверлей підзорної труби та його чорна рамка.",
+  "justzoom.options.spyglass_overlay.only_spyglass": "Лише підзорна труба",
+  "justzoom.options.spyglass_overlay.only_keybind_zoom": "Лише клавіша зуму",
+  "justzoom.options.spyglass_overlay.spyglass_and_keybind_zoom": "Підзорна труба та клавіша зуму",
+  "justzoom.options.spyglass_overlay.disabled": "Вимкнено",
   "justzoom.options.toggle.enabled": "Увімкнено",
   "justzoom.options.toggle.disabled": "Вимкнено"
 }

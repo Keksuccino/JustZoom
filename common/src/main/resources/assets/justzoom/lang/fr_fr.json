@@ -25,8 +25,12 @@
   "justzoom.options.reset_zoom_factor_when_stop_zooming.desc": "Si activé, le facteur de zoom sera réinitialisé à la valeur de base au début du zoom,\nau lieu de continuer depuis le dernier niveau de zoom.",
   "justzoom.options.use_just_zoom_for_spyglass": "Utiliser Just Zoom avec la longue-vue : %s",
   "justzoom.options.use_just_zoom_for_spyglass.desc": "Si activé, utiliser une longue-vue déclenche le même mode de zoom que la touche de zoom normale.",
-  "justzoom.options.show_spyglass_overlay": "Afficher l'overlay de la longue-vue : %s",
-  "justzoom.options.show_spyglass_overlay.desc": "Si désactivé, l'overlay de la longue-vue et son contour noir sont masqués afin de garder tout l'écran visible.",
+  "justzoom.options.spyglass_overlay": "Overlay de la longue-vue : %s",
+  "justzoom.options.spyglass_overlay.desc": "Définit quand l'overlay de la longue-vue et son contour noir sont affichés.",
+  "justzoom.options.spyglass_overlay.only_spyglass": "Longue-vue uniquement",
+  "justzoom.options.spyglass_overlay.only_keybind_zoom": "Touche de zoom uniquement",
+  "justzoom.options.spyglass_overlay.spyglass_and_keybind_zoom": "Longue-vue et touche de zoom",
+  "justzoom.options.spyglass_overlay.disabled": "Désactivé",
   "justzoom.options.toggle.enabled": "Activé",
   "justzoom.options.toggle.disabled": "Désactivé"
 }

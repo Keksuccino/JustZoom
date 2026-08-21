@@ -43,6 +43,7 @@ public class OptionsScreen extends Screen {
     protected static final int BUTTON_HEIGHT = 20;
     protected static final int BUTTON_ROW_MAX_WIDTH = 360;
     protected static final int CYCLE_VALUE_COLOR = 0xFFAA00;
+    protected static final int DISABLED_CYCLE_VALUE_COLOR = 0xFF5555;
     protected static final int FLOAT_INPUT_GAP = 5;
     protected static final int FLOAT_INPUT_MIN_WIDTH = 40;
     protected static final int KEYBIND_RESET_BUTTON_WIDTH = 50;
@@ -108,7 +109,7 @@ public class OptionsScreen extends Screen {
         this.addFullWidthOption(tab, this.buildToggleButton(JustZoom.getOptions().hideArmsWhenZooming, "justzoom.options.hide_arms_when_zooming"));
         this.addFullWidthOption(tab, this.buildToggleButton(JustZoom.getOptions().resetZoomFactorOnStopZooming, "justzoom.options.reset_zoom_factor_when_stop_zooming"));
         this.addFullWidthOption(tab, this.buildToggleButton(JustZoom.getOptions().useJustZoomForSpyglass, "justzoom.options.use_just_zoom_for_spyglass"), settings -> settings.paddingTop(OPTION_SECTION_PADDING_TOP));
-        this.addFullWidthOption(tab, this.buildToggleButton(JustZoom.getOptions().showSpyglassOverlay, "justzoom.options.show_spyglass_overlay"));
+        this.addFullWidthOption(tab, this.buildSpyglassOverlayButton());
         return tab;
     }
 
@@ -159,6 +160,16 @@ public class OptionsScreen extends Screen {
             option.setValue(!option.getValue());
             pressedButton.setMessage(this.toggleMessage(option, labelBaseKey));
         }).size(this.getButtonWidth(), BUTTON_HEIGHT).tooltip(Tooltip.create(Component.translatable(labelBaseKey + ".desc"))).build();
+        return button;
+    }
+
+    @NotNull
+    protected Button buildSpyglassOverlayButton() {
+        ConfigValue<SpyglassOverlayMode> option = JustZoom.getOptions().spyglassOverlay;
+        Button button = Button.builder(this.spyglassOverlayMessage(option.getValue()), pressedButton -> {
+            option.update(SpyglassOverlayMode::next);
+            pressedButton.setMessage(this.spyglassOverlayMessage(option.getValue()));
+        }).size(this.getButtonWidth(), BUTTON_HEIGHT).tooltip(Tooltip.create(Component.translatable("justzoom.options.spyglass_overlay.desc"))).build();
         return button;
     }
 
@@ -216,6 +227,16 @@ public class OptionsScreen extends Screen {
     protected Component toggleMessage(@NotNull ConfigValue<Boolean> option, @NotNull String labelBaseKey) {
         Component value = Component.translatable(option.getValue() ? "justzoom.options.toggle.enabled" : "justzoom.options.toggle.disabled").withStyle(Style.EMPTY.withColor(option.getValue() ? ChatFormatting.GREEN : ChatFormatting.RED));
         return Component.translatable(labelBaseKey, value);
+    }
+
+    @NotNull
+    protected Component spyglassOverlayMessage(@NotNull SpyglassOverlayMode mode) {
+        Component value = Component.translatable(mode.getTranslationKey()).withStyle(Style.EMPTY.withColor(spyglassOverlayValueColor(mode)));
+        return Component.translatable("justzoom.options.spyglass_overlay", value);
+    }
+
+    static int spyglassOverlayValueColor(@NotNull SpyglassOverlayMode mode) {
+        return mode == SpyglassOverlayMode.DISABLED ? DISABLED_CYCLE_VALUE_COLOR : CYCLE_VALUE_COLOR;
     }
 
     @NotNull
