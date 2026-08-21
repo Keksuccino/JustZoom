@@ -9,6 +9,7 @@ CHANGELOG | JUST ZOOM v2.2.0 [ W I P !!! NOT PUBLIC YET !!! ]
 - You can now configure when spyglass sounds should play, and they will play by default when zooming with they keybind now (can be changed in settings).
 - It's now possible to zoom in even more than before.
 - Just Zoom now makes the spyglass work in third-person view, when enabled in the settings.
+- Added setting to control when to show the HUD while zooming (only spyglass, only keybind zoom, both, never; default is "never").
 - Improved the smooth zoom speed and feel.
 - Improved the mouse sensitivity normalization.
 - Added configurable keybinds for zoom in/out actions.
