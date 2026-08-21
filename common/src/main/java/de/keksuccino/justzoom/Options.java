@@ -21,14 +21,12 @@ public class Options extends JsonConfig {
     public final ConfigValue<Boolean> smoothCameraOnZoom = this.zoom.option("smooth_camera_movement_on_zoom", false);
     public final ConfigValue<Boolean> normalizeMouseSensitivityOnZoom = this.zoom.option("normalize_mouse_sensitivity_on_zoom", true);
     public final ConfigValue<Boolean> allowZoomInMirroredView = this.zoom.option("allow_zoom_in_mirrored_view", false);
-    public final ConfigValue<Boolean> hideArmsWhenZooming = this.zoom.option("hide_arms_when_zooming", false);
+    public final ConfigValue<Boolean> hideArmsWhenZooming = this.zoom.option("hide_arms_when_zooming", true);
     public final ConfigValue<ShowHudMode> showHud = this.zoom.option("show_hud", ShowHudMode.NEVER);
     public final ConfigValue<Boolean> resetZoomFactorOnStopZooming = this.zoom.option("reset_zoom_factor_when_stop_zooming", false);
     public final ConfigValue<Boolean> useJustZoomForSpyglass = this.spyglass.option("use_just_zoom_for_spyglass", true);
     public final ConfigValue<SpyglassOverlayMode> spyglassOverlay = this.spyglass.option("spyglass_overlay", SpyglassOverlayMode.ONLY_SPYGLASS);
     public final ConfigValue<SpyglassSoundsMode> spyglassSounds = this.spyglass.option("spyglass_sounds", SpyglassSoundsMode.SPYGLASS_AND_KEYBIND_ZOOM);
-
-    private final ConfigValue<Boolean> legacyShowSpyglassOverlay = this.spyglass.optional("show_spyglass_overlay", Boolean.class);
 
     public Options() {
         this(JustZoom.OPTIONS_FILE, JustZoom.LEGACY_OPTIONS_FILE);
@@ -36,8 +34,6 @@ public class Options extends JsonConfig {
 
     Options(@NotNull File file, @Nullable File legacyFile) {
         super(file, legacyFile);
-        // This setting intentionally starts from its new default instead of migrating either value of the old boolean.
-        this.legacyShowSpyglassOverlay.remove();
         this.save();
     }
 
