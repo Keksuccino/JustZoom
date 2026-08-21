@@ -18,46 +18,20 @@
 - You should avoid writing permanent data to this "root" workspace here. Temporary working data is okay, but clear it up at the end, since your actual work targets will always be the sub-workspaces, where you should actually make changes to/write to.
 
 ## Coding Style & Naming Conventions
-- Target the correct Java version for each sub-workspace with 4-space indentation and UTF-8 encoding (WITHOUT BOM), matching the Gradle toolchain configuration.
+- Target the correct Java version for each sub-workspace.
 - Follow existing packages under `de.keksuccino.justzoom`, mirroring existing sub-packages to keep cross-loader boundaries clear.
 - Name resources with the `justzoom` prefix (e.g., `justzoom.mixins.json`, `justzoom.accesswidener`) so Gradle and the loaders resolve them consistently.
-- Prefer explicit nullability annotations from `jsr305`.
-- Code should be made reusable/shareable whenever possible. Avoid copy-pasting nearly identical code to multiple places when you could make it a shared method/field/etc. instead.
-- The whole project (code, classes, packages, etc.) should always be well-structured and organized, with great focus on easy maintainability. The project should be easy to understand and maintain for new devs later.
-- Avoid god classes. Split large classes into organized and well-structured smaller classes.
-- Avoid spanning method heads and method calls over multiple lines, no matter how long they are. One line per method head and method call.
-- Always document fragile parts of the code that could break easily when handled wrong. Explain what they do and what is important for them.
-- Always document code that could look a bit hacky, weird, or even useless at first look. Explain what the code does, why it is there, and what is important to note for it.
 - Prefer giving every class that needs a logger its own static final LOGGER object, instead of using a global shared logger.
 - The code base between all sub-workspaces should always look as similar/identical as possible, to easily find a specific piece of logic in multiple sub-workspaces.
 
-## Mixin Structurization
+## Mixin
 - Place shared mixins under `common/src/main/java/de/keksuccino/justzoom/mixin/mixins/common/<side>` and mirror the existing folder depth when adding new targets.
-- Declare `@Mixin` classes (and accessor interfaces) with imports grouped at the top, list `@Unique` members before any `@Shadow` declarations, and extend or implement the vanilla type when necessary; supply a suppressed dummy constructor when subclasses require it.
 - Suffix every unique field or helper with `_JustZoom`. Static finals use all caps with `_JUSTZOOM`, and injected method names follow the `before/after/on/wrap/cancel_<VanillaMethod>_JustZoom` pattern. Accessor/invoker methods also end in `_JustZoom`.
-- Cluster related injections together (for example, all `setScreen` hooks in `MixinGui`) and keep helper wrappers private unless a wider contract is required.
-- Use short `//` comments for quick reminders and `/** @reason ... */` blocks ahead of injections that change vanilla behavior, matching the authoring tone in existing files.
-- Just Zoom has access to Mixin Extras.
-- Prefer using features from Mixin Extras instead of using normal Mixin redirects or overrides.
 - When leveraging Mixin Extras (`WrapOperation`, `WrapWithCondition`, etc.), name helpers after the intent (`wrap_..._JustZoom`, `cancel_..._JustZoom`) and call the provided `Operation` when returning to vanilla flow.
-- When creating normal Mixin classes, call them `Mixin<OriginalClassName>`, so for the `Minecraft` class that would be `MixinMinecraft`.
-- When creating Mixin accessor interfaces, name them `AccessorMixin<OriginalClassName>`, so for the `Minecraft` class that would be `AccessorMixinMinecraft`.
-- Keep Mixin classes lightweight.
-- Unique methods in Mixin classes go BELOW normal Mixin methods (like injections, wrap operations, etc.).
-- Unique fields go BELOW shadow fields in Mixin classes.
-- Both unique and shadow fields should always be at the top of the class, before any methods.
-- Avoid spanning Mixin annotations over multiple lines, no matter how long they are. Each annotation should only consume one line. One line per annotation.
-- A special case for Mixin-related annotations are @Shadow, @Unique, @Final, and @Mutable on fields in Mixin classes. For fields, these should always go on the same line as the field itself, as prefix. Both these annotations and the field itself on a single line.
-- You can't nest classes or interfaces in Mixin classes. You need to place them outside Mixin classes.
-- You can't place non-Mixin classes/interfaces in packages declared as "Mixin packages". You need to place them outside these packages.
 
 ## Workflow Guidelines
 - When the user gives you a log snippet, always search for the full log file containing that snippet, and scan the whole log, so you have a complete picture of what was happening.
-- Do not simply implement things without a second thought. Simulate in your reasoning STEP-BY-STEP what each step of the execution chain of the code you implemented does, where it does something, and what could be side effects of it. Chase the whole code execution chain step-by-step, to notice edge cases, incomplete implementations, bugs, etc.
-- Always implement everything in the best way possible. Implement everything in the most optimized, performance-friendly, and professional way, following best practices for everything.
-- Never rush tasks. It doesn't matter how long a task will take, you always take the best possible route instead of the fastest.
 - Everything always needs to be compatible with Sodium and Iris. To check compatibility for these, scan the Sodium and Iris sources in the places you touch, to check if Sodium/Iris touch it too, and then see if both work well together.
-- Always clean up after yourself! When finishing a task, remove leftover code from testing, code from earlier unsuccessful implementation attempts, and dead code.
 - When you work with Vanilla Minecraft code, or Iris/Sodium, always deeply analyze the source code for these, so you really understand what you are working with and how the related code works.
 
 ## Mod Conflicts
