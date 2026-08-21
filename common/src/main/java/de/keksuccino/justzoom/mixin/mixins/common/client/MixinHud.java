@@ -22,9 +22,10 @@ public abstract class MixinHud {
 
     @Shadow @Final private Minecraft minecraft;
     @Shadow private boolean isHidden;
+    @Shadow private float scopeScale;
 
-    @Unique private float spyglassOverlayScale_JustZoom = 0.5F;
     @Unique private boolean showSpyglassOverlay_JustZoom;
+    @Unique private boolean useJustZoomSpyglassOverlayAnimation_JustZoom;
 
     @Shadow protected abstract void extractSpyglassOverlay(GuiGraphicsExtractor graphics, float scale);
 
@@ -36,9 +37,13 @@ public abstract class MixinHud {
         boolean originallyHidden = this.isHidden;
         boolean hiddenByZoom = ZoomHandler.shouldHideHudWhileZooming();
         this.showSpyglassOverlay_JustZoom = ZoomHandler.shouldShowSpyglassOverlay() && this.minecraft.options.getCameraType().isFirstPerson();
-        this.spyglassOverlayScale_JustZoom = this.showSpyglassOverlay_JustZoom ? Mth.lerp(0.5F * deltaTracker.getGameTimeDeltaTicks(), this.spyglassOverlayScale_JustZoom, 1.125F) : 0.5F;
+        this.useJustZoomSpyglassOverlayAnimation_JustZoom = ZoomHandler.isZooming();
         if (ZoomHandler.shouldExtractSpyglassOverlaySeparately(originallyHidden, hiddenByZoom, this.showSpyglassOverlay_JustZoom)) {
-            this.extractSpyglassOverlay(graphics, this.spyglassOverlayScale_JustZoom);
+            if (!this.useJustZoomSpyglassOverlayAnimation_JustZoom) {
+                // The hidden-HUD path bypasses vanilla's camera-overlay layer, so advance its own field with vanilla's exact formula before drawing separately.
+                this.scopeScale = Mth.lerp(0.5F * deltaTracker.getGameTimeDeltaTicks(), this.scopeScale, 1.125F);
+            }
+            this.extractSpyglassOverlay(graphics, ZoomHandler.getSpyglassOverlayScale(this.useJustZoomSpyglassOverlayAnimation_JustZoom, this.scopeScale));
         }
         this.isHidden = originallyHidden || hiddenByZoom;
         try {
@@ -58,7 +63,7 @@ public abstract class MixinHud {
     private boolean cancel_extractSpyglassOverlay_JustZoom(Hud instance, GuiGraphicsExtractor graphics, float scale) {
         if (this.showSpyglassOverlay_JustZoom) {
             // Keep the original extraction position when the HUD is visible, but own the call so the hidden-HUD path can use the same overlay state.
-            this.extractSpyglassOverlay(graphics, this.spyglassOverlayScale_JustZoom);
+            this.extractSpyglassOverlay(graphics, ZoomHandler.getSpyglassOverlayScale(this.useJustZoomSpyglassOverlayAnimation_JustZoom, scale));
         }
         return false;
     }

@@ -11,7 +11,7 @@ public class Options extends JsonConfig {
 
     public static final float DEFAULT_BASE_MAGNIFICATION = 4.0F;
     public static final float DEFAULT_SCROLL_MAGNIFICATION_MULTIPLIER = 1.5F;
-    public static final float DEFAULT_START_ZOOMING_ANIMATION_SPEED = 0.45F;
+    public static final float DEFAULT_START_ZOOMING_ANIMATION_SPEED = 0.30F;
     public static final float DEFAULT_STOP_ZOOMING_ANIMATION_SPEED = 0.2F;
     public static final float MIN_ANIMATION_SPEED = 0.0F;
     public static final float MAX_ANIMATION_SPEED = 5.0F;

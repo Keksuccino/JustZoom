@@ -37,6 +37,10 @@ final class ZoomLevelState {
         return normalize(this.targetMagnification, ZoomMath.MIN_MAGNIFICATION, maximumMagnification);
     }
 
+    double getToggleTransitionProgress() {
+        return this.toggleTransitionProgress;
+    }
+
     void adjustMagnification(double scrollDelta, double stepMultiplier, double maximumMagnification) {
         double currentMagnification = this.getTargetMagnification(maximumMagnification);
         this.targetMagnification = ZoomMath.applyScroll(currentMagnification, scrollDelta, stepMultiplier, maximumMagnification);

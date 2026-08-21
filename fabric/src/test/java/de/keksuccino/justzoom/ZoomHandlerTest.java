@@ -92,6 +92,36 @@ class ZoomHandlerTest {
     }
 
     @Test
+    void preservesVanillaSpyglassAnimationWhenJustZoomIsInactive() {
+        boolean justZoomZooming = ZoomHandler.ZoomInput.isActive(false, true, false);
+
+        assertEquals(0.73F, ZoomHandler.calculateSpyglassOverlayScale(justZoomZooming, 0.9D, 0.73F));
+    }
+
+    @Test
+    void usesCustomSpyglassAnimationForBothJustZoomInputs() {
+        boolean keybindZooming = ZoomHandler.ZoomInput.isActive(true, false, false);
+        boolean replacedSpyglassZooming = ZoomHandler.ZoomInput.isActive(false, true, true);
+
+        assertEquals(0.8125F, ZoomHandler.calculateSpyglassOverlayScale(keybindZooming, 0.5D, 0.73F));
+        assertEquals(0.8125F, ZoomHandler.calculateSpyglassOverlayScale(replacedSpyglassZooming, 0.5D, 0.73F));
+    }
+
+    @Test
+    void synchronizesJustZoomSpyglassAnimationWithZoomProgress() {
+        assertEquals(0.5F, ZoomHandler.calculateSpyglassOverlayScale(true, 0.0D, 0.73F));
+        assertEquals(0.8125F, ZoomHandler.calculateSpyglassOverlayScale(true, 0.5D, 0.73F));
+        assertEquals(1.125F, ZoomHandler.calculateSpyglassOverlayScale(true, 1.0D, 0.73F));
+    }
+
+    @Test
+    void clampsUnexpectedZoomProgressForSpyglassAnimation() {
+        assertEquals(0.5F, ZoomHandler.calculateSpyglassOverlayScale(true, -1.0D, 0.73F));
+        assertEquals(0.5F, ZoomHandler.calculateSpyglassOverlayScale(true, Double.NaN, 0.73F));
+        assertEquals(1.125F, ZoomHandler.calculateSpyglassOverlayScale(true, 2.0D, 0.73F));
+    }
+
+    @Test
     void usesFirstPersonCameraForImprovedRearThirdPersonZoom() {
         assertTrue(ZoomHandler.shouldUseFirstPersonCameraWhileZooming(true, true, false));
     }

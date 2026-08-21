@@ -6,6 +6,8 @@ import org.jetbrains.annotations.NotNull;
 
 public class ZoomHandler {
 
+    private static final float SPYGLASS_OVERLAY_INITIAL_SCALE = 0.5F;
+    private static final float SPYGLASS_OVERLAY_FINAL_SCALE = 1.125F;
     private static final ZoomLevelState ZOOM_LEVEL_STATE = new ZoomLevelState(JustZoom.getPersistenceData(), JustZoom.getOptions().baseMagnification.getValue(), !JustZoom.getOptions().resetZoomFactorOnStopZooming.getValue());
 
     private static float cachedNormalFov = 70.0F;
@@ -35,6 +37,16 @@ public class ZoomHandler {
 
     public static boolean shouldShowSpyglassOverlay(boolean spyglassScoping, boolean keybindZooming) {
         return JustZoom.getOptions().spyglassOverlay.getValue().shouldShow(spyglassScoping, keybindZooming);
+    }
+
+    public static float getSpyglassOverlayScale(boolean useJustZoomAnimation, float vanillaScale) {
+        return calculateSpyglassOverlayScale(useJustZoomAnimation, ZOOM_LEVEL_STATE.getToggleTransitionProgress(), vanillaScale);
+    }
+
+    static float calculateSpyglassOverlayScale(boolean useJustZoomAnimation, double transitionProgress, float vanillaScale) {
+        if (!useJustZoomAnimation) return vanillaScale;
+        double normalizedProgress = Double.isNaN(transitionProgress) ? 0.0D : Math.max(0.0D, Math.min(1.0D, transitionProgress));
+        return (float) (SPYGLASS_OVERLAY_INITIAL_SCALE + (SPYGLASS_OVERLAY_FINAL_SCALE - SPYGLASS_OVERLAY_INITIAL_SCALE) * normalizedProgress);
     }
 
     public static boolean shouldZoomInOutSmooth() {

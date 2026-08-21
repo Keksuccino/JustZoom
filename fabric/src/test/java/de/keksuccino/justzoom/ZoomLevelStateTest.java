@@ -151,6 +151,18 @@ class ZoomLevelStateTest {
     }
 
     @Test
+    void exposesTheSameRealTimeProgressUsedByRenderedZoom() {
+        TestNanoClock clock = new TestNanoClock();
+        ZoomLevelState zoomLevelState = new ZoomLevelState(this.createPersistenceData(), 4.0F, false, clock);
+
+        zoomLevelState.tick(true, true, 1.0F, 1.0F, 1000.0D);
+        clock.advanceMilliseconds(350L);
+        zoomLevelState.getRenderedMagnification(true, true, 1.0F, 1.0F, 1.0F, 1000.0D);
+
+        assertEquals(0.35D, zoomLevelState.getToggleTransitionProgress(), DOUBLE_TOLERANCE);
+    }
+
+    @Test
     void smoothWheelChangesKeepTheirOriginalLogarithmicRate() {
         TestNanoClock clock = new TestNanoClock();
         ZoomLevelState zoomLevelState = new ZoomLevelState(this.createPersistenceData(), 4.0F, false, clock);
