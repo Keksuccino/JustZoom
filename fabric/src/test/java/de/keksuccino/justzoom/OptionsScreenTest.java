@@ -4,7 +4,9 @@ import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.resources.Identifier;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
+import java.nio.file.Path;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -14,6 +16,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class OptionsScreenTest {
 
     private static final KeyMapping.Category CATEGORY = KeyMapping.Category.register(Identifier.fromNamespaceAndPath("justzoom", "test.options_screen"));
+
+    @TempDir
+    Path temporaryDirectory;
 
     @Test
     void detectsChangedKeyThatMatchesAnotherBinding() {
@@ -67,12 +72,13 @@ class OptionsScreenTest {
     }
 
     @Test
-    void floatInputFillsTheRemainingOptionRowWidth() {
-        OptionsScreen.FloatInputWidths widths = OptionsScreen.calculateFloatInputWidths(360, 100);
+    void generalFloatInputAndResetButtonFillTheOptionRowWidth() {
+        int controlWidth = OptionsScreen.calculatePrimaryControlWidth(360);
+        OptionsScreen.FloatInputWidths widths = OptionsScreen.calculateFloatInputWidths(controlWidth, 100);
 
         assertEquals(100, widths.labelWidth());
-        assertEquals(255, widths.inputWidth());
-        assertEquals(360, widths.labelWidth() + OptionsScreen.FLOAT_INPUT_GAP + widths.inputWidth());
+        assertEquals(200, widths.inputWidth());
+        assertEquals(360, widths.labelWidth() + OptionsScreen.FLOAT_INPUT_GAP + widths.inputWidth() + OptionsScreen.CONTROL_GAP + OptionsScreen.RESET_BUTTON_WIDTH);
     }
 
     @Test
@@ -82,6 +88,31 @@ class OptionsScreenTest {
         assertEquals(55, widths.labelWidth());
         assertEquals(OptionsScreen.FLOAT_INPUT_MIN_WIDTH, widths.inputWidth());
         assertEquals(100, widths.labelWidth() + OptionsScreen.FLOAT_INPUT_GAP + widths.inputWidth());
+    }
+
+    @Test
+    void generalOptionResetStateTracksWhetherTheValueDiffersFromItsDefault() {
+        Options options = new Options(this.temporaryDirectory.resolve("options.json").toFile(), null);
+
+        assertTrue(OptionsScreen.isOptionDefault(options.baseMagnification));
+
+        options.baseMagnification.setValue(8.0F);
+        assertFalse(OptionsScreen.isOptionDefault(options.baseMagnification));
+
+        options.baseMagnification.resetToDefault();
+        assertTrue(OptionsScreen.isOptionDefault(options.baseMagnification));
+    }
+
+    @Test
+    void floatInputResetStateTreatsEquivalentTextAsDefaultAndInvalidTextAsChanged() {
+        Options options = new Options(this.temporaryDirectory.resolve("float-input-options.json").toFile(), null);
+
+        assertTrue(OptionsScreen.isFloatInputDefault(options.baseMagnification, "4.0"));
+        assertTrue(OptionsScreen.isFloatInputDefault(options.baseMagnification, "4"));
+        assertFalse(OptionsScreen.isFloatInputDefault(options.baseMagnification, "invalid"));
+
+        options.baseMagnification.setValue(8.0F);
+        assertFalse(OptionsScreen.isFloatInputDefault(options.baseMagnification, "4.0"));
     }
 
     @Test

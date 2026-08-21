@@ -37,8 +37,11 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
 public class OptionsScreen extends Screen {
@@ -47,17 +50,19 @@ public class OptionsScreen extends Screen {
     protected static final int BUTTON_ROW_MAX_WIDTH = 360;
     protected static final int CYCLE_VALUE_COLOR = 0xFFAA00;
     protected static final int DISABLED_CYCLE_VALUE_COLOR = 0xFF5555;
+    protected static final int CONTROL_GAP = 5;
     protected static final int FLOAT_INPUT_GAP = 5;
     protected static final int FLOAT_INPUT_MIN_WIDTH = 40;
-    protected static final int KEYBIND_RESET_BUTTON_WIDTH = 50;
-    protected static final int KEYBIND_GAP = 5;
     protected static final int OPTION_ROW_ADVANCE = 26;
     protected static final int OPTION_SECTION_PADDING_TOP = 10;
+    protected static final int RESET_BUTTON_WIDTH = 50;
     protected static final Identifier TAB_HEADER_BACKGROUND = Identifier.withDefaultNamespace("textures/gui/tab_header_background.png");
     protected static final KeybindSetting ZOOM_KEYBIND = new KeybindSetting(KeyMappings.KEY_TOGGLE_ZOOM, "justzoom.options.zoom_keybind", "justzoom.options.zoom_keybind.desc");
     protected static final KeybindSetting ZOOM_IN_KEYBIND = new KeybindSetting(KeyMappings.KEY_ZOOM_IN, "justzoom.options.zoom_in_keybind", "justzoom.options.zoom_in_keybind.desc");
     protected static final KeybindSetting ZOOM_OUT_KEYBIND = new KeybindSetting(KeyMappings.KEY_ZOOM_OUT, "justzoom.options.zoom_out_keybind", "justzoom.options.zoom_out_keybind.desc");
     protected static final List<KeybindSetting> KEYBIND_SETTINGS = List.of(ZOOM_KEYBIND, ZOOM_IN_KEYBIND, ZOOM_OUT_KEYBIND);
+    private static final Consumer<LayoutSettings> NO_LAYOUT_ADJUSTMENTS = ignored -> {
+    };
 
     @Nullable
     protected Screen parent;
@@ -67,8 +72,9 @@ public class OptionsScreen extends Screen {
     private MenuTabBar tabNavigationBar;
     @Nullable
     private KeyMapping waitingForKeybind;
-    private final List<Button> fullWidthOptionButtons = new ArrayList<>();
+    private final List<Button> generalOptionButtons = new ArrayList<>();
     private final List<FloatInputControl> floatInputControls = new ArrayList<>();
+    private final List<GeneralOptionControl> generalOptionControls = new ArrayList<>();
     private final List<KeybindControl> keybindControls = new ArrayList<>();
 
     public OptionsScreen(@Nullable Screen parent) {
@@ -80,8 +86,9 @@ public class OptionsScreen extends Screen {
     protected void init() {
 
         this.layout.removeChildren();
-        this.fullWidthOptionButtons.clear();
+        this.generalOptionButtons.clear();
         this.floatInputControls.clear();
+        this.generalOptionControls.clear();
         this.keybindControls.clear();
 
         OptionsTab generalTab = this.buildGeneralTab();
@@ -96,6 +103,7 @@ public class OptionsScreen extends Screen {
         });
 
         this.updateControlWidths();
+        this.updateGeneralOptionButtons();
         this.updateKeybindButtons();
         this.tabNavigationBar.selectTab(0, false);
         this.repositionElements();
@@ -107,16 +115,16 @@ public class OptionsScreen extends Screen {
         OptionsTab tab = new OptionsTab(Component.translatable("justzoom.options.tab.general"));
         this.addFloatInput(tab, JustZoom.getOptions().baseMagnification, "justzoom.options.base_magnification");
         this.addFloatInput(tab, JustZoom.getOptions().scrollMagnificationMultiplier, "justzoom.options.scroll_magnification_multiplier");
-        this.addFullWidthOption(tab, this.buildToggleButton(JustZoom.getOptions().smoothZoomInOut, "justzoom.options.smooth_zoom_in_out"), settings -> settings.paddingTop(OPTION_SECTION_PADDING_TOP));
-        this.addFullWidthOption(tab, this.buildToggleButton(JustZoom.getOptions().smoothCameraOnZoom, "justzoom.options.smooth_camera_movement_on_zoom"));
-        this.addFullWidthOption(tab, this.buildToggleButton(JustZoom.getOptions().normalizeMouseSensitivityOnZoom, "justzoom.options.normalize_mouse_sensitivity_on_zoom"));
-        this.addFullWidthOption(tab, this.buildToggleButton(JustZoom.getOptions().improveThirdPersonZoom, "justzoom.options.improve_third_person_zoom"));
-        this.addFullWidthOption(tab, this.buildToggleButton(JustZoom.getOptions().hideArmsWhenZooming, "justzoom.options.hide_arms_when_zooming"));
-        this.addFullWidthOption(tab, this.buildShowHudButton());
-        this.addFullWidthOption(tab, this.buildToggleButton(JustZoom.getOptions().resetZoomFactorOnStopZooming, "justzoom.options.reset_zoom_factor_when_stop_zooming"));
-        this.addFullWidthOption(tab, this.buildToggleButton(JustZoom.getOptions().useJustZoomForSpyglass, "justzoom.options.use_just_zoom_for_spyglass"), settings -> settings.paddingTop(OPTION_SECTION_PADDING_TOP));
-        this.addFullWidthOption(tab, this.buildSpyglassOverlayButton());
-        this.addFullWidthOption(tab, this.buildSpyglassSoundsButton());
+        this.addToggleOption(tab, JustZoom.getOptions().smoothZoomInOut, "justzoom.options.smooth_zoom_in_out", settings -> settings.paddingTop(OPTION_SECTION_PADDING_TOP));
+        this.addToggleOption(tab, JustZoom.getOptions().smoothCameraOnZoom, "justzoom.options.smooth_camera_movement_on_zoom");
+        this.addToggleOption(tab, JustZoom.getOptions().normalizeMouseSensitivityOnZoom, "justzoom.options.normalize_mouse_sensitivity_on_zoom");
+        this.addToggleOption(tab, JustZoom.getOptions().improveThirdPersonZoom, "justzoom.options.improve_third_person_zoom");
+        this.addToggleOption(tab, JustZoom.getOptions().hideArmsWhenZooming, "justzoom.options.hide_arms_when_zooming");
+        this.addCycleOption(tab, JustZoom.getOptions().showHud, ShowHudMode::next, this::showHudMessage, "justzoom.options.show_hud.desc");
+        this.addToggleOption(tab, JustZoom.getOptions().resetZoomFactorOnStopZooming, "justzoom.options.reset_zoom_factor_when_stop_zooming");
+        this.addToggleOption(tab, JustZoom.getOptions().useJustZoomForSpyglass, "justzoom.options.use_just_zoom_for_spyglass", settings -> settings.paddingTop(OPTION_SECTION_PADDING_TOP));
+        this.addCycleOption(tab, JustZoom.getOptions().spyglassOverlay, SpyglassOverlayMode::next, this::spyglassOverlayMessage, "justzoom.options.spyglass_overlay.desc");
+        this.addCycleOption(tab, JustZoom.getOptions().spyglassSounds, SpyglassSoundsMode::next, this::spyglassSoundsMessage, "justzoom.options.spyglass_sounds.desc");
         return tab;
     }
 
@@ -141,24 +149,38 @@ public class OptionsScreen extends Screen {
             if (MathUtils.isFloat(value)) {
                 option.setValue(Float.parseFloat(value));
             }
+            this.updateGeneralOptionButtons();
         });
         input.setTooltip(tooltip);
 
-        LinearLayout row = LinearLayout.horizontal().spacing(FLOAT_INPUT_GAP);
-        row.addChild(labelWidget, settings -> settings.alignVerticallyMiddle());
-        row.addChild(input);
+        LinearLayout inputControl = LinearLayout.horizontal().spacing(FLOAT_INPUT_GAP);
+        inputControl.addChild(labelWidget, settings -> settings.alignVerticallyMiddle());
+        inputControl.addChild(input);
+        Button resetButton = this.buildGeneralResetButton(option, () -> label, () -> input.setValue(Float.toString(option.getValue())));
         this.floatInputControls.add(new FloatInputControl(labelWidget, input, labelWidget.getWidth()));
-        tab.addChild(row);
+        this.generalOptionControls.add(new GeneralOptionControl(() -> isFloatInputDefault(option, input.getValue()), resetButton));
+        tab.addChild(this.buildControlRowLayout(inputControl, resetButton));
     }
 
-    protected void addFullWidthOption(@NotNull OptionsTab tab, @NotNull Button button) {
-        this.fullWidthOptionButtons.add(button);
-        tab.addChild(button);
+    protected void addToggleOption(@NotNull OptionsTab tab, @NotNull ConfigValue<Boolean> option, @NotNull String labelBaseKey) {
+        this.addToggleOption(tab, option, labelBaseKey, NO_LAYOUT_ADJUSTMENTS);
     }
 
-    protected void addFullWidthOption(@NotNull OptionsTab tab, @NotNull Button button, @NotNull Consumer<LayoutSettings> settings) {
-        this.fullWidthOptionButtons.add(button);
-        tab.addChild(button, settings);
+    protected void addToggleOption(@NotNull OptionsTab tab, @NotNull ConfigValue<Boolean> option, @NotNull String labelBaseKey, @NotNull Consumer<LayoutSettings> settings) {
+        Button button = this.buildToggleButton(option, labelBaseKey);
+        this.addGeneralButtonOption(tab, option, button, () -> button.setMessage(this.toggleMessage(option, labelBaseKey)), settings);
+    }
+
+    protected <T> void addCycleOption(@NotNull OptionsTab tab, @NotNull ConfigValue<T> option, @NotNull UnaryOperator<T> nextValue, @NotNull Function<T, Component> messageFactory, @NotNull String descriptionKey) {
+        Button button = this.buildCycleButton(option, nextValue, messageFactory, descriptionKey);
+        this.addGeneralButtonOption(tab, option, button, () -> button.setMessage(messageFactory.apply(option.getValue())), NO_LAYOUT_ADJUSTMENTS);
+    }
+
+    protected void addGeneralButtonOption(@NotNull OptionsTab tab, @NotNull ConfigValue<?> option, @NotNull Button button, @NotNull Runnable refreshControl, @NotNull Consumer<LayoutSettings> settings) {
+        Button resetButton = this.buildGeneralResetButton(option, button::getMessage, refreshControl);
+        this.generalOptionButtons.add(button);
+        this.generalOptionControls.add(new GeneralOptionControl(() -> isOptionDefault(option), resetButton));
+        tab.addChild(this.buildControlRowLayout(button, resetButton), settings);
     }
 
     @NotNull
@@ -166,26 +188,9 @@ public class OptionsScreen extends Screen {
         Button button = Button.builder(this.toggleMessage(option, labelBaseKey), pressedButton -> {
             option.setValue(!option.getValue());
             pressedButton.setMessage(this.toggleMessage(option, labelBaseKey));
+            this.updateGeneralOptionButtons();
         }).size(this.getButtonWidth(), BUTTON_HEIGHT).tooltip(Tooltip.create(Component.translatable(labelBaseKey + ".desc"))).build();
         return button;
-    }
-
-    @NotNull
-    protected Button buildShowHudButton() {
-        ConfigValue<ShowHudMode> option = JustZoom.getOptions().showHud;
-        return this.buildCycleButton(option, ShowHudMode::next, this::showHudMessage, "justzoom.options.show_hud.desc");
-    }
-
-    @NotNull
-    protected Button buildSpyglassOverlayButton() {
-        ConfigValue<SpyglassOverlayMode> option = JustZoom.getOptions().spyglassOverlay;
-        return this.buildCycleButton(option, SpyglassOverlayMode::next, this::spyglassOverlayMessage, "justzoom.options.spyglass_overlay.desc");
-    }
-
-    @NotNull
-    protected Button buildSpyglassSoundsButton() {
-        ConfigValue<SpyglassSoundsMode> option = JustZoom.getOptions().spyglassSounds;
-        return this.buildCycleButton(option, SpyglassSoundsMode::next, this::spyglassSoundsMessage, "justzoom.options.spyglass_sounds.desc");
     }
 
     @NotNull
@@ -193,15 +198,25 @@ public class OptionsScreen extends Screen {
         Button button = Button.builder(messageFactory.apply(option.getValue()), pressedButton -> {
             option.update(nextValue);
             pressedButton.setMessage(messageFactory.apply(option.getValue()));
+            this.updateGeneralOptionButtons();
         }).size(this.getButtonWidth(), BUTTON_HEIGHT).tooltip(Tooltip.create(Component.translatable(descriptionKey))).build();
         return button;
+    }
+
+    @NotNull
+    protected Button buildGeneralResetButton(@NotNull ConfigValue<?> option, @NotNull Supplier<Component> optionName, @NotNull Runnable refreshControl) {
+        return Button.builder(Component.translatable("controls.reset"), ignored -> {
+            option.resetToDefault();
+            refreshControl.run();
+            this.updateGeneralOptionButtons();
+        }).size(RESET_BUTTON_WIDTH, BUTTON_HEIGHT).createNarration(defaultNarrationSupplier -> Component.translatable("narrator.controls.reset", optionName.get())).build();
     }
 
     protected void addKeybindRow(@NotNull OptionsTab tab, @NotNull KeybindSetting setting) {
         Button keybindButton = this.buildKeybindButton(setting);
         Button keybindResetButton = this.buildKeybindResetButton(setting);
         this.keybindControls.add(new KeybindControl(setting, keybindButton, keybindResetButton));
-        tab.addChild(this.buildKeybindRowLayout(keybindButton, keybindResetButton));
+        tab.addChild(this.buildControlRowLayout(keybindButton, keybindResetButton));
     }
 
     @NotNull
@@ -210,7 +225,7 @@ public class OptionsScreen extends Screen {
         return Button.builder(Component.empty(), ignored -> {
             this.waitingForKeybind = keyMapping;
             this.updateKeybindButtons();
-        }).size(this.getButtonWidth() - KEYBIND_RESET_BUTTON_WIDTH - KEYBIND_GAP, BUTTON_HEIGHT).createNarration(defaultNarrationSupplier -> keyMapping.isUnbound() ? Component.translatable("narrator.controls.unbound", Component.translatable(keyMapping.getName())) : Component.translatable("narrator.controls.bound", Component.translatable(keyMapping.getName()), defaultNarrationSupplier.get())).build();
+        }).size(calculatePrimaryControlWidth(this.getButtonWidth()), BUTTON_HEIGHT).createNarration(defaultNarrationSupplier -> keyMapping.isUnbound() ? Component.translatable("narrator.controls.unbound", Component.translatable(keyMapping.getName())) : Component.translatable("narrator.controls.bound", Component.translatable(keyMapping.getName()), defaultNarrationSupplier.get())).build();
     }
 
     @NotNull
@@ -219,22 +234,32 @@ public class OptionsScreen extends Screen {
         return Button.builder(Component.translatable("controls.reset"), ignored -> {
             Services.PLATFORM.setKeyMappingKey(keyMapping, keyMapping.getDefaultKey());
             this.afterKeybindChanged();
-        }).size(KEYBIND_RESET_BUTTON_WIDTH, BUTTON_HEIGHT).createNarration(defaultNarrationSupplier -> Component.translatable("narrator.controls.reset", Component.translatable(keyMapping.getName()))).build();
+        }).size(RESET_BUTTON_WIDTH, BUTTON_HEIGHT).createNarration(defaultNarrationSupplier -> Component.translatable("narrator.controls.reset", Component.translatable(keyMapping.getName()))).build();
     }
 
     protected void updateControlWidths() {
         int rowWidth = this.getButtonWidth();
-        for (Button button : this.fullWidthOptionButtons) {
-            button.setWidth(rowWidth);
+        int controlWidth = calculatePrimaryControlWidth(rowWidth);
+        for (Button button : this.generalOptionButtons) {
+            button.setWidth(controlWidth);
         }
         for (FloatInputControl control : this.floatInputControls) {
-            FloatInputWidths widths = calculateFloatInputWidths(rowWidth, control.preferredLabelWidth());
+            FloatInputWidths widths = calculateFloatInputWidths(controlWidth, control.preferredLabelWidth());
             control.label().setWidth(widths.labelWidth());
             control.input().setWidth(widths.inputWidth());
         }
+        for (GeneralOptionControl control : this.generalOptionControls) {
+            control.resetButton().setWidth(RESET_BUTTON_WIDTH);
+        }
         for (KeybindControl control : this.keybindControls) {
-            control.keybindButton().setWidth(rowWidth - KEYBIND_RESET_BUTTON_WIDTH - KEYBIND_GAP);
-            control.resetButton().setWidth(KEYBIND_RESET_BUTTON_WIDTH);
+            control.keybindButton().setWidth(controlWidth);
+            control.resetButton().setWidth(RESET_BUTTON_WIDTH);
+        }
+    }
+
+    protected void updateGeneralOptionButtons() {
+        for (GeneralOptionControl control : this.generalOptionControls) {
+            control.resetButton().active = !control.defaultState().getAsBoolean();
         }
     }
 
@@ -325,17 +350,27 @@ public class OptionsScreen extends Screen {
     }
 
     @NotNull
-    protected LinearLayout buildKeybindRowLayout(@NotNull Button keyButton, @NotNull Button resetButton) {
-        int rowWidth = this.getButtonWidth();
-        keyButton.setWidth(rowWidth - resetButton.getWidth() - KEYBIND_GAP);
-        LinearLayout row = LinearLayout.horizontal().spacing(KEYBIND_GAP);
-        row.addChild(keyButton);
+    protected LinearLayout buildControlRowLayout(@NotNull LayoutElement control, @NotNull Button resetButton) {
+        LinearLayout row = LinearLayout.horizontal().spacing(CONTROL_GAP);
+        row.addChild(control);
         row.addChild(resetButton);
         return row;
     }
 
     protected int getButtonWidth() {
         return Math.min(BUTTON_ROW_MAX_WIDTH, this.width - 40);
+    }
+
+    static int calculatePrimaryControlWidth(int rowWidth) {
+        return rowWidth - RESET_BUTTON_WIDTH - CONTROL_GAP;
+    }
+
+    static boolean isOptionDefault(@NotNull ConfigValue<?> option) {
+        return Objects.equals(option.getValue(), option.getDefaultValue());
+    }
+
+    static boolean isFloatInputDefault(@NotNull ConfigValue<Float> option, @NotNull String inputValue) {
+        return isOptionDefault(option) && MathUtils.isFloat(inputValue) && Float.compare(Float.parseFloat(inputValue), option.getDefaultValue()) == 0;
     }
 
     protected boolean hasKeybindCollision(@NotNull KeyMapping keyMapping) {
@@ -441,6 +476,9 @@ public class OptionsScreen extends Screen {
     }
 
     private record FloatInputControl(@NotNull StringWidget label, @NotNull EditBox input, int preferredLabelWidth) {
+    }
+
+    private record GeneralOptionControl(@NotNull BooleanSupplier defaultState, @NotNull Button resetButton) {
     }
 
     private record KeybindControl(@NotNull KeybindSetting setting, @NotNull Button keybindButton, @NotNull Button resetButton) {
