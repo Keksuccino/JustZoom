@@ -1,22 +1,21 @@
 
 CHANGELOG | JUST ZOOM v2.2.0 [ W I P !!! NOT PUBLIC YET !!! ]
 
-- Reworked the Settings screen.
-- The settings can now be opened via Mod Menu on Fabric (was already possible before), and on NeoForge via its Mods menu (was NOT possible before).
-- Removed the icon button in the Pause screen that opened the Settings screen (only way now is via the Mods menus).
-- Just Zoom now by default also replaces the normal logic of the spyglass with the Just Zoom logic (can be disabled in settings).
-- There's a setting now to configure when the spyglass overlay should be visible (only spyglass, only keybind zoom, both, never; default is "only spyglass").
-- You can now configure when spyglass sounds should play, and they will play by default when zooming with they keybind now (can be changed in settings).
-- It's now possible to zoom in even more than before.
-- Just Zoom now makes the spyglass work in third-person view, when enabled in the settings.
-- Added setting to control when to show the HUD while zooming (only spyglass, only keybind zoom, both, never; default is "never").
-- Improved the smooth zoom speed and feel.
-- Improved the mouse sensitivity normalization.
-- Added configurable keybinds for zoom in/out actions.
-- It is now possible to turn off the improved third-person zoom (automatically going into first-person while zooming).
-- The "Allow Zoom in Mirrored View" setting got removed, and instead it is now always possible to zoom while in mirrored view.
-- There are settings for configuring the start/stop zooming animation speeds now.
-- Fixed max zoom level is capped to the spyglass zoom level when smooth zooming is enabled.
-
+- Reworked the Settings screen
+- The settings can now be opened via Mod Menu on Fabric (was already possible before), and on NeoForge via its Mods menu (was NOT possible before)
+- Removed the icon button in the Pause screen that opened the Settings screen (only way now is via the Mods menus)
+- Just Zoom now by default also replaces the normal logic of the spyglass with the Just Zoom logic (can be disabled in settings)
+- There's a setting now to configure when the spyglass overlay should be visible (only spyglass, only keybind zoom, both, never; default is "only spyglass")
+- You can now configure when spyglass sounds should play, and they will play by default when zooming with they keybind now (can be changed in settings)
+- It's now possible to zoom in even more than before
+- Just Zoom now makes the spyglass work in third-person view, when enabled in the settings
+- Added setting to control when to show the HUD while zooming (only spyglass, only keybind zoom, both, never; default is "never")
+- Improved the smooth zoom speed and feel
+- Improved the mouse sensitivity normalization
+- Added configurable keybinds for zoom in/out actions
+- It is now possible to turn off the improved third-person zoom (automatically going into first-person while zooming) (#51)
+- The "Allow Zoom in Mirrored View" setting got removed, and instead it is now always possible to zoom while in mirrored view
+- There are settings for configuring the start/stop zooming animation speeds now
+- Fixed max zoom level is capped to the spyglass zoom level when smooth zooming is enabled
 
 
