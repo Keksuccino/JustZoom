@@ -25,8 +25,6 @@
   "justzoom.options.smooth_camera_movement_on_zoom.desc": "Si la cámara debe moverse suavemente (cinemático) al hacer zoom.",
   "justzoom.options.normalize_mouse_sensitivity_on_zoom": "Normalizar Sensibilidad del Mouse: %s",
   "justzoom.options.normalize_mouse_sensitivity_on_zoom.desc": "Si la sensibilidad del mouse debe ajustarse a la vista con zoom,\npara que se sienta normal y no muy rápida al mover el mouse mientras haces zoom.",
-  "justzoom.options.allow_zoom_in_mirrored_view": "Permitir Zoom en Vista Espejo: %s",
-  "justzoom.options.allow_zoom_in_mirrored_view.desc": "Si está activado, podrás hacer zoom en la vista espejo (cuando te ves a ti mismo).",
   "justzoom.options.improve_third_person_zoom": "Mejorar Zoom en Tercera Persona: %s",
   "justzoom.options.improve_third_person_zoom.desc": "Si está activado, el zoom en la vista trasera en tercera persona usa la cámara en primera persona para que el jugador no bloquee la vista ampliada.",
   "justzoom.options.hide_arms_when_zooming": "Ocultar Brazos: %s",

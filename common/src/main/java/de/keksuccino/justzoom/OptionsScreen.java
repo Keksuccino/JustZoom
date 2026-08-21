@@ -110,7 +110,6 @@ public class OptionsScreen extends Screen {
         this.addFullWidthOption(tab, this.buildToggleButton(JustZoom.getOptions().smoothZoomInOut, "justzoom.options.smooth_zoom_in_out"), settings -> settings.paddingTop(OPTION_SECTION_PADDING_TOP));
         this.addFullWidthOption(tab, this.buildToggleButton(JustZoom.getOptions().smoothCameraOnZoom, "justzoom.options.smooth_camera_movement_on_zoom"));
         this.addFullWidthOption(tab, this.buildToggleButton(JustZoom.getOptions().normalizeMouseSensitivityOnZoom, "justzoom.options.normalize_mouse_sensitivity_on_zoom"));
-        this.addFullWidthOption(tab, this.buildToggleButton(JustZoom.getOptions().allowZoomInMirroredView, "justzoom.options.allow_zoom_in_mirrored_view"));
         this.addFullWidthOption(tab, this.buildToggleButton(JustZoom.getOptions().improveThirdPersonZoom, "justzoom.options.improve_third_person_zoom"));
         this.addFullWidthOption(tab, this.buildToggleButton(JustZoom.getOptions().hideArmsWhenZooming, "justzoom.options.hide_arms_when_zooming"));
         this.addFullWidthOption(tab, this.buildShowHudButton());

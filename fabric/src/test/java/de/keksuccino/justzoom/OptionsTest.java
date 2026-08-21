@@ -48,6 +48,19 @@ class OptionsTest {
     }
 
     @Test
+    void removesTheRetiredMirroredViewOption() throws IOException {
+        for (boolean retiredValue : new boolean[]{false, true}) {
+            Path configFile = this.temporaryDirectory.resolve("retired-mirrored-view-option-" + retiredValue + ".json");
+            Files.writeString(configFile, "{\"zoom\":{\"allow_zoom_in_mirrored_view\":" + retiredValue + "}}", StandardCharsets.UTF_8);
+
+            new Options(configFile.toFile(), null);
+
+            JsonObject storedZoomOptions = JsonParser.parseString(Files.readString(configFile, StandardCharsets.UTF_8)).getAsJsonObject().getAsJsonObject("zoom");
+            assertFalse(storedZoomOptions.has("allow_zoom_in_mirrored_view"));
+        }
+    }
+
+    @Test
     void defaultsImproveThirdPersonZoomToEnabled() throws IOException {
         Path configFile = this.temporaryDirectory.resolve("third-person-default.json");
 

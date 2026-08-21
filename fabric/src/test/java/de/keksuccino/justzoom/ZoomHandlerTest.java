@@ -34,6 +34,16 @@ class ZoomHandlerTest {
     }
 
     @Test
+    void keepsZoomAvailableForEveryCameraView() {
+        assertTrue(ZoomHandler.isZoomAvailable(false));
+    }
+
+    @Test
+    void blocksZoomWhileAScreenIsOpen() {
+        assertFalse(ZoomHandler.isZoomAvailable(true));
+    }
+
+    @Test
     void combinesQueuedZoomAdjustmentClicks() {
         assertEquals(2, ZoomHandler.ZoomInput.calculateKeyAdjustment(3, 1));
         assertEquals(-2, ZoomHandler.ZoomInput.calculateKeyAdjustment(1, 3));

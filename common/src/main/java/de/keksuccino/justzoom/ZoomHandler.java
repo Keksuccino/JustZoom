@@ -122,7 +122,11 @@ public class ZoomHandler {
     }
 
     private static boolean isZoomAvailable(@NotNull Minecraft minecraft) {
-        return minecraft.gui.screen() == null && (!minecraft.options.getCameraType().isMirrored() || JustZoom.getOptions().allowZoomInMirroredView.getValue());
+        return isZoomAvailable(minecraft.gui.screen() != null);
+    }
+
+    static boolean isZoomAvailable(boolean screenOpen) {
+        return !screenOpen;
     }
 
     public static class MouseScrollFeedback {

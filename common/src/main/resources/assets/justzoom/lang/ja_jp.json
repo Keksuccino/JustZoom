@@ -25,8 +25,6 @@
   "justzoom.options.smooth_camera_movement_on_zoom.desc": "ズーム時にカメラをスムーズ（シネマティック）に動かします。",
   "justzoom.options.normalize_mouse_sensitivity_on_zoom": "マウス感度の正規化: %s",
   "justzoom.options.normalize_mouse_sensitivity_on_zoom.desc": "ズーム時にマウス感度を調整し、\nズーム中のマウス移動が速すぎないようにします。",
-  "justzoom.options.allow_zoom_in_mirrored_view": "ミラービューでのズーム許可: %s",
-  "justzoom.options.allow_zoom_in_mirrored_view.desc": "有効にすると、ミラービュー（自分が見える時）でもズームできます。",
   "justzoom.options.improve_third_person_zoom": "三人称視点ズームを改善: %s",
   "justzoom.options.improve_third_person_zoom.desc": "有効にすると、三人称後方視点でのズーム時に一人称カメラを使用し、プレイヤーがズームした視界を遮らないようにします。",
   "justzoom.options.hide_arms_when_zooming": "腕を隠す: %s",
