@@ -35,4 +35,15 @@ class OptionsTest {
         }
     }
 
+    @Test
+    void defaultsShowHudToNever() throws IOException {
+        Path configFile = this.temporaryDirectory.resolve("new-config.json");
+
+        Options options = new Options(configFile.toFile(), null);
+
+        assertEquals(ShowHudMode.NEVER, options.showHud.getValue());
+        JsonObject storedZoomOptions = JsonParser.parseString(Files.readString(configFile, StandardCharsets.UTF_8)).getAsJsonObject().getAsJsonObject("zoom");
+        assertEquals("never", storedZoomOptions.get("show_hud").getAsString());
+    }
+
 }

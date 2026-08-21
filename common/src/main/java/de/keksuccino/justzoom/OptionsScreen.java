@@ -112,6 +112,7 @@ public class OptionsScreen extends Screen {
         this.addFullWidthOption(tab, this.buildToggleButton(JustZoom.getOptions().normalizeMouseSensitivityOnZoom, "justzoom.options.normalize_mouse_sensitivity_on_zoom"));
         this.addFullWidthOption(tab, this.buildToggleButton(JustZoom.getOptions().allowZoomInMirroredView, "justzoom.options.allow_zoom_in_mirrored_view"));
         this.addFullWidthOption(tab, this.buildToggleButton(JustZoom.getOptions().hideArmsWhenZooming, "justzoom.options.hide_arms_when_zooming"));
+        this.addFullWidthOption(tab, this.buildShowHudButton());
         this.addFullWidthOption(tab, this.buildToggleButton(JustZoom.getOptions().resetZoomFactorOnStopZooming, "justzoom.options.reset_zoom_factor_when_stop_zooming"));
         this.addFullWidthOption(tab, this.buildToggleButton(JustZoom.getOptions().useJustZoomForSpyglass, "justzoom.options.use_just_zoom_for_spyglass"), settings -> settings.paddingTop(OPTION_SECTION_PADDING_TOP));
         this.addFullWidthOption(tab, this.buildSpyglassOverlayButton());
@@ -167,6 +168,12 @@ public class OptionsScreen extends Screen {
             pressedButton.setMessage(this.toggleMessage(option, labelBaseKey));
         }).size(this.getButtonWidth(), BUTTON_HEIGHT).tooltip(Tooltip.create(Component.translatable(labelBaseKey + ".desc"))).build();
         return button;
+    }
+
+    @NotNull
+    protected Button buildShowHudButton() {
+        ConfigValue<ShowHudMode> option = JustZoom.getOptions().showHud;
+        return this.buildCycleButton(option, ShowHudMode::next, this::showHudMessage, "justzoom.options.show_hud.desc");
     }
 
     @NotNull
@@ -244,6 +251,16 @@ public class OptionsScreen extends Screen {
     protected Component toggleMessage(@NotNull ConfigValue<Boolean> option, @NotNull String labelBaseKey) {
         Component value = Component.translatable(option.getValue() ? "justzoom.options.toggle.enabled" : "justzoom.options.toggle.disabled").withStyle(Style.EMPTY.withColor(option.getValue() ? ChatFormatting.GREEN : ChatFormatting.RED));
         return Component.translatable(labelBaseKey, value);
+    }
+
+    @NotNull
+    protected Component showHudMessage(@NotNull ShowHudMode mode) {
+        Component value = Component.translatable(mode.getTranslationKey()).withStyle(Style.EMPTY.withColor(showHudValueColor(mode)));
+        return Component.translatable("justzoom.options.show_hud", value);
+    }
+
+    static int showHudValueColor(@NotNull ShowHudMode mode) {
+        return spyglassCycleValueColor(mode == ShowHudMode.NEVER);
     }
 
     @NotNull

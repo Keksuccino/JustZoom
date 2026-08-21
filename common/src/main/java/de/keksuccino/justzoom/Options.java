@@ -22,6 +22,7 @@ public class Options extends JsonConfig {
     public final ConfigValue<Boolean> normalizeMouseSensitivityOnZoom = this.zoom.option("normalize_mouse_sensitivity_on_zoom", true);
     public final ConfigValue<Boolean> allowZoomInMirroredView = this.zoom.option("allow_zoom_in_mirrored_view", false);
     public final ConfigValue<Boolean> hideArmsWhenZooming = this.zoom.option("hide_arms_when_zooming", false);
+    public final ConfigValue<ShowHudMode> showHud = this.zoom.option("show_hud", ShowHudMode.NEVER);
     public final ConfigValue<Boolean> resetZoomFactorOnStopZooming = this.zoom.option("reset_zoom_factor_when_stop_zooming", false);
     public final ConfigValue<Boolean> useJustZoomForSpyglass = this.spyglass.option("use_just_zoom_for_spyglass", true);
     public final ConfigValue<SpyglassOverlayMode> spyglassOverlay = this.spyglass.option("spyglass_overlay", SpyglassOverlayMode.ONLY_SPYGLASS);

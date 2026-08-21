@@ -45,6 +45,12 @@ public class ZoomHandler {
         return isZooming() && JustZoom.getOptions().hideArmsWhenZooming.getValue();
     }
 
+    public static boolean shouldHideHudWhileZooming() {
+        Minecraft minecraft = Minecraft.getInstance();
+        boolean spyglassScoping = minecraft.player != null && minecraft.player.isScoping();
+        return JustZoom.getOptions().showHud.getValue().shouldHide(spyglassScoping, isKeybindZooming());
+    }
+
     public static void onCameraTick() {
         boolean zooming = isZooming();
         if (!zooming && JustZoom.getOptions().resetZoomFactorOnStopZooming.getValue()) {
