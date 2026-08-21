@@ -42,6 +42,7 @@ public class Options extends JsonConfig {
 
     Options(@NotNull File file, @Nullable File legacyFile) {
         super(file, legacyFile);
+        // DO NOT CLEAR/DELETE OLD CONFIG VALUES! JUST KEEP THEM IN THE FILE.
         this.save();
     }
 
