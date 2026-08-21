@@ -14,7 +14,7 @@ CHANGELOG | JUST ZOOM v3.0.0 [ W I P !!! NOT PUBLIC YET !!! ]
 - Improved the mouse sensitivity normalization
 - Added configurable keybinds for zoom in/out actions
 - It is now possible to turn off the improved third-person zoom (automatically going into first-person while zooming) (#51)
-- The "Allow Zoom in Mirrored View" setting got removed, and instead it is now always possible to zoom while in mirrored view
+- The "Allow Zoom in Mirrored View" setting got removed, and instead it is now always possible to zoom while in mirrored view (#51)
 - There are settings for configuring the start/stop zooming animation speeds now
 - Fixed max zoom level is capped to the spyglass zoom level when smooth zooming is enabled
 
