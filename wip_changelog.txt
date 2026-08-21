@@ -13,6 +13,7 @@ CHANGELOG | JUST ZOOM v2.2.0 [ W I P !!! NOT PUBLIC YET !!! ]
 - Improved the smooth zoom speed and feel.
 - Improved the mouse sensitivity normalization.
 - Added configurable keybinds for zoom in/out actions.
+- It is now possible to turn off the improved third-person zoom (automatically going into first-person while zooming).
 - Fixed max zoom level is capped to the spyglass zoom level when smooth zooming is enabled.
 
 
