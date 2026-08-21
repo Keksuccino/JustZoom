@@ -18,18 +18,15 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(Hud.class)
-public class MixinHud {
+public abstract class MixinHud {
 
     @Shadow @Final private Minecraft minecraft;
     @Shadow private boolean isHidden;
 
-    @Shadow
-    private void extractSpyglassOverlay(GuiGraphicsExtractor graphics, float scale) {
-        throw new AssertionError();
-    }
-
     @Unique private float spyglassOverlayScale_JustZoom = 0.5F;
     @Unique private boolean showSpyglassOverlay_JustZoom;
+
+    @Shadow protected abstract void extractSpyglassOverlay(GuiGraphicsExtractor graphics, float scale);
 
     /**
      * @reason Reusing the HUD's own visibility gates works for both Fabric's direct renderer and NeoForge's layered renderer. The spyglass overlay is extracted separately because it has its own visibility setting, while the real hidden state and render flag must be restored so this setting does not also hide hands like vanilla's HUD toggle.
