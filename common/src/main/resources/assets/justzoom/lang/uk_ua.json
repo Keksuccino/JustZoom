@@ -27,6 +27,8 @@
   "justzoom.options.normalize_mouse_sensitivity_on_zoom.desc": "Чи має чутливість миші підлаштовуватися під зум,\nщоб рух миші не був занадто швидким при зумі.",
   "justzoom.options.allow_zoom_in_mirrored_view": "Дозволити зум у дзеркальному вигляді: %s",
   "justzoom.options.allow_zoom_in_mirrored_view.desc": "Якщо увімкнено, зум буде можливий у дзеркальному вигляді (коли ти бачиш себе).",
+  "justzoom.options.improve_third_person_zoom": "Покращити зум від третьої особи: %s",
+  "justzoom.options.improve_third_person_zoom.desc": "Якщо увімкнено, під час зуму з виглядом від третьої особи ззаду використовується камера від першої особи, щоб гравець не закривав збільшений огляд.",
   "justzoom.options.hide_arms_when_zooming": "Приховувати руки: %s",
   "justzoom.options.hide_arms_when_zooming.desc": "Якщо увімкнено, руки гравця будуть невидимими під час зуму.",
   "justzoom.options.show_hud": "Показувати HUD: %s",

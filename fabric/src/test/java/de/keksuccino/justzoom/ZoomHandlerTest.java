@@ -81,4 +81,24 @@ class ZoomHandlerTest {
         assertFalse(ZoomHandler.shouldExtractSpyglassOverlaySeparately(false, false, true));
     }
 
+    @Test
+    void usesFirstPersonCameraForImprovedRearThirdPersonZoom() {
+        assertTrue(ZoomHandler.shouldUseFirstPersonCameraWhileZooming(true, true, false));
+    }
+
+    @Test
+    void keepsRearThirdPersonCameraWhenImprovementIsDisabled() {
+        assertFalse(ZoomHandler.shouldUseFirstPersonCameraWhileZooming(true, false, false));
+    }
+
+    @Test
+    void doesNotOverrideTheCameraOutsideZoom() {
+        assertFalse(ZoomHandler.shouldUseFirstPersonCameraWhileZooming(false, true, false));
+    }
+
+    @Test
+    void doesNotOverrideTheMirroredCamera() {
+        assertFalse(ZoomHandler.shouldUseFirstPersonCameraWhileZooming(true, true, true));
+    }
+
 }

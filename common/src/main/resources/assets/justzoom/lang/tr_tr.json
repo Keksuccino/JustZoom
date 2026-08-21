@@ -27,6 +27,8 @@
   "justzoom.options.normalize_mouse_sensitivity_on_zoom.desc": "Fare hassasiyetinin yakınlaştırılmış görünüme göre ayarlanıp ayarlanmayacağı,\nböylece yakınlaştırma yaparken fareyi hareket ettirdiğinde çok hızlı hissettirmez.",
   "justzoom.options.allow_zoom_in_mirrored_view": "Ayna Görünümünde Yakınlaştırmaya İzin Ver: %s",
   "justzoom.options.allow_zoom_in_mirrored_view.desc": "Etkinleştirilirse, ayna görünümünde (kendini gördüğünde) de yakınlaştırma yapabilirsin.",
+  "justzoom.options.improve_third_person_zoom": "Üçüncü Şahıs Yakınlaştırmasını İyileştir: %s",
+  "justzoom.options.improve_third_person_zoom.desc": "Etkinleştirilirse, arkadan üçüncü şahıs görünümünde yakınlaştırırken oyuncunun yakınlaştırılmış görünümü engellememesi için birinci şahıs kamerası kullanılır.",
   "justzoom.options.hide_arms_when_zooming": "Kolları Gizle: %s",
   "justzoom.options.hide_arms_when_zooming.desc": "Etkinleştirilirse, yakınlaştırma yaparken oyuncunun kolları görünmez olur.",
   "justzoom.options.show_hud": "HUD'u Göster: %s",

@@ -27,6 +27,8 @@
   "justzoom.options.normalize_mouse_sensitivity_on_zoom.desc": "If the mouse sensitivity should adjust itself to the zoomed view,\nso it feels normal and not too fast when moving the mouse while zooming.",
   "justzoom.options.allow_zoom_in_mirrored_view": "Allow Zoom in Mirrored View: %s",
   "justzoom.options.allow_zoom_in_mirrored_view.desc": "If enabled, zooming will be possible in the mirrored view (when you see yourself).",
+  "justzoom.options.improve_third_person_zoom": "Improve Third-Person Zoom: %s",
+  "justzoom.options.improve_third_person_zoom.desc": "If enabled, zooming in rear third-person view uses the first-person camera so the player does not block the zoomed view.",
   "justzoom.options.hide_arms_when_zooming": "Hide Arms: %s",
   "justzoom.options.hide_arms_when_zooming.desc": "If enabled, the player's arms will be invisible while zooming.",
   "justzoom.options.show_hud": "Show HUD: %s",

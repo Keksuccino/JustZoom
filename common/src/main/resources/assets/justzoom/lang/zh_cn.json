@@ -27,6 +27,8 @@
   "justzoom.options.normalize_mouse_sensitivity_on_zoom.desc": "鼠标灵敏度是否应该根据缩放视图自动调整，\n这样在缩放时移动鼠标就不会感觉太快。",
   "justzoom.options.allow_zoom_in_mirrored_view": "允许在镜像视图中缩放：%s",
   "justzoom.options.allow_zoom_in_mirrored_view.desc": "如果启用，在镜像视图（当你看到自己时）中也可以缩放。",
+  "justzoom.options.improve_third_person_zoom": "改进第三人称缩放：%s",
+  "justzoom.options.improve_third_person_zoom.desc": "如果启用，在第三人称后视角缩放时将使用第一人称镜头，避免玩家模型遮挡放大的视野。",
   "justzoom.options.hide_arms_when_zooming": "隐藏手臂：%s",
   "justzoom.options.hide_arms_when_zooming.desc": "如果启用，缩放时玩家的手臂将不可见。",
   "justzoom.options.show_hud": "显示 HUD：%s",

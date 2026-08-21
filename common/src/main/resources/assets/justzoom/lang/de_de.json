@@ -27,6 +27,8 @@
   "justzoom.options.normalize_mouse_sensitivity_on_zoom.desc": "Ob sich die Mausempfindlichkeit an die gezoomte Ansicht anpassen soll,\ndamit sie sich normal anfühlt und nicht zu schnell ist, wenn du die Maus beim Zoomen bewegst.",
   "justzoom.options.allow_zoom_in_mirrored_view": "Zoom in Spiegelansicht erlauben: %s",
   "justzoom.options.allow_zoom_in_mirrored_view.desc": "Falls aktiviert, kannst du auch in der Spiegelansicht zoomen (wenn du dich selbst siehst).",
+  "justzoom.options.improve_third_person_zoom": "Third-Person-Zoom verbessern: %s",
+  "justzoom.options.improve_third_person_zoom.desc": "Falls aktiviert, verwendet der Zoom in der Third-Person-Rückansicht die First-Person-Kamera, damit der Spieler die gezoomte Ansicht nicht verdeckt.",
   "justzoom.options.hide_arms_when_zooming": "Arme verstecken: %s",
   "justzoom.options.hide_arms_when_zooming.desc": "Falls aktiviert, werden deine Arme beim Zoomen unsichtbar.",
   "justzoom.options.show_hud": "HUD anzeigen: %s",

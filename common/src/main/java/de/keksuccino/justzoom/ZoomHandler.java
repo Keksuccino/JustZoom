@@ -45,6 +45,15 @@ public class ZoomHandler {
         return isZooming() && JustZoom.getOptions().hideArmsWhenZooming.getValue();
     }
 
+    public static boolean shouldUseFirstPersonCameraWhileZooming() {
+        Minecraft minecraft = Minecraft.getInstance();
+        return shouldUseFirstPersonCameraWhileZooming(isZooming(), JustZoom.getOptions().improveThirdPersonZoom.getValue(), minecraft.options.getCameraType().isMirrored());
+    }
+
+    static boolean shouldUseFirstPersonCameraWhileZooming(boolean zooming, boolean improveThirdPersonZoom, boolean mirrored) {
+        return zooming && improveThirdPersonZoom && !mirrored;
+    }
+
     public static boolean shouldHideHudWhileZooming() {
         Minecraft minecraft = Minecraft.getInstance();
         boolean spyglassScoping = minecraft.player != null && minecraft.player.isScoping();
