@@ -51,6 +51,10 @@ public class ZoomHandler {
         return JustZoom.getOptions().showHud.getValue().shouldHide(spyglassScoping, isKeybindZooming());
     }
 
+    public static boolean shouldExtractSpyglassOverlaySeparately(boolean hudOriginallyHidden, boolean hudHiddenByZoom, boolean overlayVisible) {
+        return !hudOriginallyHidden && hudHiddenByZoom && overlayVisible;
+    }
+
     public static void onCameraTick() {
         boolean zooming = isZooming();
         if (!zooming && JustZoom.getOptions().resetZoomFactorOnStopZooming.getValue()) {

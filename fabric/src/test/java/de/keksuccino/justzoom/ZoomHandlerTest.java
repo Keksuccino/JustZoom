@@ -61,4 +61,24 @@ class ZoomHandlerTest {
         assertEquals(0.0D, ZoomHandler.ZoomInput.calculateScrollAdjustment(true, false, Double.POSITIVE_INFINITY));
     }
 
+    @Test
+    void extractsEnabledSpyglassOverlayWhenZoomHidesTheHud() {
+        assertTrue(ZoomHandler.shouldExtractSpyglassOverlaySeparately(false, true, true));
+    }
+
+    @Test
+    void leavesSpyglassOverlayControlledByItsOwnSetting() {
+        assertFalse(ZoomHandler.shouldExtractSpyglassOverlaySeparately(false, true, false));
+    }
+
+    @Test
+    void respectsVanillaHudHiding() {
+        assertFalse(ZoomHandler.shouldExtractSpyglassOverlaySeparately(true, true, true));
+    }
+
+    @Test
+    void usesTheNormalExtractionPositionWhileTheHudIsVisible() {
+        assertFalse(ZoomHandler.shouldExtractSpyglassOverlaySeparately(false, false, true));
+    }
+
 }

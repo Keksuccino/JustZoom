@@ -10,9 +10,11 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.Hud;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.util.Mth;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(Hud.class)
@@ -21,13 +23,27 @@ public class MixinHud {
     @Shadow @Final private Minecraft minecraft;
     @Shadow private boolean isHidden;
 
+    @Shadow
+    private void extractSpyglassOverlay(GuiGraphicsExtractor graphics, float scale) {
+        throw new AssertionError();
+    }
+
+    @Unique private float spyglassOverlayScale_JustZoom = 0.5F;
+    @Unique private boolean showSpyglassOverlay_JustZoom;
+
     /**
-     * @reason Reusing the HUD's own visibility gates works for both Fabric's direct renderer and NeoForge's layered renderer. The real hidden state and render flag must be restored so this setting does not also hide hands and first-person screen effects like vanilla's HUD toggle.
+     * @reason Reusing the HUD's own visibility gates works for both Fabric's direct renderer and NeoForge's layered renderer. The spyglass overlay is extracted separately because it has its own visibility setting, while the real hidden state and render flag must be restored so this setting does not also hide hands like vanilla's HUD toggle.
      */
     @WrapMethod(method = "extractRenderState")
     private void wrap_extractRenderState_JustZoom(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker, Operation<Void> original) {
         boolean originallyHidden = this.isHidden;
-        this.isHidden = originallyHidden || ZoomHandler.shouldHideHudWhileZooming();
+        boolean hiddenByZoom = ZoomHandler.shouldHideHudWhileZooming();
+        this.showSpyglassOverlay_JustZoom = ZoomHandler.shouldShowSpyglassOverlay() && this.minecraft.options.getCameraType().isFirstPerson();
+        this.spyglassOverlayScale_JustZoom = this.showSpyglassOverlay_JustZoom ? Mth.lerp(0.5F * deltaTracker.getGameTimeDeltaTicks(), this.spyglassOverlayScale_JustZoom, 1.125F) : 0.5F;
+        if (ZoomHandler.shouldExtractSpyglassOverlaySeparately(originallyHidden, hiddenByZoom, this.showSpyglassOverlay_JustZoom)) {
+            this.extractSpyglassOverlay(graphics, this.spyglassOverlayScale_JustZoom);
+        }
+        this.isHidden = originallyHidden || hiddenByZoom;
         try {
             original.call(graphics, deltaTracker);
         } finally {
@@ -42,8 +58,12 @@ public class MixinHud {
     }
 
     @WrapWithCondition(method = "extractCameraOverlays", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Hud;extractSpyglassOverlay(Lnet/minecraft/client/gui/GuiGraphicsExtractor;F)V"))
-    private boolean wrap_extractSpyglassOverlay_JustZoom(Hud instance, GuiGraphicsExtractor graphics, float scale) {
-        return ZoomHandler.shouldShowSpyglassOverlay();
+    private boolean cancel_extractSpyglassOverlay_JustZoom(Hud instance, GuiGraphicsExtractor graphics, float scale) {
+        if (this.showSpyglassOverlay_JustZoom) {
+            // Keep the original extraction position when the HUD is visible, but own the call so the hidden-HUD path can use the same overlay state.
+            this.extractSpyglassOverlay(graphics, this.spyglassOverlayScale_JustZoom);
+        }
+        return false;
     }
 
 }
