@@ -11,7 +11,8 @@
     "client.MixinHud",
     "client.MixinKeyMapping_Category",
     "client.MixinMinecraft",
-    "client.MixinMouseHandler"
+    "client.MixinMouseHandler",
+    "client.MixinSpyglassItem"
   ],
   "mixins": [
   ],

@@ -39,6 +39,12 @@
   "justzoom.options.spyglass_overlay.only_keybind_zoom": "Yalnızca Yakınlaştırma Tuşu",
   "justzoom.options.spyglass_overlay.spyglass_and_keybind_zoom": "Dürbün ve Yakınlaştırma Tuşu",
   "justzoom.options.spyglass_overlay.disabled": "Kapalı",
+  "justzoom.options.spyglass_sounds": "Dürbün Sesleri: %s",
+  "justzoom.options.spyglass_sounds.desc": "Dürbün seslerinin ne zaman çalınacağını belirler.",
+  "justzoom.options.spyglass_sounds.only_spyglass": "Yalnızca Dürbün",
+  "justzoom.options.spyglass_sounds.only_keybind_zoom": "Yalnızca Yakınlaştırma Tuşu",
+  "justzoom.options.spyglass_sounds.spyglass_and_keybind_zoom": "Dürbün ve Yakınlaştırma Tuşu",
+  "justzoom.options.spyglass_sounds.disabled": "Kapalı",
   "justzoom.options.toggle.enabled": "Açık",
   "justzoom.options.toggle.disabled": "Kapalı"
 }

@@ -39,6 +39,12 @@
   "justzoom.options.spyglass_overlay.only_keybind_zoom": "Лише клавіша зуму",
   "justzoom.options.spyglass_overlay.spyglass_and_keybind_zoom": "Підзорна труба та клавіша зуму",
   "justzoom.options.spyglass_overlay.disabled": "Вимкнено",
+  "justzoom.options.spyglass_sounds": "Звуки підзорної труби: %s",
+  "justzoom.options.spyglass_sounds.desc": "Визначає, коли відтворюються звуки підзорної труби.",
+  "justzoom.options.spyglass_sounds.only_spyglass": "Лише підзорна труба",
+  "justzoom.options.spyglass_sounds.only_keybind_zoom": "Лише клавіша зуму",
+  "justzoom.options.spyglass_sounds.spyglass_and_keybind_zoom": "Підзорна труба та клавіша зуму",
+  "justzoom.options.spyglass_sounds.disabled": "Вимкнено",
   "justzoom.options.toggle.enabled": "Увімкнено",
   "justzoom.options.toggle.disabled": "Вимкнено"
 }

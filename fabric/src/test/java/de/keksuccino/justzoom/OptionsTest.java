@@ -27,9 +27,11 @@ class OptionsTest {
             Options options = new Options(configFile.toFile(), null);
 
             assertEquals(SpyglassOverlayMode.ONLY_SPYGLASS, options.spyglassOverlay.getValue());
+            assertEquals(SpyglassSoundsMode.SPYGLASS_AND_KEYBIND_ZOOM, options.spyglassSounds.getValue());
             JsonObject storedSpyglassOptions = JsonParser.parseString(Files.readString(configFile, StandardCharsets.UTF_8)).getAsJsonObject().getAsJsonObject("spyglass");
             assertFalse(storedSpyglassOptions.has("show_spyglass_overlay"));
             assertEquals("only_spyglass", storedSpyglassOptions.get("spyglass_overlay").getAsString());
+            assertEquals("spyglass_and_keybind_zoom", storedSpyglassOptions.get("spyglass_sounds").getAsString());
         }
     }
 

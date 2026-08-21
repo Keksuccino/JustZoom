@@ -38,6 +38,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 public class OptionsScreen extends Screen {
 
@@ -113,6 +115,7 @@ public class OptionsScreen extends Screen {
         this.addFullWidthOption(tab, this.buildToggleButton(JustZoom.getOptions().resetZoomFactorOnStopZooming, "justzoom.options.reset_zoom_factor_when_stop_zooming"));
         this.addFullWidthOption(tab, this.buildToggleButton(JustZoom.getOptions().useJustZoomForSpyglass, "justzoom.options.use_just_zoom_for_spyglass"), settings -> settings.paddingTop(OPTION_SECTION_PADDING_TOP));
         this.addFullWidthOption(tab, this.buildSpyglassOverlayButton());
+        this.addFullWidthOption(tab, this.buildSpyglassSoundsButton());
         return tab;
     }
 
@@ -169,10 +172,21 @@ public class OptionsScreen extends Screen {
     @NotNull
     protected Button buildSpyglassOverlayButton() {
         ConfigValue<SpyglassOverlayMode> option = JustZoom.getOptions().spyglassOverlay;
-        Button button = Button.builder(this.spyglassOverlayMessage(option.getValue()), pressedButton -> {
-            option.update(SpyglassOverlayMode::next);
-            pressedButton.setMessage(this.spyglassOverlayMessage(option.getValue()));
-        }).size(this.getButtonWidth(), BUTTON_HEIGHT).tooltip(Tooltip.create(Component.translatable("justzoom.options.spyglass_overlay.desc"))).build();
+        return this.buildCycleButton(option, SpyglassOverlayMode::next, this::spyglassOverlayMessage, "justzoom.options.spyglass_overlay.desc");
+    }
+
+    @NotNull
+    protected Button buildSpyglassSoundsButton() {
+        ConfigValue<SpyglassSoundsMode> option = JustZoom.getOptions().spyglassSounds;
+        return this.buildCycleButton(option, SpyglassSoundsMode::next, this::spyglassSoundsMessage, "justzoom.options.spyglass_sounds.desc");
+    }
+
+    @NotNull
+    protected <T> Button buildCycleButton(@NotNull ConfigValue<T> option, @NotNull UnaryOperator<T> nextValue, @NotNull Function<T, Component> messageFactory, @NotNull String descriptionKey) {
+        Button button = Button.builder(messageFactory.apply(option.getValue()), pressedButton -> {
+            option.update(nextValue);
+            pressedButton.setMessage(messageFactory.apply(option.getValue()));
+        }).size(this.getButtonWidth(), BUTTON_HEIGHT).tooltip(Tooltip.create(Component.translatable(descriptionKey))).build();
         return button;
     }
 
@@ -239,7 +253,21 @@ public class OptionsScreen extends Screen {
     }
 
     static int spyglassOverlayValueColor(@NotNull SpyglassOverlayMode mode) {
-        return mode == SpyglassOverlayMode.DISABLED ? DISABLED_CYCLE_VALUE_COLOR : CYCLE_VALUE_COLOR;
+        return spyglassCycleValueColor(mode == SpyglassOverlayMode.DISABLED);
+    }
+
+    @NotNull
+    protected Component spyglassSoundsMessage(@NotNull SpyglassSoundsMode mode) {
+        Component value = Component.translatable(mode.getTranslationKey()).withStyle(Style.EMPTY.withColor(spyglassSoundsValueColor(mode)));
+        return Component.translatable("justzoom.options.spyglass_sounds", value);
+    }
+
+    static int spyglassSoundsValueColor(@NotNull SpyglassSoundsMode mode) {
+        return spyglassCycleValueColor(mode == SpyglassSoundsMode.DISABLED);
+    }
+
+    private static int spyglassCycleValueColor(boolean disabled) {
+        return disabled ? DISABLED_CYCLE_VALUE_COLOR : CYCLE_VALUE_COLOR;
     }
 
     @NotNull
