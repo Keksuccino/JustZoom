@@ -138,6 +138,8 @@ subprojects {
                 "mod_description": mod_description,
                 "mod_license": mod_license,
                 "mod_authors": mod_authors,
+                "mod_website": mod_website,
+                "mod_issues": mod_issues,
                 "minecraft_version": minecraft_version,
                 "java_version": java_version,
                 "fabric_version": fabric_version,
