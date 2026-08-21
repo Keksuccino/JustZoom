@@ -8,7 +8,7 @@
   "justzoom.options": "Just Zoom 설정",
   "justzoom.options.tab.general": "일반",
   "justzoom.options.tab.controls": "조작",
-  "justzoom.options.zoom_keybind": "줌 키: %s",
+  "justzoom.options.zoom_keybind": "줌: %s",
   "justzoom.options.zoom_keybind.desc": "줌에 사용할 키 또는 마우스 버튼입니다.",
   "justzoom.options.zoom_in_keybind": "확대: %s",
   "justzoom.options.zoom_in_keybind.desc": "줌 사용 중 배율을 높이는 키, 마우스 버튼 또는 마우스 휠 방향입니다.",

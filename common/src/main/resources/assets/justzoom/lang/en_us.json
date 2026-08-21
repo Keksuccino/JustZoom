@@ -8,7 +8,7 @@
   "justzoom.options": "Just Zoom Options",
   "justzoom.options.tab.general": "General",
   "justzoom.options.tab.controls": "Controls",
-  "justzoom.options.zoom_keybind": "Zoom Key: %s",
+  "justzoom.options.zoom_keybind": "Zoom: %s",
   "justzoom.options.zoom_keybind.desc": "The key or mouse button used to zoom.",
   "justzoom.options.zoom_in_keybind": "Zoom In: %s",
   "justzoom.options.zoom_in_keybind.desc": "The key, mouse button, or mouse wheel direction used to increase magnification while zooming.",

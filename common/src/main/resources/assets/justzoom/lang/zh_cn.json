@@ -8,7 +8,7 @@
   "justzoom.options": "Just Zoom 设置",
   "justzoom.options.tab.general": "常规",
   "justzoom.options.tab.controls": "控制",
-  "justzoom.options.zoom_keybind": "缩放按键：%s",
+  "justzoom.options.zoom_keybind": "缩放：%s",
   "justzoom.options.zoom_keybind.desc": "用于缩放的键盘按键或鼠标按钮。",
   "justzoom.options.zoom_in_keybind": "放大：%s",
   "justzoom.options.zoom_in_keybind.desc": "缩放时用于提高放大倍率的键盘按键、鼠标按钮或滚轮方向。",

@@ -8,7 +8,7 @@
   "justzoom.options": "Just Zoom Einstellungen",
   "justzoom.options.tab.general": "Allgemein",
   "justzoom.options.tab.controls": "Steuerung",
-  "justzoom.options.zoom_keybind": "Zoom-Taste: %s",
+  "justzoom.options.zoom_keybind": "Zoom: %s",
   "justzoom.options.zoom_keybind.desc": "Die Taste oder Maustaste, die zum Zoomen verwendet wird.",
   "justzoom.options.zoom_in_keybind": "Hineinzoomen: %s",
   "justzoom.options.zoom_in_keybind.desc": "Die Taste, Maustaste oder Mausradrichtung, mit der die Vergrößerung beim Zoomen erhöht wird.",

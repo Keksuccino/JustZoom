@@ -8,7 +8,7 @@
   "justzoom.options": "Налаштування Just Zoom",
   "justzoom.options.tab.general": "Загальні",
   "justzoom.options.tab.controls": "Керування",
-  "justzoom.options.zoom_keybind": "Клавіша зуму: %s",
+  "justzoom.options.zoom_keybind": "Зум: %s",
   "justzoom.options.zoom_keybind.desc": "Клавіша клавіатури або кнопка миші, що використовується для зуму.",
   "justzoom.options.zoom_in_keybind": "Наблизити: %s",
   "justzoom.options.zoom_in_keybind.desc": "Клавіша, кнопка миші або напрямок колеса, що збільшує наближення під час зуму.",

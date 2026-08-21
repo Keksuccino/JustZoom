@@ -8,7 +8,7 @@
   "justzoom.options": "Just Zoom Ayarları",
   "justzoom.options.tab.general": "Genel",
   "justzoom.options.tab.controls": "Kontroller",
-  "justzoom.options.zoom_keybind": "Yakınlaştırma Tuşu: %s",
+  "justzoom.options.zoom_keybind": "Yakınlaştır: %s",
   "justzoom.options.zoom_keybind.desc": "Yakınlaştırmak için kullanılan klavye tuşu veya fare düğmesi.",
   "justzoom.options.zoom_in_keybind": "Yakınlaştır: %s",
   "justzoom.options.zoom_in_keybind.desc": "Yakınlaştırma sırasında büyütmeyi artıran tuş, fare düğmesi veya fare tekerleği yönü.",

@@ -8,7 +8,7 @@
   "justzoom.options": "Opciones de Just Zoom",
   "justzoom.options.tab.general": "General",
   "justzoom.options.tab.controls": "Controles",
-  "justzoom.options.zoom_keybind": "Tecla de zoom: %s",
+  "justzoom.options.zoom_keybind": "Zoom: %s",
   "justzoom.options.zoom_keybind.desc": "La tecla o botón del mouse que se usa para hacer zoom.",
   "justzoom.options.zoom_in_keybind": "Acercar: %s",
   "justzoom.options.zoom_in_keybind.desc": "La tecla, botón del mouse o dirección de la rueda que aumenta la ampliación al usar el zoom.",

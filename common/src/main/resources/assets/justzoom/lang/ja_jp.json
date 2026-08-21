@@ -8,7 +8,7 @@
   "justzoom.options": "Just Zoom 設定",
   "justzoom.options.tab.general": "一般",
   "justzoom.options.tab.controls": "操作設定",
-  "justzoom.options.zoom_keybind": "ズームキー: %s",
+  "justzoom.options.zoom_keybind": "ズーム: %s",
   "justzoom.options.zoom_keybind.desc": "ズームに使用するキーまたはマウスボタンです。",
   "justzoom.options.zoom_in_keybind": "ズームイン: %s",
   "justzoom.options.zoom_in_keybind.desc": "ズーム中に倍率を上げるためのキー、マウスボタン、またはマウスホイールの方向です。",

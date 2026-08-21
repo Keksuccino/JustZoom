@@ -8,7 +8,7 @@
   "justzoom.options": "Options Just Zoom",
   "justzoom.options.tab.general": "Général",
   "justzoom.options.tab.controls": "Commandes",
-  "justzoom.options.zoom_keybind": "Touche de zoom : %s",
+  "justzoom.options.zoom_keybind": "Zoom : %s",
   "justzoom.options.zoom_keybind.desc": "La touche du clavier ou le bouton de la souris utilisé pour zoomer.",
   "justzoom.options.zoom_in_keybind": "Zoom avant : %s",
   "justzoom.options.zoom_in_keybind.desc": "La touche, le bouton de la souris ou le sens de la molette utilisé pour augmenter le grossissement pendant le zoom.",
