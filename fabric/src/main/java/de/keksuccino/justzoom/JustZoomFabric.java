@@ -14,6 +14,8 @@ public class JustZoomFabric implements ModInitializer {
         if (Services.PLATFORM.isOnClient()) {
 
             KeyMappingHelper.registerKeyMapping(KeyMappings.KEY_TOGGLE_ZOOM);
+            KeyMappingHelper.registerKeyMapping(KeyMappings.KEY_ZOOM_IN);
+            KeyMappingHelper.registerKeyMapping(KeyMappings.KEY_ZOOM_OUT);
 
         }
 

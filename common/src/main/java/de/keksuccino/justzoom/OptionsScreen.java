@@ -1,6 +1,7 @@
 package de.keksuccino.justzoom;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import de.keksuccino.justzoom.platform.Services;
 import de.keksuccino.justzoom.util.config.ConfigValue;
 import de.keksuccino.konkrete.math.MathUtils;
 import net.minecraft.ChatFormatting;
@@ -52,7 +53,9 @@ public class OptionsScreen extends Screen {
     protected static final int OPTION_SECTION_PADDING_TOP = 10;
     protected static final Identifier TAB_HEADER_BACKGROUND = Identifier.withDefaultNamespace("textures/gui/tab_header_background.png");
     protected static final KeybindSetting ZOOM_KEYBIND = new KeybindSetting(KeyMappings.KEY_TOGGLE_ZOOM, "justzoom.options.zoom_keybind", "justzoom.options.zoom_keybind.desc");
-    protected static final List<KeybindSetting> KEYBIND_SETTINGS = List.of(ZOOM_KEYBIND);
+    protected static final KeybindSetting ZOOM_IN_KEYBIND = new KeybindSetting(KeyMappings.KEY_ZOOM_IN, "justzoom.options.zoom_in_keybind", "justzoom.options.zoom_in_keybind.desc");
+    protected static final KeybindSetting ZOOM_OUT_KEYBIND = new KeybindSetting(KeyMappings.KEY_ZOOM_OUT, "justzoom.options.zoom_out_keybind", "justzoom.options.zoom_out_keybind.desc");
+    protected static final List<KeybindSetting> KEYBIND_SETTINGS = List.of(ZOOM_KEYBIND, ZOOM_IN_KEYBIND, ZOOM_OUT_KEYBIND);
 
     @Nullable
     protected Screen parent;
@@ -193,7 +196,7 @@ public class OptionsScreen extends Screen {
     protected Button buildKeybindResetButton(@NotNull KeybindSetting setting) {
         KeyMapping keyMapping = setting.keyMapping();
         return Button.builder(Component.translatable("controls.reset"), ignored -> {
-            keyMapping.setKey(keyMapping.getDefaultKey());
+            Services.PLATFORM.setKeyMappingKey(keyMapping, keyMapping.getDefaultKey());
             this.afterKeybindChanged();
         }).size(KEYBIND_RESET_BUTTON_WIDTH, BUTTON_HEIGHT).createNarration(defaultNarrationSupplier -> Component.translatable("narrator.controls.reset", Component.translatable(keyMapping.getName()))).build();
     }
@@ -326,7 +329,7 @@ public class OptionsScreen extends Screen {
     @Override
     public boolean mouseClicked(@NotNull MouseButtonEvent event, boolean doubleClick) {
         if (this.waitingForKeybind != null) {
-            this.waitingForKeybind.setKey(InputConstants.Type.MOUSE.getOrCreate(event.button()));
+            Services.PLATFORM.setKeyMappingKey(this.waitingForKeybind, InputConstants.Type.MOUSE.getOrCreate(event.button()));
             this.afterKeybindChanged();
             return true;
         }
@@ -334,9 +337,19 @@ public class OptionsScreen extends Screen {
     }
 
     @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double deltaX, double deltaY) {
+        if (this.waitingForKeybind != null && KeyMappings.isZoomAdjustment(this.waitingForKeybind) && KeyMappings.hasMouseWheelDirection(deltaY)) {
+            Services.PLATFORM.setKeyMappingKey(this.waitingForKeybind, KeyMappings.getMouseWheelKey(deltaY));
+            this.afterKeybindChanged();
+            return true;
+        }
+        return super.mouseScrolled(mouseX, mouseY, deltaX, deltaY);
+    }
+
+    @Override
     public boolean keyPressed(@NotNull KeyEvent event) {
         if (this.waitingForKeybind != null) {
-            this.waitingForKeybind.setKey(event.isEscape() ? InputConstants.UNKNOWN : InputConstants.getKey(event));
+            Services.PLATFORM.setKeyMappingKey(this.waitingForKeybind, event.isEscape() ? InputConstants.UNKNOWN : InputConstants.getKey(event));
             this.afterKeybindChanged();
             return true;
         }

@@ -30,6 +30,8 @@ public class JustZoomNeoForge {
     public static void onRegisterKeybinds(RegisterKeyMappingsEvent e) {
 
         e.register(KeyMappings.KEY_TOGGLE_ZOOM);
+        e.register(KeyMappings.KEY_ZOOM_IN);
+        e.register(KeyMappings.KEY_ZOOM_OUT);
 
     }
 

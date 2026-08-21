@@ -1,5 +1,6 @@
 package de.keksuccino.justzoom;
 
+import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import org.jetbrains.annotations.NotNull;
 
@@ -52,6 +53,14 @@ public class ZoomHandler {
         ZOOM_LEVEL_STATE.tick(zooming, shouldZoomInOutSmooth(), ZoomMath.calculateMaximumMagnification(cachedNormalFov));
     }
 
+    public static void onInputTick() {
+        int zoomInClicks = consumeClicks(KeyMappings.KEY_ZOOM_IN);
+        int zoomOutClicks = consumeClicks(KeyMappings.KEY_ZOOM_OUT);
+        if (isZooming()) {
+            adjustMagnification(ZoomInput.calculateKeyAdjustment(zoomInClicks, zoomOutClicks));
+        }
+    }
+
     public static double getRenderedMagnification(float partialTicks, float normalFov) {
         return ZOOM_LEVEL_STATE.getRenderedMagnification(isZooming(), shouldZoomInOutSmooth(), partialTicks, ZoomMath.calculateMaximumMagnification(normalFov));
     }
@@ -72,17 +81,25 @@ public class ZoomHandler {
     public static void onMouseScroll(@NotNull MouseScrollFeedback feedback, double deltaY) {
 
         if (isZooming()) {
-
-            feedback.cancel = true;
-
-            if (deltaY != 0.0D) {
-                double maximumMagnification = ZoomMath.calculateMaximumMagnification(cachedNormalFov);
-                double stepMultiplier = ZoomMath.normalizeScrollMagnificationMultiplier(JustZoom.getOptions().scrollMagnificationMultiplier.getValue(), Options.DEFAULT_SCROLL_MAGNIFICATION_MULTIPLIER);
-                ZOOM_LEVEL_STATE.adjustMagnification(deltaY, stepMultiplier, maximumMagnification);
-            }
-
+            boolean zoomInTriggered = KeyMappings.matchesMouseWheel(KeyMappings.KEY_ZOOM_IN, deltaY);
+            boolean zoomOutTriggered = KeyMappings.matchesMouseWheel(KeyMappings.KEY_ZOOM_OUT, deltaY);
+            feedback.cancel = zoomInTriggered || zoomOutTriggered;
+            adjustMagnification(ZoomInput.calculateScrollAdjustment(zoomInTriggered, zoomOutTriggered, deltaY));
         }
 
+    }
+
+    private static int consumeClicks(@NotNull KeyMapping keyMapping) {
+        int clicks = 0;
+        while (keyMapping.consumeClick()) clicks++;
+        return clicks;
+    }
+
+    private static void adjustMagnification(double adjustment) {
+        if (adjustment == 0.0D) return;
+        double maximumMagnification = ZoomMath.calculateMaximumMagnification(cachedNormalFov);
+        double stepMultiplier = ZoomMath.normalizeScrollMagnificationMultiplier(JustZoom.getOptions().scrollMagnificationMultiplier.getValue(), Options.DEFAULT_SCROLL_MAGNIFICATION_MULTIPLIER);
+        ZOOM_LEVEL_STATE.adjustMagnification(adjustment, stepMultiplier, maximumMagnification);
     }
 
     private static boolean isZoomAvailable(@NotNull Minecraft minecraft) {
@@ -102,6 +119,15 @@ public class ZoomHandler {
 
         static boolean isActive(boolean keybindDown, boolean spyglassScoping, boolean useJustZoomForSpyglass) {
             return keybindDown || spyglassScoping && useJustZoomForSpyglass;
+        }
+
+        static int calculateKeyAdjustment(int zoomInClicks, int zoomOutClicks) {
+            return Math.max(0, zoomInClicks) - Math.max(0, zoomOutClicks);
+        }
+
+        static double calculateScrollAdjustment(boolean zoomInTriggered, boolean zoomOutTriggered, double deltaY) {
+            if (!Double.isFinite(deltaY) || deltaY == 0.0D || zoomInTriggered == zoomOutTriggered) return 0.0D;
+            return zoomInTriggered ? Math.abs(deltaY) : -Math.abs(deltaY);
         }
 
     }
