@@ -7,6 +7,7 @@
   "key.mouse.10": "Mausrad runter",
   "justzoom.options": "Just Zoom Einstellungen",
   "justzoom.options.tab.general": "Allgemein",
+  "justzoom.options.tab.advanced": "Erweitert",
   "justzoom.options.tab.controls": "Steuerung",
   "justzoom.options.zoom_keybind": "Zoom: %s",
   "justzoom.options.zoom_keybind.desc": "Die Taste oder Maustaste, die zum Zoomen verwendet wird.",

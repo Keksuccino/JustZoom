@@ -1,16 +1,23 @@
 package de.keksuccino.justzoom;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.resources.Identifier;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class OptionsScreenTest {
@@ -135,7 +142,7 @@ class OptionsScreenTest {
         assertEquals(1.0D, OptionsScreen.animationSpeedToSliderValue(6.0F, 0.45F));
         assertEquals(0.09D, OptionsScreen.animationSpeedToSliderValue(Float.NaN, 0.45F), 0.000000001D);
         assertEquals(0.04D, OptionsScreen.animationSpeedToSliderValue(Float.NaN, 0.2F), 0.000000001D);
-        assertEquals(0.45F, OptionsScreen.sliderValueToAnimationSpeed(Double.NaN));
+        assertEquals(Options.DEFAULT_START_ZOOMING_ANIMATION_SPEED, OptionsScreen.sliderValueToAnimationSpeed(Double.NaN));
     }
 
     @Test
@@ -167,6 +174,19 @@ class OptionsScreenTest {
         List<KeyMapping> keyMappings = OptionsScreen.KEYBIND_SETTINGS.stream().map(OptionsScreen.KeybindSetting::keyMapping).toList();
 
         assertEquals(List.of(KeyMappings.KEY_TOGGLE_ZOOM, KeyMappings.KEY_ZOOM_IN, KeyMappings.KEY_ZOOM_OUT), keyMappings);
+    }
+
+    @Test
+    void everyBundledLanguageNamesTheAdvancedTab() throws IOException {
+        for (String language : List.of("de_de", "en_us", "es_mx", "fr_fr", "ja_jp", "ko_kr", "ru_ru", "tr_tr", "uk_ua", "zh_cn")) {
+            String resourcePath = "assets/justzoom/lang/" + language + ".json";
+            try (InputStream stream = OptionsScreenTest.class.getClassLoader().getResourceAsStream(resourcePath)) {
+                assertNotNull(stream, resourcePath);
+                JsonObject translations = JsonParser.parseReader(new InputStreamReader(stream, StandardCharsets.UTF_8)).getAsJsonObject();
+                assertTrue(translations.has("justzoom.options.tab.advanced"), language);
+                assertFalse(translations.get("justzoom.options.tab.advanced").getAsString().isBlank(), language);
+            }
+        }
     }
 
     private static KeyMapping keyMapping(String suffix, int defaultKey) {

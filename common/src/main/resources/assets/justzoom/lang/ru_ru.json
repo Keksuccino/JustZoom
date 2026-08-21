@@ -7,6 +7,7 @@
   "key.mouse.10": "Колесо мыши вниз",
   "justzoom.options": "Настройки Just Zoom",
   "justzoom.options.tab.general": "Общие",
+  "justzoom.options.tab.advanced": "Расширенные",
   "justzoom.options.tab.controls": "Управление",
   "justzoom.options.zoom_keybind": "Зум: %s",
   "justzoom.options.zoom_keybind.desc": "Клавиша клавиатуры или кнопка мыши, используемая для зума.",

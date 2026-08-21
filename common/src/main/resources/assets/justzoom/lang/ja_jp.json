@@ -7,6 +7,7 @@
   "key.mouse.10": "マウスホイール下",
   "justzoom.options": "Just Zoom 設定",
   "justzoom.options.tab.general": "一般",
+  "justzoom.options.tab.advanced": "詳細設定",
   "justzoom.options.tab.controls": "操作設定",
   "justzoom.options.zoom_keybind": "ズーム: %s",
   "justzoom.options.zoom_keybind.desc": "ズームに使用するキーまたはマウスボタンです。",

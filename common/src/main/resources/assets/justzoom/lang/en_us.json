@@ -7,6 +7,7 @@
   "key.mouse.10": "Mouse Wheel Down",
   "justzoom.options": "Just Zoom Options",
   "justzoom.options.tab.general": "General",
+  "justzoom.options.tab.advanced": "Advanced",
   "justzoom.options.tab.controls": "Controls",
   "justzoom.options.zoom_keybind": "Zoom: %s",
   "justzoom.options.zoom_keybind.desc": "The key or mouse button used to zoom.",

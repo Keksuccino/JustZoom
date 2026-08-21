@@ -7,6 +7,7 @@
   "key.mouse.10": "鼠标滚轮向下",
   "justzoom.options": "Just Zoom 设置",
   "justzoom.options.tab.general": "常规",
+  "justzoom.options.tab.advanced": "高级",
   "justzoom.options.tab.controls": "控制",
   "justzoom.options.zoom_keybind": "缩放：%s",
   "justzoom.options.zoom_keybind.desc": "用于缩放的键盘按键或鼠标按钮。",

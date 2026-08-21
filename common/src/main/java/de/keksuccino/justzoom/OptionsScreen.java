@@ -74,10 +74,10 @@ public class OptionsScreen extends Screen {
     private MenuTabBar tabNavigationBar;
     @Nullable
     private KeyMapping waitingForKeybind;
-    private final List<Button> generalOptionButtons = new ArrayList<>();
+    private final List<Button> optionButtons = new ArrayList<>();
     private final List<FloatInputControl> floatInputControls = new ArrayList<>();
     private final List<AnimationSpeedSlider> animationSpeedSliders = new ArrayList<>();
-    private final List<GeneralOptionControl> generalOptionControls = new ArrayList<>();
+    private final List<OptionControl> optionControls = new ArrayList<>();
     private final List<KeybindControl> keybindControls = new ArrayList<>();
 
     public OptionsScreen(@Nullable Screen parent) {
@@ -89,15 +89,16 @@ public class OptionsScreen extends Screen {
     protected void init() {
 
         this.layout.removeChildren();
-        this.generalOptionButtons.clear();
+        this.optionButtons.clear();
         this.floatInputControls.clear();
         this.animationSpeedSliders.clear();
-        this.generalOptionControls.clear();
+        this.optionControls.clear();
         this.keybindControls.clear();
 
         OptionsTab generalTab = this.buildGeneralTab();
+        OptionsTab advancedTab = this.buildAdvancedTab();
         OptionsTab controlsTab = this.buildControlsTab();
-        this.tabNavigationBar = MenuTabBar.builder(this.tabManager, this.width).addTabs(generalTab, controlsTab).build();
+        this.tabNavigationBar = MenuTabBar.builder(this.tabManager, this.width).addTabs(generalTab, advancedTab, controlsTab).build();
         this.addRenderableWidget(this.tabNavigationBar);
 
         this.layout.addToFooter(Button.builder(CommonComponents.GUI_DONE, ignored -> this.onClose()).size(150, BUTTON_HEIGHT).build());
@@ -107,7 +108,7 @@ public class OptionsScreen extends Screen {
         });
 
         this.updateControlWidths();
-        this.updateGeneralOptionButtons();
+        this.updateOptionResetButtons();
         this.updateKeybindButtons();
         this.tabNavigationBar.selectTab(0, false);
         this.repositionElements();
@@ -117,11 +118,7 @@ public class OptionsScreen extends Screen {
     @NotNull
     protected OptionsTab buildGeneralTab() {
         OptionsTab tab = new OptionsTab(Component.translatable("justzoom.options.tab.general"));
-        this.addFloatInput(tab, JustZoom.getOptions().baseMagnification, "justzoom.options.base_magnification");
-        this.addFloatInput(tab, JustZoom.getOptions().scrollMagnificationMultiplier, "justzoom.options.scroll_magnification_multiplier");
-        this.addToggleOption(tab, JustZoom.getOptions().smoothZoomInOut, "justzoom.options.smooth_zoom_in_out", settings -> settings.paddingTop(OPTION_SECTION_PADDING_TOP));
-        this.addAnimationSpeedSlider(tab, JustZoom.getOptions().startZoomingAnimationSpeed, "justzoom.options.start_zooming_animation_speed");
-        this.addAnimationSpeedSlider(tab, JustZoom.getOptions().stopZoomingAnimationSpeed, "justzoom.options.stop_zooming_animation_speed");
+        this.addToggleOption(tab, JustZoom.getOptions().smoothZoomInOut, "justzoom.options.smooth_zoom_in_out");
         this.addToggleOption(tab, JustZoom.getOptions().smoothCameraOnZoom, "justzoom.options.smooth_camera_movement_on_zoom");
         this.addToggleOption(tab, JustZoom.getOptions().normalizeMouseSensitivityOnZoom, "justzoom.options.normalize_mouse_sensitivity_on_zoom");
         this.addToggleOption(tab, JustZoom.getOptions().improveThirdPersonZoom, "justzoom.options.improve_third_person_zoom");
@@ -131,6 +128,16 @@ public class OptionsScreen extends Screen {
         this.addToggleOption(tab, JustZoom.getOptions().useJustZoomForSpyglass, "justzoom.options.use_just_zoom_for_spyglass", settings -> settings.paddingTop(OPTION_SECTION_PADDING_TOP));
         this.addCycleOption(tab, JustZoom.getOptions().spyglassOverlay, SpyglassOverlayMode::next, this::spyglassOverlayMessage, "justzoom.options.spyglass_overlay.desc");
         this.addCycleOption(tab, JustZoom.getOptions().spyglassSounds, SpyglassSoundsMode::next, this::spyglassSoundsMessage, "justzoom.options.spyglass_sounds.desc");
+        return tab;
+    }
+
+    @NotNull
+    protected OptionsTab buildAdvancedTab() {
+        OptionsTab tab = new OptionsTab(Component.translatable("justzoom.options.tab.advanced"));
+        this.addFloatInput(tab, JustZoom.getOptions().baseMagnification, "justzoom.options.base_magnification");
+        this.addFloatInput(tab, JustZoom.getOptions().scrollMagnificationMultiplier, "justzoom.options.scroll_magnification_multiplier");
+        this.addAnimationSpeedSlider(tab, JustZoom.getOptions().startZoomingAnimationSpeed, "justzoom.options.start_zooming_animation_speed");
+        this.addAnimationSpeedSlider(tab, JustZoom.getOptions().stopZoomingAnimationSpeed, "justzoom.options.stop_zooming_animation_speed");
         return tab;
     }
 
@@ -155,16 +162,16 @@ public class OptionsScreen extends Screen {
             if (MathUtils.isFloat(value)) {
                 option.setValue(Float.parseFloat(value));
             }
-            this.updateGeneralOptionButtons();
+            this.updateOptionResetButtons();
         });
         input.setTooltip(tooltip);
 
         LinearLayout inputControl = LinearLayout.horizontal().spacing(FLOAT_INPUT_GAP);
         inputControl.addChild(labelWidget, settings -> settings.alignVerticallyMiddle());
         inputControl.addChild(input);
-        Button resetButton = this.buildGeneralResetButton(option, () -> label, () -> input.setValue(Float.toString(option.getValue())));
+        Button resetButton = this.buildResetButton(option, () -> label, () -> input.setValue(Float.toString(option.getValue())));
         this.floatInputControls.add(new FloatInputControl(labelWidget, input, labelWidget.getWidth()));
-        this.generalOptionControls.add(new GeneralOptionControl(() -> isFloatInputDefault(option, input.getValue()), resetButton));
+        this.optionControls.add(new OptionControl(() -> isFloatInputDefault(option, input.getValue()), resetButton));
         tab.addChild(this.buildControlRowLayout(inputControl, resetButton));
     }
 
@@ -174,26 +181,26 @@ public class OptionsScreen extends Screen {
 
     protected void addAnimationSpeedSlider(@NotNull OptionsTab tab, @NotNull ConfigValue<Float> option, @NotNull String labelBaseKey) {
         AnimationSpeedSlider slider = new AnimationSpeedSlider(option, labelBaseKey, this.getButtonWidth());
-        Button resetButton = this.buildGeneralResetButton(option, slider::getMessage, slider::refreshFromOption);
+        Button resetButton = this.buildResetButton(option, slider::getMessage, slider::refreshFromOption);
         this.animationSpeedSliders.add(slider);
-        this.generalOptionControls.add(new GeneralOptionControl(() -> isOptionDefault(option), resetButton));
+        this.optionControls.add(new OptionControl(() -> isOptionDefault(option), resetButton));
         tab.addChild(this.buildControlRowLayout(slider, resetButton));
     }
 
     protected void addToggleOption(@NotNull OptionsTab tab, @NotNull ConfigValue<Boolean> option, @NotNull String labelBaseKey, @NotNull Consumer<LayoutSettings> settings) {
         Button button = this.buildToggleButton(option, labelBaseKey);
-        this.addGeneralButtonOption(tab, option, button, () -> button.setMessage(this.toggleMessage(option, labelBaseKey)), settings);
+        this.addButtonOption(tab, option, button, () -> button.setMessage(this.toggleMessage(option, labelBaseKey)), settings);
     }
 
     protected <T> void addCycleOption(@NotNull OptionsTab tab, @NotNull ConfigValue<T> option, @NotNull UnaryOperator<T> nextValue, @NotNull Function<T, Component> messageFactory, @NotNull String descriptionKey) {
         Button button = this.buildCycleButton(option, nextValue, messageFactory, descriptionKey);
-        this.addGeneralButtonOption(tab, option, button, () -> button.setMessage(messageFactory.apply(option.getValue())), NO_LAYOUT_ADJUSTMENTS);
+        this.addButtonOption(tab, option, button, () -> button.setMessage(messageFactory.apply(option.getValue())), NO_LAYOUT_ADJUSTMENTS);
     }
 
-    protected void addGeneralButtonOption(@NotNull OptionsTab tab, @NotNull ConfigValue<?> option, @NotNull Button button, @NotNull Runnable refreshControl, @NotNull Consumer<LayoutSettings> settings) {
-        Button resetButton = this.buildGeneralResetButton(option, button::getMessage, refreshControl);
-        this.generalOptionButtons.add(button);
-        this.generalOptionControls.add(new GeneralOptionControl(() -> isOptionDefault(option), resetButton));
+    protected void addButtonOption(@NotNull OptionsTab tab, @NotNull ConfigValue<?> option, @NotNull Button button, @NotNull Runnable refreshControl, @NotNull Consumer<LayoutSettings> settings) {
+        Button resetButton = this.buildResetButton(option, button::getMessage, refreshControl);
+        this.optionButtons.add(button);
+        this.optionControls.add(new OptionControl(() -> isOptionDefault(option), resetButton));
         tab.addChild(this.buildControlRowLayout(button, resetButton), settings);
     }
 
@@ -202,7 +209,7 @@ public class OptionsScreen extends Screen {
         Button button = Button.builder(this.toggleMessage(option, labelBaseKey), pressedButton -> {
             option.setValue(!option.getValue());
             pressedButton.setMessage(this.toggleMessage(option, labelBaseKey));
-            this.updateGeneralOptionButtons();
+            this.updateOptionResetButtons();
         }).size(this.getButtonWidth(), BUTTON_HEIGHT).tooltip(Tooltip.create(Component.translatable(labelBaseKey + ".desc"))).build();
         return button;
     }
@@ -212,17 +219,17 @@ public class OptionsScreen extends Screen {
         Button button = Button.builder(messageFactory.apply(option.getValue()), pressedButton -> {
             option.update(nextValue);
             pressedButton.setMessage(messageFactory.apply(option.getValue()));
-            this.updateGeneralOptionButtons();
+            this.updateOptionResetButtons();
         }).size(this.getButtonWidth(), BUTTON_HEIGHT).tooltip(Tooltip.create(Component.translatable(descriptionKey))).build();
         return button;
     }
 
     @NotNull
-    protected Button buildGeneralResetButton(@NotNull ConfigValue<?> option, @NotNull Supplier<Component> optionName, @NotNull Runnable refreshControl) {
+    protected Button buildResetButton(@NotNull ConfigValue<?> option, @NotNull Supplier<Component> optionName, @NotNull Runnable refreshControl) {
         return Button.builder(Component.translatable("controls.reset"), ignored -> {
             option.resetToDefault();
             refreshControl.run();
-            this.updateGeneralOptionButtons();
+            this.updateOptionResetButtons();
         }).size(RESET_BUTTON_WIDTH, BUTTON_HEIGHT).createNarration(defaultNarrationSupplier -> Component.translatable("narrator.controls.reset", optionName.get())).build();
     }
 
@@ -254,7 +261,7 @@ public class OptionsScreen extends Screen {
     protected void updateControlWidths() {
         int rowWidth = this.getButtonWidth();
         int controlWidth = calculatePrimaryControlWidth(rowWidth);
-        for (Button button : this.generalOptionButtons) {
+        for (Button button : this.optionButtons) {
             button.setWidth(controlWidth);
         }
         for (AnimationSpeedSlider slider : this.animationSpeedSliders) {
@@ -265,7 +272,7 @@ public class OptionsScreen extends Screen {
             control.label().setWidth(widths.labelWidth());
             control.input().setWidth(widths.inputWidth());
         }
-        for (GeneralOptionControl control : this.generalOptionControls) {
+        for (OptionControl control : this.optionControls) {
             control.resetButton().setWidth(RESET_BUTTON_WIDTH);
         }
         for (KeybindControl control : this.keybindControls) {
@@ -274,8 +281,8 @@ public class OptionsScreen extends Screen {
         }
     }
 
-    protected void updateGeneralOptionButtons() {
-        for (GeneralOptionControl control : this.generalOptionControls) {
+    protected void updateOptionResetButtons() {
+        for (OptionControl control : this.optionControls) {
             control.resetButton().active = !control.defaultState().getAsBoolean();
         }
     }
@@ -510,7 +517,7 @@ public class OptionsScreen extends Screen {
     private record FloatInputControl(@NotNull StringWidget label, @NotNull EditBox input, int preferredLabelWidth) {
     }
 
-    private record GeneralOptionControl(@NotNull BooleanSupplier defaultState, @NotNull Button resetButton) {
+    private record OptionControl(@NotNull BooleanSupplier defaultState, @NotNull Button resetButton) {
     }
 
     private record KeybindControl(@NotNull KeybindSetting setting, @NotNull Button keybindButton, @NotNull Button resetButton) {
@@ -542,7 +549,7 @@ public class OptionsScreen extends Screen {
             if (Float.compare(this.option.getValue(), animationSpeed) != 0) {
                 this.option.setValue(animationSpeed);
             }
-            OptionsScreen.this.updateGeneralOptionButtons();
+            OptionsScreen.this.updateOptionResetButtons();
         }
 
         @Override

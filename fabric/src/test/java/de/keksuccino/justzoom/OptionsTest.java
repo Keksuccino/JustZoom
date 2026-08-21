@@ -48,7 +48,7 @@ class OptionsTest {
     }
 
     @Test
-    void removesTheRetiredMirroredViewOption() throws IOException {
+    void preservesTheRetiredMirroredViewOption() throws IOException {
         for (boolean retiredValue : new boolean[]{false, true}) {
             Path configFile = this.temporaryDirectory.resolve("retired-mirrored-view-option-" + retiredValue + ".json");
             Files.writeString(configFile, "{\"zoom\":{\"allow_zoom_in_mirrored_view\":" + retiredValue + "}}", StandardCharsets.UTF_8);
@@ -56,7 +56,7 @@ class OptionsTest {
             new Options(configFile.toFile(), null);
 
             JsonObject storedZoomOptions = JsonParser.parseString(Files.readString(configFile, StandardCharsets.UTF_8)).getAsJsonObject().getAsJsonObject("zoom");
-            assertFalse(storedZoomOptions.has("allow_zoom_in_mirrored_view"));
+            assertEquals(retiredValue, storedZoomOptions.get("allow_zoom_in_mirrored_view").getAsBoolean());
         }
     }
 
@@ -77,25 +77,25 @@ class OptionsTest {
 
         Options options = new Options(configFile.toFile(), null);
 
-        assertEquals(0.45F, options.startZoomingAnimationSpeed.getValue());
-        assertEquals(0.2F, options.stopZoomingAnimationSpeed.getValue());
+        assertEquals(Options.DEFAULT_START_ZOOMING_ANIMATION_SPEED, options.startZoomingAnimationSpeed.getValue());
+        assertEquals(Options.DEFAULT_STOP_ZOOMING_ANIMATION_SPEED, options.stopZoomingAnimationSpeed.getValue());
         JsonObject storedZoomOptions = JsonParser.parseString(Files.readString(configFile, StandardCharsets.UTF_8)).getAsJsonObject().getAsJsonObject("zoom");
-        assertEquals(0.45F, storedZoomOptions.get("start_zooming_animation_speed").getAsFloat());
-        assertEquals(0.2F, storedZoomOptions.get("stop_zooming_animation_speed").getAsFloat());
+        assertEquals(Options.DEFAULT_START_ZOOMING_ANIMATION_SPEED, storedZoomOptions.get("start_zooming_animation_speed").getAsFloat());
+        assertEquals(Options.DEFAULT_STOP_ZOOMING_ANIMATION_SPEED, storedZoomOptions.get("stop_zooming_animation_speed").getAsFloat());
     }
 
     @Test
-    void removesTheDevelopmentTransitionSpeedNames() throws IOException {
+    void preservesTheDevelopmentTransitionSpeedNames() throws IOException {
         Path configFile = this.temporaryDirectory.resolve("development-transition-speed-names.json");
         Files.writeString(configFile, "{\"zoom\":{\"zoom_in_transition_speed\":1.0,\"zoom_out_transition_speed\":1.0}}", StandardCharsets.UTF_8);
 
         Options options = new Options(configFile.toFile(), null);
 
-        assertEquals(0.45F, options.startZoomingAnimationSpeed.getValue());
-        assertEquals(0.2F, options.stopZoomingAnimationSpeed.getValue());
+        assertEquals(Options.DEFAULT_START_ZOOMING_ANIMATION_SPEED, options.startZoomingAnimationSpeed.getValue());
+        assertEquals(Options.DEFAULT_STOP_ZOOMING_ANIMATION_SPEED, options.stopZoomingAnimationSpeed.getValue());
         JsonObject storedZoomOptions = JsonParser.parseString(Files.readString(configFile, StandardCharsets.UTF_8)).getAsJsonObject().getAsJsonObject("zoom");
-        assertFalse(storedZoomOptions.has("zoom_in_transition_speed"));
-        assertFalse(storedZoomOptions.has("zoom_out_transition_speed"));
+        assertEquals(1.0F, storedZoomOptions.get("zoom_in_transition_speed").getAsFloat());
+        assertEquals(1.0F, storedZoomOptions.get("zoom_out_transition_speed").getAsFloat());
     }
 
     @Test

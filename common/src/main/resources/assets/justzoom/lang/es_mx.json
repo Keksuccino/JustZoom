@@ -7,6 +7,7 @@
   "key.mouse.10": "Rueda del mouse hacia abajo",
   "justzoom.options": "Opciones de Just Zoom",
   "justzoom.options.tab.general": "General",
+  "justzoom.options.tab.advanced": "Avanzado",
   "justzoom.options.tab.controls": "Controles",
   "justzoom.options.zoom_keybind": "Zoom: %s",
   "justzoom.options.zoom_keybind.desc": "La tecla o botón del mouse que se usa para hacer zoom.",
