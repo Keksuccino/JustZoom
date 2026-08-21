@@ -48,8 +48,8 @@ final class ZoomLevelState {
         this.targetMagnification = normalize(baseMagnification, Options.DEFAULT_BASE_MAGNIFICATION, ZoomMath.MAX_MAGNIFICATION);
     }
 
-    void tick(boolean zooming, boolean smooth, float zoomInTransitionSpeed, float zoomOutTransitionSpeed, double maximumMagnification) {
-        this.updateToggleTransition(zooming, smooth, zoomInTransitionSpeed, zoomOutTransitionSpeed);
+    void tick(boolean zooming, boolean smooth, float startZoomingAnimationSpeed, float stopZoomingAnimationSpeed, double maximumMagnification) {
+        this.updateToggleTransition(zooming, smooth, startZoomingAnimationSpeed, stopZoomingAnimationSpeed);
         this.previousSmoothedActiveMagnification = normalize(this.smoothedActiveMagnification, this.getTargetMagnification(maximumMagnification), maximumMagnification);
         if (!smooth) {
             this.smoothedActiveMagnification = this.getTargetMagnification(maximumMagnification);
@@ -67,9 +67,9 @@ final class ZoomLevelState {
         this.preloadActiveMagnificationIfInactive(zooming, maximumMagnification);
     }
 
-    double getRenderedMagnification(boolean zooming, boolean smooth, float zoomInTransitionSpeed, float zoomOutTransitionSpeed, float partialTicks, double maximumMagnification) {
+    double getRenderedMagnification(boolean zooming, boolean smooth, float startZoomingAnimationSpeed, float stopZoomingAnimationSpeed, float partialTicks, double maximumMagnification) {
         double target = zooming ? this.getTargetMagnification(maximumMagnification) : ZoomMath.MIN_MAGNIFICATION;
-        this.updateToggleTransition(zooming, smooth, zoomInTransitionSpeed, zoomOutTransitionSpeed);
+        this.updateToggleTransition(zooming, smooth, startZoomingAnimationSpeed, stopZoomingAnimationSpeed);
         if (!smooth) return target;
 
         this.preloadActiveMagnificationIfInactive(zooming, maximumMagnification);
@@ -91,7 +91,7 @@ final class ZoomLevelState {
         this.previousSmoothedActiveMagnification = activeTarget;
     }
 
-    private void updateToggleTransition(boolean zooming, boolean smooth, float zoomInTransitionSpeed, float zoomOutTransitionSpeed) {
+    private void updateToggleTransition(boolean zooming, boolean smooth, float startZoomingAnimationSpeed, float stopZoomingAnimationSpeed) {
         long now = this.nanoTimeSource.getAsLong();
         if (!smooth) {
             this.toggleTransitionProgress = zooming ? 1.0D : 0.0D;
@@ -108,28 +108,28 @@ final class ZoomLevelState {
         } else {
             // Advance the previously observed direction first; a reversal begins at this sample so it never jumps across an unknown input boundary.
             double elapsedSeconds = Math.max(0.0D, (now - this.lastTransitionUpdateNanos) / NANOSECONDS_PER_SECOND);
-            float activeTransitionSpeed = transitionSpeedFor(this.transitionDirectionZooming, zoomInTransitionSpeed, zoomOutTransitionSpeed);
-            this.advanceToggleTransition(this.transitionDirectionZooming, elapsedSeconds, activeTransitionSpeed);
+            float activeAnimationSpeed = animationSpeedFor(this.transitionDirectionZooming, startZoomingAnimationSpeed, stopZoomingAnimationSpeed);
+            this.advanceToggleTransition(this.transitionDirectionZooming, elapsedSeconds, activeAnimationSpeed);
             this.lastTransitionUpdateNanos = now;
             this.transitionDirectionZooming = zooming;
         }
 
-        float currentTransitionSpeed = transitionSpeedFor(zooming, zoomInTransitionSpeed, zoomOutTransitionSpeed);
-        if (currentTransitionSpeed == Options.MIN_TRANSITION_SPEED) {
+        float currentAnimationSpeed = animationSpeedFor(zooming, startZoomingAnimationSpeed, stopZoomingAnimationSpeed);
+        if (currentAnimationSpeed == Options.MIN_ANIMATION_SPEED) {
             this.toggleTransitionProgress = zooming ? 1.0D : 0.0D;
         }
     }
 
-    private static float transitionSpeedFor(boolean zooming, float zoomInTransitionSpeed, float zoomOutTransitionSpeed) {
-        return zooming ? Options.normalizeTransitionSpeed(zoomInTransitionSpeed, Options.DEFAULT_ZOOM_IN_TRANSITION_SPEED) : Options.normalizeTransitionSpeed(zoomOutTransitionSpeed, Options.DEFAULT_ZOOM_OUT_TRANSITION_SPEED);
+    private static float animationSpeedFor(boolean zooming, float startZoomingAnimationSpeed, float stopZoomingAnimationSpeed) {
+        return zooming ? Options.normalizeAnimationSpeed(startZoomingAnimationSpeed, Options.DEFAULT_START_ZOOMING_ANIMATION_SPEED) : Options.normalizeAnimationSpeed(stopZoomingAnimationSpeed, Options.DEFAULT_STOP_ZOOMING_ANIMATION_SPEED);
     }
 
-    private void advanceToggleTransition(boolean zooming, double elapsedSeconds, float transitionSpeed) {
-        if (transitionSpeed == Options.MIN_TRANSITION_SPEED) {
+    private void advanceToggleTransition(boolean zooming, double elapsedSeconds, float animationSpeed) {
+        if (animationSpeed == Options.MIN_ANIMATION_SPEED) {
             this.toggleTransitionProgress = zooming ? 1.0D : 0.0D;
             return;
         }
-        this.toggleTransitionProgress = moveTowards(this.toggleTransitionProgress, zooming ? 1.0D : 0.0D, elapsedSeconds / transitionSpeed);
+        this.toggleTransitionProgress = moveTowards(this.toggleTransitionProgress, zooming ? 1.0D : 0.0D, elapsedSeconds / animationSpeed);
     }
 
     private static double moveTowards(double current, double target, double maximumChange) {

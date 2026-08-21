@@ -70,7 +70,7 @@ public class ZoomHandler {
         if (!zooming && options.resetZoomFactorOnStopZooming.getValue()) {
             ZOOM_LEVEL_STATE.resetTargetMagnification(options.baseMagnification.getValue());
         }
-        ZOOM_LEVEL_STATE.tick(zooming, options.smoothZoomInOut.getValue(), options.zoomInTransitionSpeed.getValue(), options.zoomOutTransitionSpeed.getValue(), ZoomMath.calculateMaximumMagnification(cachedNormalFov));
+        ZOOM_LEVEL_STATE.tick(zooming, options.smoothZoomInOut.getValue(), options.startZoomingAnimationSpeed.getValue(), options.stopZoomingAnimationSpeed.getValue(), ZoomMath.calculateMaximumMagnification(cachedNormalFov));
     }
 
     public static void onInputTick() {
@@ -83,7 +83,7 @@ public class ZoomHandler {
 
     public static double getRenderedMagnification(float partialTicks, float normalFov) {
         Options options = JustZoom.getOptions();
-        return ZOOM_LEVEL_STATE.getRenderedMagnification(isZooming(), options.smoothZoomInOut.getValue(), options.zoomInTransitionSpeed.getValue(), options.zoomOutTransitionSpeed.getValue(), partialTicks, ZoomMath.calculateMaximumMagnification(normalFov));
+        return ZOOM_LEVEL_STATE.getRenderedMagnification(isZooming(), options.smoothZoomInOut.getValue(), options.startZoomingAnimationSpeed.getValue(), options.stopZoomingAnimationSpeed.getValue(), partialTicks, ZoomMath.calculateMaximumMagnification(normalFov));
     }
 
     public static void updateRenderedFov(float normalFov, float modifiedFov) {

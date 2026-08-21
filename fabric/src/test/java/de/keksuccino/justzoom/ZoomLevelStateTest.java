@@ -93,7 +93,7 @@ class ZoomLevelStateTest {
     }
 
     @Test
-    void zoomInAndOutUseTheirIndependentRealTimeDurations() {
+    void startingAndStoppingZoomUseTheirIndependentRealTimeDurations() {
         PersistenceData persistenceData = this.createPersistenceData();
         persistenceData.lastMagnification.setValue(800.0F);
         TestNanoClock clock = new TestNanoClock();

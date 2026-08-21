@@ -72,39 +72,53 @@ class OptionsTest {
     }
 
     @Test
-    void defaultsBothTransitionSpeedsToOneSecond() throws IOException {
-        Path configFile = this.temporaryDirectory.resolve("transition-speed-defaults.json");
+    void defaultsStartAndStopAnimationSpeedsToRequestedValues() throws IOException {
+        Path configFile = this.temporaryDirectory.resolve("animation-speed-defaults.json");
 
         Options options = new Options(configFile.toFile(), null);
 
-        assertEquals(1.0F, options.zoomInTransitionSpeed.getValue());
-        assertEquals(1.0F, options.zoomOutTransitionSpeed.getValue());
+        assertEquals(0.45F, options.startZoomingAnimationSpeed.getValue());
+        assertEquals(0.2F, options.stopZoomingAnimationSpeed.getValue());
         JsonObject storedZoomOptions = JsonParser.parseString(Files.readString(configFile, StandardCharsets.UTF_8)).getAsJsonObject().getAsJsonObject("zoom");
-        assertEquals(1.0F, storedZoomOptions.get("zoom_in_transition_speed").getAsFloat());
-        assertEquals(1.0F, storedZoomOptions.get("zoom_out_transition_speed").getAsFloat());
+        assertEquals(0.45F, storedZoomOptions.get("start_zooming_animation_speed").getAsFloat());
+        assertEquals(0.2F, storedZoomOptions.get("stop_zooming_animation_speed").getAsFloat());
     }
 
     @Test
-    void persistsTransitionSpeedsIndependently() {
-        Path configFile = this.temporaryDirectory.resolve("transition-speeds.json");
+    void removesTheDevelopmentTransitionSpeedNames() throws IOException {
+        Path configFile = this.temporaryDirectory.resolve("development-transition-speed-names.json");
+        Files.writeString(configFile, "{\"zoom\":{\"zoom_in_transition_speed\":1.0,\"zoom_out_transition_speed\":1.0}}", StandardCharsets.UTF_8);
+
         Options options = new Options(configFile.toFile(), null);
 
-        options.zoomInTransitionSpeed.setValue(0.3F);
-        options.zoomOutTransitionSpeed.setValue(4.7F);
+        assertEquals(0.45F, options.startZoomingAnimationSpeed.getValue());
+        assertEquals(0.2F, options.stopZoomingAnimationSpeed.getValue());
+        JsonObject storedZoomOptions = JsonParser.parseString(Files.readString(configFile, StandardCharsets.UTF_8)).getAsJsonObject().getAsJsonObject("zoom");
+        assertFalse(storedZoomOptions.has("zoom_in_transition_speed"));
+        assertFalse(storedZoomOptions.has("zoom_out_transition_speed"));
+    }
+
+    @Test
+    void persistsAnimationSpeedsIndependently() {
+        Path configFile = this.temporaryDirectory.resolve("animation-speeds.json");
+        Options options = new Options(configFile.toFile(), null);
+
+        options.startZoomingAnimationSpeed.setValue(0.35F);
+        options.stopZoomingAnimationSpeed.setValue(4.75F);
         Options reloadedOptions = new Options(configFile.toFile(), null);
 
-        assertEquals(0.3F, reloadedOptions.zoomInTransitionSpeed.getValue());
-        assertEquals(4.7F, reloadedOptions.zoomOutTransitionSpeed.getValue());
+        assertEquals(0.35F, reloadedOptions.startZoomingAnimationSpeed.getValue());
+        assertEquals(4.75F, reloadedOptions.stopZoomingAnimationSpeed.getValue());
     }
 
     @Test
-    void normalizesTransitionSpeedsToTheirSupportedRange() {
-        assertEquals(0.0F, Options.normalizeTransitionSpeed(-1.0F, 1.0F));
-        assertEquals(5.0F, Options.normalizeTransitionSpeed(6.0F, 1.0F));
-        assertEquals(0.1F, Options.normalizeTransitionSpeed(0.14F, 1.0F));
-        assertEquals(0.2F, Options.normalizeTransitionSpeed(0.16F, 1.0F));
-        assertEquals(1.0F, Options.normalizeTransitionSpeed(Float.NaN, 1.0F));
-        assertEquals(1.0F, Options.normalizeTransitionSpeed(Float.POSITIVE_INFINITY, 1.0F));
+    void normalizesAnimationSpeedsToTheirSupportedRangeAndStep() {
+        assertEquals(0.0F, Options.normalizeAnimationSpeed(-1.0F, 0.45F));
+        assertEquals(5.0F, Options.normalizeAnimationSpeed(6.0F, 0.45F));
+        assertEquals(0.1F, Options.normalizeAnimationSpeed(0.12F, 0.45F));
+        assertEquals(0.15F, Options.normalizeAnimationSpeed(0.13F, 0.45F));
+        assertEquals(0.45F, Options.normalizeAnimationSpeed(Float.NaN, 0.45F));
+        assertEquals(0.2F, Options.normalizeAnimationSpeed(Float.POSITIVE_INFINITY, 0.2F));
     }
 
     @Test
