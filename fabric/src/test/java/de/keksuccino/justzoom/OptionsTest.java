@@ -72,6 +72,42 @@ class OptionsTest {
     }
 
     @Test
+    void defaultsBothTransitionSpeedsToOneSecond() throws IOException {
+        Path configFile = this.temporaryDirectory.resolve("transition-speed-defaults.json");
+
+        Options options = new Options(configFile.toFile(), null);
+
+        assertEquals(1.0F, options.zoomInTransitionSpeed.getValue());
+        assertEquals(1.0F, options.zoomOutTransitionSpeed.getValue());
+        JsonObject storedZoomOptions = JsonParser.parseString(Files.readString(configFile, StandardCharsets.UTF_8)).getAsJsonObject().getAsJsonObject("zoom");
+        assertEquals(1.0F, storedZoomOptions.get("zoom_in_transition_speed").getAsFloat());
+        assertEquals(1.0F, storedZoomOptions.get("zoom_out_transition_speed").getAsFloat());
+    }
+
+    @Test
+    void persistsTransitionSpeedsIndependently() {
+        Path configFile = this.temporaryDirectory.resolve("transition-speeds.json");
+        Options options = new Options(configFile.toFile(), null);
+
+        options.zoomInTransitionSpeed.setValue(0.3F);
+        options.zoomOutTransitionSpeed.setValue(4.7F);
+        Options reloadedOptions = new Options(configFile.toFile(), null);
+
+        assertEquals(0.3F, reloadedOptions.zoomInTransitionSpeed.getValue());
+        assertEquals(4.7F, reloadedOptions.zoomOutTransitionSpeed.getValue());
+    }
+
+    @Test
+    void normalizesTransitionSpeedsToTheirSupportedRange() {
+        assertEquals(0.0F, Options.normalizeTransitionSpeed(-1.0F, 1.0F));
+        assertEquals(5.0F, Options.normalizeTransitionSpeed(6.0F, 1.0F));
+        assertEquals(0.1F, Options.normalizeTransitionSpeed(0.14F, 1.0F));
+        assertEquals(0.2F, Options.normalizeTransitionSpeed(0.16F, 1.0F));
+        assertEquals(1.0F, Options.normalizeTransitionSpeed(Float.NaN, 1.0F));
+        assertEquals(1.0F, Options.normalizeTransitionSpeed(Float.POSITIVE_INFINITY, 1.0F));
+    }
+
+    @Test
     void persistsDisabledImproveThirdPersonZoom() {
         Path configFile = this.temporaryDirectory.resolve("third-person-disabled.json");
         Options options = new Options(configFile.toFile(), null);

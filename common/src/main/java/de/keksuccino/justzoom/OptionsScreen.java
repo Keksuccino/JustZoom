@@ -8,6 +8,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
@@ -37,6 +38,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
@@ -74,6 +76,7 @@ public class OptionsScreen extends Screen {
     private KeyMapping waitingForKeybind;
     private final List<Button> generalOptionButtons = new ArrayList<>();
     private final List<FloatInputControl> floatInputControls = new ArrayList<>();
+    private final List<TransitionSpeedSlider> transitionSpeedSliders = new ArrayList<>();
     private final List<GeneralOptionControl> generalOptionControls = new ArrayList<>();
     private final List<KeybindControl> keybindControls = new ArrayList<>();
 
@@ -88,6 +91,7 @@ public class OptionsScreen extends Screen {
         this.layout.removeChildren();
         this.generalOptionButtons.clear();
         this.floatInputControls.clear();
+        this.transitionSpeedSliders.clear();
         this.generalOptionControls.clear();
         this.keybindControls.clear();
 
@@ -116,6 +120,8 @@ public class OptionsScreen extends Screen {
         this.addFloatInput(tab, JustZoom.getOptions().baseMagnification, "justzoom.options.base_magnification");
         this.addFloatInput(tab, JustZoom.getOptions().scrollMagnificationMultiplier, "justzoom.options.scroll_magnification_multiplier");
         this.addToggleOption(tab, JustZoom.getOptions().smoothZoomInOut, "justzoom.options.smooth_zoom_in_out", settings -> settings.paddingTop(OPTION_SECTION_PADDING_TOP));
+        this.addTransitionSpeedSlider(tab, JustZoom.getOptions().zoomInTransitionSpeed, "justzoom.options.zoom_in_transition_speed");
+        this.addTransitionSpeedSlider(tab, JustZoom.getOptions().zoomOutTransitionSpeed, "justzoom.options.zoom_out_transition_speed");
         this.addToggleOption(tab, JustZoom.getOptions().smoothCameraOnZoom, "justzoom.options.smooth_camera_movement_on_zoom");
         this.addToggleOption(tab, JustZoom.getOptions().normalizeMouseSensitivityOnZoom, "justzoom.options.normalize_mouse_sensitivity_on_zoom");
         this.addToggleOption(tab, JustZoom.getOptions().improveThirdPersonZoom, "justzoom.options.improve_third_person_zoom");
@@ -164,6 +170,14 @@ public class OptionsScreen extends Screen {
 
     protected void addToggleOption(@NotNull OptionsTab tab, @NotNull ConfigValue<Boolean> option, @NotNull String labelBaseKey) {
         this.addToggleOption(tab, option, labelBaseKey, NO_LAYOUT_ADJUSTMENTS);
+    }
+
+    protected void addTransitionSpeedSlider(@NotNull OptionsTab tab, @NotNull ConfigValue<Float> option, @NotNull String labelBaseKey) {
+        TransitionSpeedSlider slider = new TransitionSpeedSlider(option, labelBaseKey, this.getButtonWidth());
+        Button resetButton = this.buildGeneralResetButton(option, slider::getMessage, slider::refreshFromOption);
+        this.transitionSpeedSliders.add(slider);
+        this.generalOptionControls.add(new GeneralOptionControl(() -> isOptionDefault(option), resetButton));
+        tab.addChild(this.buildControlRowLayout(slider, resetButton));
     }
 
     protected void addToggleOption(@NotNull OptionsTab tab, @NotNull ConfigValue<Boolean> option, @NotNull String labelBaseKey, @NotNull Consumer<LayoutSettings> settings) {
@@ -242,6 +256,9 @@ public class OptionsScreen extends Screen {
         int controlWidth = calculatePrimaryControlWidth(rowWidth);
         for (Button button : this.generalOptionButtons) {
             button.setWidth(controlWidth);
+        }
+        for (TransitionSpeedSlider slider : this.transitionSpeedSliders) {
+            slider.setWidth(controlWidth);
         }
         for (FloatInputControl control : this.floatInputControls) {
             FloatInputWidths widths = calculateFloatInputWidths(controlWidth, control.preferredLabelWidth());
@@ -373,6 +390,19 @@ public class OptionsScreen extends Screen {
         return isOptionDefault(option) && MathUtils.isFloat(inputValue) && Float.compare(Float.parseFloat(inputValue), option.getDefaultValue()) == 0;
     }
 
+    static float sliderValueToTransitionSpeed(double sliderValue) {
+        double safeSliderValue = Double.isFinite(sliderValue) ? sliderValue : transitionSpeedToSliderValue(Options.DEFAULT_ZOOM_IN_TRANSITION_SPEED);
+        double clampedSliderValue = Math.max(0.0D, Math.min(1.0D, safeSliderValue));
+        int stepCount = Math.round((Options.MAX_TRANSITION_SPEED - Options.MIN_TRANSITION_SPEED) / Options.TRANSITION_SPEED_STEP);
+        int step = (int) Math.round(clampedSliderValue * stepCount);
+        return Options.MIN_TRANSITION_SPEED + step * Options.TRANSITION_SPEED_STEP;
+    }
+
+    static double transitionSpeedToSliderValue(float transitionSpeed) {
+        float normalizedSpeed = Options.normalizeTransitionSpeed(transitionSpeed, Options.DEFAULT_ZOOM_IN_TRANSITION_SPEED);
+        return (double) (normalizedSpeed - Options.MIN_TRANSITION_SPEED) / (Options.MAX_TRANSITION_SPEED - Options.MIN_TRANSITION_SPEED);
+    }
+
     protected boolean hasKeybindCollision(@NotNull KeyMapping keyMapping) {
         return this.minecraft != null && hasKeybindCollision(keyMapping, this.minecraft.options.keyMappings);
     }
@@ -482,6 +512,51 @@ public class OptionsScreen extends Screen {
     }
 
     private record KeybindControl(@NotNull KeybindSetting setting, @NotNull Button keybindButton, @NotNull Button resetButton) {
+    }
+
+    protected class TransitionSpeedSlider extends AbstractSliderButton {
+
+        private final ConfigValue<Float> option;
+        private final String labelBaseKey;
+
+        protected TransitionSpeedSlider(@NotNull ConfigValue<Float> option, @NotNull String labelBaseKey, int width) {
+            super(0, 0, width, BUTTON_HEIGHT, CommonComponents.EMPTY, transitionSpeedToSliderValue(option.getValue()));
+            this.option = option;
+            this.labelBaseKey = labelBaseKey;
+            this.setTooltip(Tooltip.create(Component.translatable(labelBaseKey + ".desc")));
+            this.updateMessage();
+        }
+
+        @Override
+        protected void updateMessage() {
+            String seconds = String.format(Locale.ROOT, "%.1f", sliderValueToTransitionSpeed(this.value));
+            this.setMessage(Component.translatable(this.labelBaseKey, Component.translatable("justzoom.options.seconds", seconds)));
+        }
+
+        @Override
+        protected void applyValue() {
+            float transitionSpeed = sliderValueToTransitionSpeed(this.value);
+            this.value = transitionSpeedToSliderValue(transitionSpeed);
+            if (Float.compare(this.option.getValue(), transitionSpeed) != 0) {
+                this.option.setValue(transitionSpeed);
+            }
+            OptionsScreen.this.updateGeneralOptionButtons();
+        }
+
+        @Override
+        public boolean keyPressed(@NotNull KeyEvent event) {
+            if (!this.canChangeValue || !event.isLeft() && !event.isRight()) return super.keyPressed(event);
+            // Vanilla advances sliders by one pixel, which the required 0.1-second snapping could otherwise swallow.
+            double sliderStep = Options.TRANSITION_SPEED_STEP / (Options.MAX_TRANSITION_SPEED - Options.MIN_TRANSITION_SPEED);
+            this.setValue(this.value + (event.isLeft() ? -sliderStep : sliderStep));
+            return true;
+        }
+
+        protected void refreshFromOption() {
+            this.value = transitionSpeedToSliderValue(this.option.getValue());
+            this.updateMessage();
+        }
+
     }
 
     protected class OptionsTab implements Tab {

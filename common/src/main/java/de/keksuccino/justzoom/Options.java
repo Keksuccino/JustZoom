@@ -11,6 +11,11 @@ public class Options extends JsonConfig {
 
     public static final float DEFAULT_BASE_MAGNIFICATION = 4.0F;
     public static final float DEFAULT_SCROLL_MAGNIFICATION_MULTIPLIER = 1.5F;
+    public static final float DEFAULT_ZOOM_IN_TRANSITION_SPEED = 1.0F;
+    public static final float DEFAULT_ZOOM_OUT_TRANSITION_SPEED = 1.0F;
+    public static final float MIN_TRANSITION_SPEED = 0.0F;
+    public static final float MAX_TRANSITION_SPEED = 5.0F;
+    public static final float TRANSITION_SPEED_STEP = 0.1F;
 
     private final ConfigSection zoom = this.section("zoom");
     private final ConfigSection spyglass = this.section("spyglass");
@@ -18,6 +23,8 @@ public class Options extends JsonConfig {
     public final ConfigValue<Float> baseMagnification = this.zoom.option("base_magnification", DEFAULT_BASE_MAGNIFICATION);
     public final ConfigValue<Float> scrollMagnificationMultiplier = this.zoom.option("scroll_magnification_multiplier", DEFAULT_SCROLL_MAGNIFICATION_MULTIPLIER);
     public final ConfigValue<Boolean> smoothZoomInOut = this.zoom.option("smooth_zoom_in_out", true);
+    public final ConfigValue<Float> zoomInTransitionSpeed = this.zoom.option("zoom_in_transition_speed", DEFAULT_ZOOM_IN_TRANSITION_SPEED);
+    public final ConfigValue<Float> zoomOutTransitionSpeed = this.zoom.option("zoom_out_transition_speed", DEFAULT_ZOOM_OUT_TRANSITION_SPEED);
     public final ConfigValue<Boolean> smoothCameraOnZoom = this.zoom.option("smooth_camera_movement_on_zoom", false);
     public final ConfigValue<Boolean> normalizeMouseSensitivityOnZoom = this.zoom.option("normalize_mouse_sensitivity_on_zoom", true);
     public final ConfigValue<Boolean> improveThirdPersonZoom = this.zoom.option("improve_third_person_zoom", true);
@@ -37,6 +44,13 @@ public class Options extends JsonConfig {
         // Remove the retired toggle from upgraded configs instead of leaving an option that no longer affects behavior.
         this.zoom.optional("allow_zoom_in_mirrored_view", Boolean.class).remove();
         this.save();
+    }
+
+    static float normalizeTransitionSpeed(float seconds, float fallback) {
+        float safeFallback = Float.isFinite(fallback) ? Math.max(MIN_TRANSITION_SPEED, Math.min(MAX_TRANSITION_SPEED, fallback)) : DEFAULT_ZOOM_IN_TRANSITION_SPEED;
+        float clampedSeconds = Math.max(MIN_TRANSITION_SPEED, Math.min(MAX_TRANSITION_SPEED, Float.isFinite(seconds) ? seconds : safeFallback));
+        int step = Math.round((clampedSeconds - MIN_TRANSITION_SPEED) / TRANSITION_SPEED_STEP);
+        return MIN_TRANSITION_SPEED + step * TRANSITION_SPEED_STEP;
     }
 
 }

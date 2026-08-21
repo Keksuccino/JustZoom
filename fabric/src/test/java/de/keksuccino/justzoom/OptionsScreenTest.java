@@ -116,6 +116,25 @@ class OptionsScreenTest {
     }
 
     @Test
+    void transitionSpeedSliderUsesTheCompleteRangeInPointOneSecondSteps() {
+        assertEquals(0.0F, OptionsScreen.sliderValueToTransitionSpeed(-1.0D));
+        assertEquals(0.0F, OptionsScreen.sliderValueToTransitionSpeed(0.0D));
+        assertEquals(0.1F, OptionsScreen.sliderValueToTransitionSpeed(0.01D));
+        assertEquals(1.0F, OptionsScreen.sliderValueToTransitionSpeed(0.2D));
+        assertEquals(5.0F, OptionsScreen.sliderValueToTransitionSpeed(1.0D));
+        assertEquals(5.0F, OptionsScreen.sliderValueToTransitionSpeed(2.0D));
+    }
+
+    @Test
+    void transitionSpeedSliderNormalizesStoredValues() {
+        assertEquals(0.0D, OptionsScreen.transitionSpeedToSliderValue(-1.0F));
+        assertEquals(0.2D, OptionsScreen.transitionSpeedToSliderValue(1.0F), 0.000000001D);
+        assertEquals(1.0D, OptionsScreen.transitionSpeedToSliderValue(6.0F));
+        assertEquals(0.2D, OptionsScreen.transitionSpeedToSliderValue(Float.NaN), 0.000000001D);
+        assertEquals(1.0F, OptionsScreen.sliderValueToTransitionSpeed(Double.NaN));
+    }
+
+    @Test
     void spyglassOverlayCycleUsesOrangeExceptWhenDisabled() {
         assertEquals(OptionsScreen.CYCLE_VALUE_COLOR, OptionsScreen.spyglassOverlayValueColor(SpyglassOverlayMode.ONLY_SPYGLASS));
         assertEquals(OptionsScreen.CYCLE_VALUE_COLOR, OptionsScreen.spyglassOverlayValueColor(SpyglassOverlayMode.ONLY_KEYBIND_ZOOM));

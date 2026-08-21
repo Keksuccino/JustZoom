@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.nio.file.Path;
+import java.util.function.LongSupplier;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -84,100 +85,171 @@ class ZoomLevelStateTest {
     void nonSmoothZoomTransitionsImmediatelyInBothDirections() {
         ZoomLevelState zoomLevelState = new ZoomLevelState(this.createPersistenceData(), 4.0F, false);
 
-        zoomLevelState.tick(true, false, 1000.0D);
-        assertEquals(4.0D, zoomLevelState.getRenderedMagnification(true, false, 1.0F, 1000.0D), DOUBLE_TOLERANCE);
+        zoomLevelState.tick(true, false, 1.0F, 1.0F, 1000.0D);
+        assertEquals(4.0D, zoomLevelState.getRenderedMagnification(true, false, 1.0F, 1.0F, 1.0F, 1000.0D), DOUBLE_TOLERANCE);
 
-        zoomLevelState.tick(false, false, 1000.0D);
-        assertEquals(1.0D, zoomLevelState.getRenderedMagnification(false, false, 1.0F, 1000.0D), DOUBLE_TOLERANCE);
+        zoomLevelState.tick(false, false, 1.0F, 1.0F, 1000.0D);
+        assertEquals(1.0D, zoomLevelState.getRenderedMagnification(false, false, 1.0F, 1.0F, 1.0F, 1000.0D), DOUBLE_TOLERANCE);
     }
 
     @Test
-    void smoothToggleTransitionHasAFixedFourTickDurationAtHighMagnification() {
+    void zoomInAndOutUseTheirIndependentRealTimeDurations() {
         PersistenceData persistenceData = this.createPersistenceData();
         persistenceData.lastMagnification.setValue(800.0F);
-        ZoomLevelState zoomLevelState = new ZoomLevelState(persistenceData, 4.0F, true);
+        TestNanoClock clock = new TestNanoClock();
+        ZoomLevelState zoomLevelState = new ZoomLevelState(persistenceData, 4.0F, true, clock);
 
-        zoomLevelState.tick(true, true, 1000.0D);
-        assertEquals(Math.pow(800.0D, 0.25D), zoomLevelState.getRenderedMagnification(true, true, 1.0F, 1000.0D), DOUBLE_TOLERANCE);
-        zoomLevelState.tick(true, true, 1000.0D);
-        assertEquals(Math.sqrt(800.0D), zoomLevelState.getRenderedMagnification(true, true, 1.0F, 1000.0D), DOUBLE_TOLERANCE);
-        zoomLevelState.tick(true, true, 1000.0D);
-        zoomLevelState.tick(true, true, 1000.0D);
-        assertEquals(800.0D, zoomLevelState.getRenderedMagnification(true, true, 1.0F, 1000.0D), DOUBLE_TOLERANCE);
+        zoomLevelState.tick(true, true, 1.0F, 2.0F, 1000.0D);
+        clock.advanceMilliseconds(250L);
+        assertEquals(Math.pow(800.0D, 0.25D), zoomLevelState.getRenderedMagnification(true, true, 1.0F, 2.0F, 1.0F, 1000.0D), DOUBLE_TOLERANCE);
+        clock.advanceMilliseconds(750L);
+        assertEquals(800.0D, zoomLevelState.getRenderedMagnification(true, true, 1.0F, 2.0F, 1.0F, 1000.0D), DOUBLE_TOLERANCE);
 
-        zoomLevelState.tick(false, true, 1000.0D);
-        assertEquals(Math.pow(800.0D, 0.75D), zoomLevelState.getRenderedMagnification(false, true, 1.0F, 1000.0D), DOUBLE_TOLERANCE);
-        zoomLevelState.tick(false, true, 1000.0D);
-        zoomLevelState.tick(false, true, 1000.0D);
-        zoomLevelState.tick(false, true, 1000.0D);
-        assertEquals(ZoomMath.MIN_MAGNIFICATION, zoomLevelState.getRenderedMagnification(false, true, 1.0F, 1000.0D), DOUBLE_TOLERANCE);
+        zoomLevelState.tick(false, true, 1.0F, 2.0F, 1000.0D);
+        clock.advanceMilliseconds(500L);
+        assertEquals(Math.pow(800.0D, 0.75D), zoomLevelState.getRenderedMagnification(false, true, 1.0F, 2.0F, 1.0F, 1000.0D), DOUBLE_TOLERANCE);
+        clock.advanceMilliseconds(1500L);
+        assertEquals(ZoomMath.MIN_MAGNIFICATION, zoomLevelState.getRenderedMagnification(false, true, 1.0F, 2.0F, 1.0F, 1000.0D), DOUBLE_TOLERANCE);
+    }
+
+    @Test
+    void zeroSecondDurationsTransitionImmediately() {
+        TestNanoClock clock = new TestNanoClock();
+        ZoomLevelState zoomLevelState = new ZoomLevelState(this.createPersistenceData(), 4.0F, false, clock);
+
+        zoomLevelState.tick(true, true, 0.0F, 0.0F, 1000.0D);
+        assertEquals(4.0D, zoomLevelState.getRenderedMagnification(true, true, 0.0F, 0.0F, 1.0F, 1000.0D), DOUBLE_TOLERANCE);
+
+        zoomLevelState.tick(false, true, 0.0F, 0.0F, 1000.0D);
+        assertEquals(ZoomMath.MIN_MAGNIFICATION, zoomLevelState.getRenderedMagnification(false, true, 0.0F, 0.0F, 1.0F, 1000.0D), DOUBLE_TOLERANCE);
+    }
+
+    @Test
+    void extraClientTicksDoNotAccelerateTheTransition() {
+        TestNanoClock clock = new TestNanoClock();
+        ZoomLevelState zoomLevelState = new ZoomLevelState(this.createPersistenceData(), 4.0F, false, clock);
+
+        zoomLevelState.tick(true, true, 1.0F, 1.0F, 1000.0D);
+        for (int tick = 0; tick < 20; tick++) {
+            zoomLevelState.tick(true, true, 1.0F, 1.0F, 1000.0D);
+        }
+
+        assertEquals(ZoomMath.MIN_MAGNIFICATION, zoomLevelState.getRenderedMagnification(true, true, 1.0F, 1.0F, 1.0F, 1000.0D), DOUBLE_TOLERANCE);
+        clock.advanceMilliseconds(500L);
+        assertEquals(2.0D, zoomLevelState.getRenderedMagnification(true, true, 1.0F, 1.0F, 1.0F, 1000.0D), DOUBLE_TOLERANCE);
+    }
+
+    @Test
+    void aDelayedRenderCatchesUpToElapsedRealTime() {
+        TestNanoClock clock = new TestNanoClock();
+        ZoomLevelState zoomLevelState = new ZoomLevelState(this.createPersistenceData(), 4.0F, false, clock);
+
+        zoomLevelState.tick(true, true, 1.0F, 1.0F, 1000.0D);
+        clock.advanceMilliseconds(1500L);
+
+        assertEquals(4.0D, zoomLevelState.getRenderedMagnification(true, true, 1.0F, 1.0F, 1.0F, 1000.0D), DOUBLE_TOLERANCE);
     }
 
     @Test
     void smoothWheelChangesKeepTheirOriginalLogarithmicRate() {
-        ZoomLevelState zoomLevelState = new ZoomLevelState(this.createPersistenceData(), 4.0F, false);
+        TestNanoClock clock = new TestNanoClock();
+        ZoomLevelState zoomLevelState = new ZoomLevelState(this.createPersistenceData(), 4.0F, false, clock);
 
-        zoomLevelState.tick(true, true, 1000.0D);
-        zoomLevelState.tick(true, true, 1000.0D);
-        zoomLevelState.tick(true, true, 1000.0D);
-        zoomLevelState.tick(true, true, 1000.0D);
+        zoomLevelState.tick(true, true, 1.0F, 1.0F, 1000.0D);
+        clock.advanceMilliseconds(1000L);
+        zoomLevelState.getRenderedMagnification(true, true, 1.0F, 1.0F, 1.0F, 1000.0D);
         zoomLevelState.adjustMagnification(2.0D, 2.0D, 1000.0D);
 
-        zoomLevelState.tick(true, true, 1000.0D);
-        assertEquals(4.8D, zoomLevelState.getRenderedMagnification(true, true, 1.0F, 1000.0D), DOUBLE_TOLERANCE);
-        zoomLevelState.tick(true, true, 1000.0D);
-        assertEquals(5.76D, zoomLevelState.getRenderedMagnification(true, true, 1.0F, 1000.0D), DOUBLE_TOLERANCE);
+        zoomLevelState.tick(true, true, 1.0F, 1.0F, 1000.0D);
+        assertEquals(4.8D, zoomLevelState.getRenderedMagnification(true, true, 1.0F, 1.0F, 1.0F, 1000.0D), DOUBLE_TOLERANCE);
+        zoomLevelState.tick(true, true, 1.0F, 1.0F, 1000.0D);
+        assertEquals(5.76D, zoomLevelState.getRenderedMagnification(true, true, 1.0F, 1.0F, 1.0F, 1000.0D), DOUBLE_TOLERANCE);
     }
 
     @Test
     void releaseDuringWheelSmoothingFadesFromTheCurrentRenderedLevel() {
-        ZoomLevelState zoomLevelState = new ZoomLevelState(this.createPersistenceData(), 4.0F, false);
-        for (int tick = 0; tick < ZoomLevelState.TOGGLE_TRANSITION_TICKS; tick++) zoomLevelState.tick(true, true, 1000.0D);
+        TestNanoClock clock = new TestNanoClock();
+        ZoomLevelState zoomLevelState = new ZoomLevelState(this.createPersistenceData(), 4.0F, false, clock);
+        zoomLevelState.tick(true, true, 1.0F, 1.0F, 1000.0D);
+        clock.advanceMilliseconds(1000L);
+        zoomLevelState.getRenderedMagnification(true, true, 1.0F, 1.0F, 1.0F, 1000.0D);
         zoomLevelState.adjustMagnification(2.0D, 2.0D, 1000.0D);
-        zoomLevelState.tick(true, true, 1000.0D);
+        zoomLevelState.tick(true, true, 1.0F, 1.0F, 1000.0D);
 
-        zoomLevelState.tick(false, true, 1000.0D);
+        zoomLevelState.tick(false, true, 1.0F, 1.0F, 1000.0D);
+        clock.advanceMilliseconds(250L);
 
-        assertEquals(Math.pow(4.8D, 0.75D), zoomLevelState.getRenderedMagnification(false, true, 1.0F, 1000.0D), DOUBLE_TOLERANCE);
+        assertEquals(Math.pow(4.8D, 0.75D), zoomLevelState.getRenderedMagnification(false, true, 1.0F, 1.0F, 1.0F, 1000.0D), DOUBLE_TOLERANCE);
     }
 
     @Test
     void rapidToggleReversalContinuesFromTheCurrentTransition() {
-        ZoomLevelState zoomLevelState = new ZoomLevelState(this.createPersistenceData(), 16.0F, false);
+        TestNanoClock clock = new TestNanoClock();
+        ZoomLevelState zoomLevelState = new ZoomLevelState(this.createPersistenceData(), 16.0F, false, clock);
 
-        zoomLevelState.tick(true, true, 1000.0D);
-        zoomLevelState.tick(true, true, 1000.0D);
-        assertEquals(4.0D, zoomLevelState.getRenderedMagnification(true, true, 1.0F, 1000.0D), DOUBLE_TOLERANCE);
-        zoomLevelState.tick(false, true, 1000.0D);
-        assertEquals(2.0D, zoomLevelState.getRenderedMagnification(false, true, 1.0F, 1000.0D), DOUBLE_TOLERANCE);
-        zoomLevelState.tick(true, true, 1000.0D);
-        assertEquals(4.0D, zoomLevelState.getRenderedMagnification(true, true, 1.0F, 1000.0D), DOUBLE_TOLERANCE);
+        zoomLevelState.tick(true, true, 1.0F, 1.0F, 1000.0D);
+        clock.advanceMilliseconds(500L);
+        assertEquals(4.0D, zoomLevelState.getRenderedMagnification(true, true, 1.0F, 1.0F, 1.0F, 1000.0D), DOUBLE_TOLERANCE);
+
+        zoomLevelState.tick(false, true, 1.0F, 1.0F, 1000.0D);
+        clock.advanceMilliseconds(250L);
+        assertEquals(2.0D, zoomLevelState.getRenderedMagnification(false, true, 1.0F, 1.0F, 1.0F, 1000.0D), DOUBLE_TOLERANCE);
+
+        zoomLevelState.tick(true, true, 1.0F, 1.0F, 1000.0D);
+        clock.advanceMilliseconds(250L);
+        assertEquals(4.0D, zoomLevelState.getRenderedMagnification(true, true, 1.0F, 1.0F, 1.0F, 1000.0D), DOUBLE_TOLERANCE);
     }
 
     @Test
     void completedReleasePreloadsThePersistedTargetForImmediateReactivation() {
-        ZoomLevelState zoomLevelState = new ZoomLevelState(this.createPersistenceData(), 4.0F, false);
-        for (int tick = 0; tick < ZoomLevelState.TOGGLE_TRANSITION_TICKS; tick++) zoomLevelState.tick(true, true, 1000.0D);
+        TestNanoClock clock = new TestNanoClock();
+        ZoomLevelState zoomLevelState = new ZoomLevelState(this.createPersistenceData(), 4.0F, false, clock);
+        zoomLevelState.tick(true, true, 1.0F, 1.0F, 1000.0D);
+        clock.advanceMilliseconds(1000L);
+        zoomLevelState.getRenderedMagnification(true, true, 1.0F, 1.0F, 1.0F, 1000.0D);
         zoomLevelState.adjustMagnification(2.0D, 2.0D, 1000.0D);
-        zoomLevelState.tick(true, true, 1000.0D);
-        for (int tick = 0; tick < ZoomLevelState.TOGGLE_TRANSITION_TICKS; tick++) zoomLevelState.tick(false, true, 1000.0D);
+        zoomLevelState.tick(true, true, 1.0F, 1.0F, 1000.0D);
+        zoomLevelState.tick(false, true, 1.0F, 1.0F, 1000.0D);
+        clock.advanceMilliseconds(1000L);
+        zoomLevelState.getRenderedMagnification(false, true, 1.0F, 1.0F, 1.0F, 1000.0D);
 
-        zoomLevelState.tick(true, true, 1000.0D);
+        zoomLevelState.tick(true, true, 1.0F, 1.0F, 1000.0D);
+        clock.advanceMilliseconds(250L);
 
-        assertEquals(2.0D, zoomLevelState.getRenderedMagnification(true, true, 1.0F, 1000.0D), DOUBLE_TOLERANCE);
+        assertEquals(2.0D, zoomLevelState.getRenderedMagnification(true, true, 1.0F, 1.0F, 1.0F, 1000.0D), DOUBLE_TOLERANCE);
     }
 
     @Test
-    void smoothZoomInterpolatesGeometricallyBetweenTicks() {
-        ZoomLevelState zoomLevelState = new ZoomLevelState(this.createPersistenceData(), 4.0F, false);
+    void smoothWheelChangesStillInterpolateGeometricallyBetweenTicks() {
+        TestNanoClock clock = new TestNanoClock();
+        ZoomLevelState zoomLevelState = new ZoomLevelState(this.createPersistenceData(), 4.0F, false, clock);
+        zoomLevelState.tick(true, true, 1.0F, 1.0F, 1000.0D);
+        clock.advanceMilliseconds(1000L);
+        zoomLevelState.getRenderedMagnification(true, true, 1.0F, 1.0F, 1.0F, 1000.0D);
+        zoomLevelState.adjustMagnification(1.0D, 2.0D, 1000.0D);
 
-        zoomLevelState.tick(true, true, 1000.0D);
+        zoomLevelState.tick(true, true, 1.0F, 1.0F, 1000.0D);
 
-        assertEquals(Math.pow(4.0D, 0.125D), zoomLevelState.getRenderedMagnification(true, true, 0.5F, 1000.0D), DOUBLE_TOLERANCE);
+        assertEquals(Math.sqrt(4.0D * 4.8D), zoomLevelState.getRenderedMagnification(true, true, 1.0F, 1.0F, 0.5F, 1000.0D), DOUBLE_TOLERANCE);
     }
 
     private PersistenceData createPersistenceData() {
         return new PersistenceData(this.temporaryDirectory.resolve("persistence_data.json").toFile());
+    }
+
+    private static final class TestNanoClock implements LongSupplier {
+
+        private long nanos;
+
+        @Override
+        public long getAsLong() {
+            return this.nanos;
+        }
+
+        void advanceMilliseconds(long milliseconds) {
+            this.nanos += milliseconds * 1_000_000L;
+        }
+
     }
 
 }

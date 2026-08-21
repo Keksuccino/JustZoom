@@ -2,25 +2,34 @@ package de.keksuccino.justzoom;
 
 import org.jetbrains.annotations.NotNull;
 import java.util.Objects;
+import java.util.function.LongSupplier;
 
 final class ZoomLevelState {
 
     static final double WHEEL_MAGNIFICATION_CHANGE_PER_TICK = 1.2D;
-    static final int TOGGLE_TRANSITION_TICKS = 4;
-    private static final double TOGGLE_TRANSITION_PROGRESS_PER_TICK = 1.0D / TOGGLE_TRANSITION_TICKS;
+    private static final double NANOSECONDS_PER_SECOND = 1_000_000_000.0D;
 
     private final PersistenceData persistenceData;
+    private final LongSupplier nanoTimeSource;
     private double targetMagnification;
+    private double previousSmoothedActiveMagnification;
     private double smoothedActiveMagnification;
     private double toggleTransitionProgress;
-    private double previousRenderedMagnification = ZoomMath.MIN_MAGNIFICATION;
-    private double renderedMagnification = ZoomMath.MIN_MAGNIFICATION;
+    private long lastTransitionUpdateNanos;
+    private boolean transitionTimeInitialized;
+    private boolean transitionDirectionZooming;
 
     ZoomLevelState(@NotNull PersistenceData persistenceData, float baseMagnification, boolean applyLastMagnification) {
+        this(persistenceData, baseMagnification, applyLastMagnification, System::nanoTime);
+    }
+
+    ZoomLevelState(@NotNull PersistenceData persistenceData, float baseMagnification, boolean applyLastMagnification, @NotNull LongSupplier nanoTimeSource) {
         this.persistenceData = Objects.requireNonNull(persistenceData);
+        this.nanoTimeSource = Objects.requireNonNull(nanoTimeSource);
         double normalizedBaseMagnification = normalize(baseMagnification, Options.DEFAULT_BASE_MAGNIFICATION, ZoomMath.MAX_MAGNIFICATION);
         float lastMagnification = persistenceData.lastMagnification.getValueOrDefault((float) normalizedBaseMagnification);
         this.targetMagnification = normalize(applyLastMagnification ? lastMagnification : normalizedBaseMagnification, normalizedBaseMagnification, ZoomMath.MAX_MAGNIFICATION);
+        this.previousSmoothedActiveMagnification = this.targetMagnification;
         this.smoothedActiveMagnification = this.targetMagnification;
     }
 
@@ -39,13 +48,12 @@ final class ZoomLevelState {
         this.targetMagnification = normalize(baseMagnification, Options.DEFAULT_BASE_MAGNIFICATION, ZoomMath.MAX_MAGNIFICATION);
     }
 
-    void tick(boolean zooming, boolean smooth, double maximumMagnification) {
-        this.previousRenderedMagnification = ZoomMath.normalizeMagnification(this.renderedMagnification, ZoomMath.MIN_MAGNIFICATION, maximumMagnification);
-        double target = zooming ? this.getTargetMagnification(maximumMagnification) : ZoomMath.MIN_MAGNIFICATION;
+    void tick(boolean zooming, boolean smooth, float zoomInTransitionSpeed, float zoomOutTransitionSpeed, double maximumMagnification) {
+        this.updateToggleTransition(zooming, smooth, zoomInTransitionSpeed, zoomOutTransitionSpeed);
+        this.previousSmoothedActiveMagnification = normalize(this.smoothedActiveMagnification, this.getTargetMagnification(maximumMagnification), maximumMagnification);
         if (!smooth) {
             this.smoothedActiveMagnification = this.getTargetMagnification(maximumMagnification);
-            this.toggleTransitionProgress = zooming ? 1.0D : 0.0D;
-            this.renderedMagnification = target;
+            this.previousSmoothedActiveMagnification = this.smoothedActiveMagnification;
             return;
         }
 
@@ -56,25 +64,72 @@ final class ZoomLevelState {
             this.smoothedActiveMagnification = ZoomMath.moveMagnificationTowards(this.smoothedActiveMagnification, activeTarget, WHEEL_MAGNIFICATION_CHANGE_PER_TICK);
         }
 
-        // The separate toggle envelope gives key activation and release a fixed duration regardless of magnification.
-        this.toggleTransitionProgress = moveTowards(this.toggleTransitionProgress, zooming ? 1.0D : 0.0D, TOGGLE_TRANSITION_PROGRESS_PER_TICK);
-        if (!zooming && this.toggleTransitionProgress == 0.0D) {
-            // Preload an inactive persisted target invisibly so the next activation never inherits wheel-smoothing latency.
-            this.smoothedActiveMagnification = activeTarget;
-        }
-        this.renderedMagnification = ZoomMath.interpolateMagnification(ZoomMath.MIN_MAGNIFICATION, this.smoothedActiveMagnification, (float) this.toggleTransitionProgress);
-        this.renderedMagnification = ZoomMath.normalizeMagnification(this.renderedMagnification, target, maximumMagnification);
+        this.preloadActiveMagnificationIfInactive(zooming, maximumMagnification);
     }
 
-    double getRenderedMagnification(boolean zooming, boolean smooth, float partialTicks, double maximumMagnification) {
+    double getRenderedMagnification(boolean zooming, boolean smooth, float zoomInTransitionSpeed, float zoomOutTransitionSpeed, float partialTicks, double maximumMagnification) {
         double target = zooming ? this.getTargetMagnification(maximumMagnification) : ZoomMath.MIN_MAGNIFICATION;
+        this.updateToggleTransition(zooming, smooth, zoomInTransitionSpeed, zoomOutTransitionSpeed);
         if (!smooth) return target;
-        double interpolated = ZoomMath.interpolateMagnification(this.previousRenderedMagnification, this.renderedMagnification, partialTicks);
-        return ZoomMath.normalizeMagnification(interpolated, target, maximumMagnification);
+
+        this.preloadActiveMagnificationIfInactive(zooming, maximumMagnification);
+
+        double interpolatedActiveMagnification = ZoomMath.interpolateMagnification(this.previousSmoothedActiveMagnification, this.smoothedActiveMagnification, partialTicks);
+        double renderedMagnification = ZoomMath.interpolateMagnification(ZoomMath.MIN_MAGNIFICATION, interpolatedActiveMagnification, (float) this.toggleTransitionProgress);
+        return ZoomMath.normalizeMagnification(renderedMagnification, target, maximumMagnification);
     }
 
     private static double normalize(double magnification, double fallback, double maximumMagnification) {
         return ZoomMath.normalizeMagnification(magnification, fallback, maximumMagnification);
+    }
+
+    private void preloadActiveMagnificationIfInactive(boolean zooming, double maximumMagnification) {
+        if (zooming || this.toggleTransitionProgress != 0.0D) return;
+        // Preload an inactive persisted target invisibly so the next activation never inherits wheel-smoothing latency.
+        double activeTarget = this.getTargetMagnification(maximumMagnification);
+        this.smoothedActiveMagnification = activeTarget;
+        this.previousSmoothedActiveMagnification = activeTarget;
+    }
+
+    private void updateToggleTransition(boolean zooming, boolean smooth, float zoomInTransitionSpeed, float zoomOutTransitionSpeed) {
+        long now = this.nanoTimeSource.getAsLong();
+        if (!smooth) {
+            this.toggleTransitionProgress = zooming ? 1.0D : 0.0D;
+            this.transitionDirectionZooming = zooming;
+            this.lastTransitionUpdateNanos = now;
+            this.transitionTimeInitialized = true;
+            return;
+        }
+
+        if (!this.transitionTimeInitialized) {
+            this.lastTransitionUpdateNanos = now;
+            this.transitionTimeInitialized = true;
+            this.transitionDirectionZooming = zooming;
+        } else {
+            // Advance the previously observed direction first; a reversal begins at this sample so it never jumps across an unknown input boundary.
+            double elapsedSeconds = Math.max(0.0D, (now - this.lastTransitionUpdateNanos) / NANOSECONDS_PER_SECOND);
+            float activeTransitionSpeed = transitionSpeedFor(this.transitionDirectionZooming, zoomInTransitionSpeed, zoomOutTransitionSpeed);
+            this.advanceToggleTransition(this.transitionDirectionZooming, elapsedSeconds, activeTransitionSpeed);
+            this.lastTransitionUpdateNanos = now;
+            this.transitionDirectionZooming = zooming;
+        }
+
+        float currentTransitionSpeed = transitionSpeedFor(zooming, zoomInTransitionSpeed, zoomOutTransitionSpeed);
+        if (currentTransitionSpeed == Options.MIN_TRANSITION_SPEED) {
+            this.toggleTransitionProgress = zooming ? 1.0D : 0.0D;
+        }
+    }
+
+    private static float transitionSpeedFor(boolean zooming, float zoomInTransitionSpeed, float zoomOutTransitionSpeed) {
+        return zooming ? Options.normalizeTransitionSpeed(zoomInTransitionSpeed, Options.DEFAULT_ZOOM_IN_TRANSITION_SPEED) : Options.normalizeTransitionSpeed(zoomOutTransitionSpeed, Options.DEFAULT_ZOOM_OUT_TRANSITION_SPEED);
+    }
+
+    private void advanceToggleTransition(boolean zooming, double elapsedSeconds, float transitionSpeed) {
+        if (transitionSpeed == Options.MIN_TRANSITION_SPEED) {
+            this.toggleTransitionProgress = zooming ? 1.0D : 0.0D;
+            return;
+        }
+        this.toggleTransitionProgress = moveTowards(this.toggleTransitionProgress, zooming ? 1.0D : 0.0D, elapsedSeconds / transitionSpeed);
     }
 
     private static double moveTowards(double current, double target, double maximumChange) {
