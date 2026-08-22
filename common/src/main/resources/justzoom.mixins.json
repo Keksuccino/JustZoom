@@ -10,6 +10,7 @@
     "client.MixinEditBox",
     "client.MixinGameRenderer",
     "client.MixinHud",
+    "client.MixinItemInHandRenderer",
     "client.MixinKeyMapping_Category",
     "client.MixinMinecraft",
     "client.MixinMenuTabBar",
