@@ -34,26 +34,34 @@ public class JustZoom {
     }
 
     public static void updateOptions() {
+        assertIsClient();
         options = new Options();
     }
 
     @NotNull
     public static Options getOptions() {
+        assertIsClient();
         if (options == null) updateOptions();
         return options;
     }
 
     @NotNull
     public static PersistenceData getPersistenceData() {
+        assertIsClient();
         if (persistenceData == null) persistenceData = new PersistenceData(INSTANCE_PERSISTENCE_DATA);
         return persistenceData;
     }
 
     private static File createDirectory(@NotNull File file) {
+        if (!Services.PLATFORM.isOnClient()) return null; // Do not create any directories on the server.
         if (!file.isDirectory()) {
             file.mkdirs();
         }
         return file;
+    }
+
+    public static void assertIsClient() {
+        if (!Services.PLATFORM.isOnClient()) throw new RuntimeException("Tried to access Just Zoom on the server-side, but it is a CLIENT mod!");
     }
 
 }

@@ -17,11 +17,9 @@ public class JustZoomNeoForge {
         // JustZoom.init() got moved to MixinMinecraft
 
         if (Services.PLATFORM.isOnClient()) {
-
             eventBus.register(JustZoomNeoForge.class);
             IConfigScreenFactory configScreenFactory = (container, parent) -> new OptionsScreen(parent);
             modContainer.registerExtensionPoint(IConfigScreenFactory.class, configScreenFactory);
-
         }
 
     }
@@ -29,9 +27,11 @@ public class JustZoomNeoForge {
     @SubscribeEvent
     public static void onRegisterKeybinds(RegisterKeyMappingsEvent e) {
 
-        e.register(KeyMappings.KEY_TOGGLE_ZOOM);
-        e.register(KeyMappings.KEY_ZOOM_IN);
-        e.register(KeyMappings.KEY_ZOOM_OUT);
+        if (Services.PLATFORM.isOnClient()) {
+            e.register(KeyMappings.KEY_TOGGLE_ZOOM);
+            e.register(KeyMappings.KEY_ZOOM_IN);
+            e.register(KeyMappings.KEY_ZOOM_OUT);
+        }
 
     }
 
