@@ -4,6 +4,12 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GlyphSource;
+import net.minecraft.client.gui.components.StringWidget;
+import net.minecraft.client.gui.font.glyphs.EffectGlyph;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.FontDescription;
 import net.minecraft.resources.Identifier;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -14,6 +20,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.function.LongSupplier;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -164,12 +171,63 @@ class OptionsScreenTest {
     }
 
     @Test
-    void maximumZoomPreviewRequiresAnInWorldSelectedAdvancedSliderInteraction() {
-        assertTrue(OptionsScreen.shouldActivateMaximumZoomPreview(true, true, true, false));
-        assertTrue(OptionsScreen.shouldActivateMaximumZoomPreview(true, true, false, true));
-        assertFalse(OptionsScreen.shouldActivateMaximumZoomPreview(false, true, true, true));
-        assertFalse(OptionsScreen.shouldActivateMaximumZoomPreview(true, false, true, true));
-        assertFalse(OptionsScreen.shouldActivateMaximumZoomPreview(true, true, false, false));
+    void maximumZoomPreviewRequiresAnInWorldSelectedAdvancedTabAndRecentSliderMovement() {
+        assertTrue(OptionsScreen.shouldActivateMaximumZoomPreview(true, true, true));
+        assertFalse(OptionsScreen.shouldActivateMaximumZoomPreview(false, true, true));
+        assertFalse(OptionsScreen.shouldActivateMaximumZoomPreview(true, false, true));
+        assertFalse(OptionsScreen.shouldActivateMaximumZoomPreview(true, true, false));
+    }
+
+    @Test
+    void maximumZoomPreviewStartsOnMovementAndLingersForOneSecond() {
+        TestNanoClock clock = new TestNanoClock();
+        OptionsScreen.MaximumZoomPreviewTimer timer = new OptionsScreen.MaximumZoomPreviewTimer(clock);
+
+        assertFalse(timer.isActive());
+
+        timer.recordMovement();
+        assertTrue(timer.isActive());
+
+        clock.advanceNanos(OptionsScreen.MAXIMUM_ZOOM_PREVIEW_LINGER_NANOS);
+        assertTrue(timer.isActive());
+
+        clock.advanceNanos(1L);
+        assertFalse(timer.isActive());
+    }
+
+    @Test
+    void maximumZoomPreviewMovementRefreshesTheLingerWindow() {
+        TestNanoClock clock = new TestNanoClock();
+        OptionsScreen.MaximumZoomPreviewTimer timer = new OptionsScreen.MaximumZoomPreviewTimer(clock);
+        timer.recordMovement();
+        clock.advanceNanos(OptionsScreen.MAXIMUM_ZOOM_PREVIEW_LINGER_NANOS);
+
+        timer.recordMovement();
+        clock.advanceNanos(OptionsScreen.MAXIMUM_ZOOM_PREVIEW_LINGER_NANOS);
+
+        assertTrue(timer.isActive());
+        clock.advanceNanos(1L);
+        assertFalse(timer.isActive());
+    }
+
+    @Test
+    void maximumZoomPreviewTimerCanBeResetWhenTheScreenLifecycleRestarts() {
+        TestNanoClock clock = new TestNanoClock();
+        OptionsScreen.MaximumZoomPreviewTimer timer = new OptionsScreen.MaximumZoomPreviewTimer(clock);
+        timer.recordMovement();
+
+        timer.reset();
+
+        assertFalse(timer.isActive());
+    }
+
+    @Test
+    void previewOpacityIncludesInputSettingLabels() {
+        StringWidget inputSettingLabel = new StringWidget(100, 9, Component.literal("Input label"), nonRenderingFont());
+
+        OptionsScreen.updatePreviewControlOpacity(inputSettingLabel, null, OptionsScreen.PREVIEW_CONTROL_OPACITY);
+
+        assertEquals(OptionsScreen.PREVIEW_CONTROL_OPACITY, inputSettingLabel.getAlpha());
     }
 
     @Test
@@ -222,6 +280,37 @@ class OptionsScreenTest {
 
     private static KeyMapping keyMapping(String suffix, int defaultKey) {
         return new KeyMapping("justzoom.test." + suffix, defaultKey, CATEGORY);
+    }
+
+    private static Font nonRenderingFont() {
+        return new Font(new Font.Provider() {
+
+            @Override
+            public GlyphSource glyphs(FontDescription font) {
+                throw new AssertionError("This opacity-only test must not render text");
+            }
+
+            @Override
+            public EffectGlyph effect() {
+                throw new AssertionError("This opacity-only test must not render text");
+            }
+
+        });
+    }
+
+    private static final class TestNanoClock implements LongSupplier {
+
+        private long nowNanos;
+
+        @Override
+        public long getAsLong() {
+            return this.nowNanos;
+        }
+
+        void advanceNanos(long nanos) {
+            this.nowNanos += nanos;
+        }
+
     }
 
 }

@@ -45,6 +45,7 @@ import java.util.Objects;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.LongSupplier;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
@@ -57,6 +58,7 @@ public class OptionsScreen extends Screen {
     protected static final int CONTROL_GAP = 5;
     protected static final int FLOAT_INPUT_GAP = 5;
     protected static final int FLOAT_INPUT_MIN_WIDTH = 40;
+    protected static final long MAXIMUM_ZOOM_PREVIEW_LINGER_NANOS = 1_000_000_000L;
     protected static final int OPTION_ROW_ADVANCE = 26;
     protected static final float PREVIEW_CONTROL_OPACITY = 0.2F;
     protected static final int RESET_BUTTON_WIDTH = 50;
@@ -80,6 +82,7 @@ public class OptionsScreen extends Screen {
     private OptionsTab advancedTab;
     @Nullable
     private MaximumZoomFactorSlider maximumZoomFactorSlider;
+    private final MaximumZoomPreviewTimer maximumZoomPreviewTimer;
     private boolean maximumZoomPreviewActive;
     private final List<Button> optionButtons = new ArrayList<>();
     private final List<FloatInputControl> floatInputControls = new ArrayList<>();
@@ -90,6 +93,7 @@ public class OptionsScreen extends Screen {
     public OptionsScreen(@Nullable Screen parent) {
         super(Component.translatable("justzoom.options"));
         this.parent = parent;
+        this.maximumZoomPreviewTimer = new MaximumZoomPreviewTimer(System::nanoTime);
     }
 
     @Override
@@ -103,6 +107,7 @@ public class OptionsScreen extends Screen {
         this.keybindControls.clear();
         this.advancedTab = null;
         this.maximumZoomFactorSlider = null;
+        this.maximumZoomPreviewTimer.reset();
         this.maximumZoomPreviewActive = false;
 
         OptionsTab generalTab = this.buildGeneralTab();
@@ -445,8 +450,8 @@ public class OptionsScreen extends Screen {
         return Options.normalizeMaximumZoomFactorPercentage(percentage) / (double) Options.MAXIMUM_ZOOM_FACTOR_PERCENTAGE;
     }
 
-    static boolean shouldActivateMaximumZoomPreview(boolean inWorld, boolean advancedTabSelected, boolean sliderHovered, boolean sliderFocused) {
-        return inWorld && advancedTabSelected && (sliderHovered || sliderFocused);
+    static boolean shouldActivateMaximumZoomPreview(boolean inWorld, boolean advancedTabSelected, boolean sliderRecentlyMoved) {
+        return inWorld && advancedTabSelected && sliderRecentlyMoved;
     }
 
     protected boolean hasKeybindCollision(@NotNull KeyMapping keyMapping) {
@@ -516,34 +521,38 @@ public class OptionsScreen extends Screen {
     }
 
     boolean isMaximumZoomPreviewActive() {
-        return this.maximumZoomPreviewActive;
+        boolean advancedTabSelected = this.advancedTab != null && this.tabManager.getCurrentTab() == this.advancedTab;
+        return shouldActivateMaximumZoomPreview(this.minecraft != null && this.minecraft.level != null, advancedTabSelected, this.maximumZoomPreviewTimer.isActive());
     }
 
-    private void updateMaximumZoomPreviewState(int mouseX, int mouseY) {
-        boolean advancedTabSelected = this.advancedTab != null && this.tabManager.getCurrentTab() == this.advancedTab;
-        boolean sliderHovered = this.maximumZoomFactorSlider != null && this.advancedTab != null && this.advancedTab.containsPoint(mouseX, mouseY) && this.maximumZoomFactorSlider.isMouseOver(mouseX, mouseY);
-        boolean sliderFocused = this.maximumZoomFactorSlider != null && this.maximumZoomFactorSlider.isFocused();
-        this.maximumZoomPreviewActive = shouldActivateMaximumZoomPreview(this.minecraft.level != null, advancedTabSelected, sliderHovered, sliderFocused);
+    private void onMaximumZoomFactorSliderMoved() {
+        this.maximumZoomPreviewTimer.recordMovement();
+        this.updateMaximumZoomPreviewState();
+    }
+
+    private void updateMaximumZoomPreviewState() {
+        this.maximumZoomPreviewActive = this.isMaximumZoomPreviewActive();
+        // Apply every render so widgets restored by a tab change never retain the previous tab's opacity.
         this.updatePreviewControlOpacity();
     }
 
     private void updatePreviewControlOpacity() {
         float opacity = this.maximumZoomPreviewActive ? PREVIEW_CONTROL_OPACITY : 1.0F;
         for (GuiEventListener child : this.children()) {
-            this.updatePreviewControlOpacity(child, opacity);
+            updatePreviewControlOpacity(child, this.maximumZoomFactorSlider, opacity);
         }
         if (this.maximumZoomFactorSlider != null) {
             this.maximumZoomFactorSlider.setAlpha(1.0F);
         }
     }
 
-    private void updatePreviewControlOpacity(@NotNull GuiEventListener listener, float opacity) {
-        if (listener instanceof AbstractWidget widget && !(widget instanceof StringWidget) && widget != this.maximumZoomFactorSlider) {
+    static void updatePreviewControlOpacity(@NotNull GuiEventListener listener, @Nullable AbstractWidget exemptWidget, float opacity) {
+        if (listener instanceof AbstractWidget widget && widget != exemptWidget) {
             widget.setAlpha(opacity);
         }
         if (listener instanceof ContainerEventHandler container) {
             for (GuiEventListener child : container.children()) {
-                this.updatePreviewControlOpacity(child, opacity);
+                updatePreviewControlOpacity(child, exemptWidget, opacity);
             }
         }
     }
@@ -563,7 +572,7 @@ public class OptionsScreen extends Screen {
 
     @Override
     public void extractRenderState(@NotNull GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
-        this.updateMaximumZoomPreviewState(mouseX, mouseY);
+        this.updateMaximumZoomPreviewState();
         super.extractRenderState(graphics, mouseX, mouseY, a);
         if (!this.maximumZoomPreviewActive) {
             graphics.blit(RenderPipelines.GUI_TEXTURED, Screen.FOOTER_SEPARATOR, 0, this.height - this.layout.getFooterHeight(), 0.0F, 0.0F, this.width, 2, 32, 2);
@@ -572,7 +581,7 @@ public class OptionsScreen extends Screen {
 
     @Override
     public void extractBackground(@NotNull GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
-        this.updateMaximumZoomPreviewState(mouseX, mouseY);
+        this.updateMaximumZoomPreviewState();
         if (this.maximumZoomPreviewActive) {
             this.minecraft.gui.hud.extractDeferredSubtitles();
             return;
@@ -588,6 +597,7 @@ public class OptionsScreen extends Screen {
 
     @Override
     public void onClose() {
+        this.maximumZoomPreviewTimer.reset();
         this.maximumZoomPreviewActive = false;
         this.updatePreviewControlOpacity();
         Minecraft.getInstance().gui.setScreen(this.parent);
@@ -606,6 +616,33 @@ public class OptionsScreen extends Screen {
     }
 
     private record KeybindControl(@NotNull KeybindSetting setting, @NotNull Button keybindButton, @NotNull Button resetButton) {
+    }
+
+    static final class MaximumZoomPreviewTimer {
+
+        private final LongSupplier nanoTimeSource;
+        private long lastMovementNanos;
+        private boolean movementRecorded;
+
+        MaximumZoomPreviewTimer(@NotNull LongSupplier nanoTimeSource) {
+            this.nanoTimeSource = Objects.requireNonNull(nanoTimeSource);
+        }
+
+        void recordMovement() {
+            this.lastMovementNanos = this.nanoTimeSource.getAsLong();
+            this.movementRecorded = true;
+        }
+
+        boolean isActive() {
+            if (!this.movementRecorded) return false;
+            long elapsedNanos = this.nanoTimeSource.getAsLong() - this.lastMovementNanos;
+            return elapsedNanos >= 0L && elapsedNanos <= MAXIMUM_ZOOM_PREVIEW_LINGER_NANOS;
+        }
+
+        void reset() {
+            this.movementRecorded = false;
+        }
+
     }
 
     protected class AnimationSpeedSlider extends AbstractSliderButton {
@@ -678,6 +715,7 @@ public class OptionsScreen extends Screen {
             this.value = maximumZoomFactorPercentageToSliderValue(percentage);
             if (this.option.getValue() != percentage) {
                 this.option.setValue(percentage);
+                OptionsScreen.this.onMaximumZoomFactorSliderMoved();
             }
             OptionsScreen.this.updateOptionResetButtons();
         }
@@ -749,10 +787,6 @@ public class OptionsScreen extends Screen {
         @Override
         public Layout getLayout() {
             return this.scrollableLayout;
-        }
-
-        protected boolean containsPoint(int x, int y) {
-            return this.scrollableLayout.getRectangle().containsPoint(x, y);
         }
 
     }
