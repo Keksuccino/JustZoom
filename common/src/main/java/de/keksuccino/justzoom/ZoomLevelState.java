@@ -7,7 +7,7 @@ import java.util.function.LongSupplier;
 
 final class ZoomLevelState {
 
-    static final double WHEEL_MAGNIFICATION_CHANGE_PER_TICK = 1.2D;
+    static final double WHEEL_MAGNIFICATION_CHANGE_PER_TICK = 1.728D;
     private static final double NANOSECONDS_PER_SECOND = 1_000_000_000.0D;
 
     private final PersistenceData persistenceData;
@@ -79,7 +79,7 @@ final class ZoomLevelState {
         double activeTarget = this.getTargetMagnification(maximumMagnification);
         this.smoothedActiveMagnification = normalize(this.smoothedActiveMagnification, activeTarget, maximumMagnification);
         if (zooming) {
-            // Magnification is followed in logarithmic space, so exponentiating the legacy rate scales its speed while x1.0 keeps the original behavior.
+            // Magnification is followed in logarithmic space, so exponentiating the base rate makes the configured value a true speed multiplier.
             float normalizedScrollSpeed = Options.normalizeSmoothZoomScrollSpeed(smoothZoomScrollSpeed, Options.DEFAULT_SMOOTH_ZOOM_SCROLL_SPEED);
             double changeMultiplier = Math.pow(WHEEL_MAGNIFICATION_CHANGE_PER_TICK, normalizedScrollSpeed);
             this.smoothedActiveMagnification = ZoomMath.moveMagnificationTowards(this.smoothedActiveMagnification, activeTarget, changeMultiplier);

@@ -176,7 +176,9 @@ class ZoomLevelStateTest {
     }
 
     @Test
-    void smoothWheelChangesKeepTheirOriginalLogarithmicRate() {
+    void smoothWheelChangesUseTheDefaultLogarithmicRate() {
+        assertEquals(1.728D, ZoomLevelState.WHEEL_MAGNIFICATION_CHANGE_PER_TICK, DOUBLE_TOLERANCE);
+
         TestNanoClock clock = new TestNanoClock();
         ZoomLevelState zoomLevelState = new ZoomLevelState(this.createPersistenceData(), 4.0F, false, clock);
 
@@ -186,9 +188,10 @@ class ZoomLevelStateTest {
         zoomLevelState.adjustMagnification(2.0D, 2.0D, 1000.0D);
 
         zoomLevelState.tick(true, true, Options.DEFAULT_SMOOTH_ZOOM_SCROLL_SPEED, 1.0F, 1.0F, 1000.0D);
-        assertEquals(4.8D, zoomLevelState.getRenderedMagnification(true, true, 1.0F, 1.0F, 1.0F, 1000.0D), DOUBLE_TOLERANCE);
+        double firstTickMagnification = 4.0D * ZoomLevelState.WHEEL_MAGNIFICATION_CHANGE_PER_TICK;
+        assertEquals(firstTickMagnification, zoomLevelState.getRenderedMagnification(true, true, 1.0F, 1.0F, 1.0F, 1000.0D), DOUBLE_TOLERANCE);
         zoomLevelState.tick(true, true, Options.DEFAULT_SMOOTH_ZOOM_SCROLL_SPEED, 1.0F, 1.0F, 1000.0D);
-        assertEquals(5.76D, zoomLevelState.getRenderedMagnification(true, true, 1.0F, 1.0F, 1.0F, 1000.0D), DOUBLE_TOLERANCE);
+        assertEquals(firstTickMagnification * ZoomLevelState.WHEEL_MAGNIFICATION_CHANGE_PER_TICK, zoomLevelState.getRenderedMagnification(true, true, 1.0F, 1.0F, 1.0F, 1000.0D), DOUBLE_TOLERANCE);
     }
 
     @Test
@@ -246,8 +249,9 @@ class ZoomLevelStateTest {
         shortAnimationState.tick(true, true, 2.0F, 0.1F, 0.2F, 1000.0D);
         longAnimationState.tick(true, true, 2.0F, 5.0F, 5.0F, 1000.0D);
 
-        assertEquals(5.76D, shortAnimationState.getRenderedMagnification(true, true, 0.1F, 0.2F, 1.0F, 1000.0D), DOUBLE_TOLERANCE);
-        assertEquals(5.76D, longAnimationState.getRenderedMagnification(true, true, 5.0F, 5.0F, 1.0F, 1000.0D), DOUBLE_TOLERANCE);
+        double expectedMagnification = 4.0D * Math.pow(ZoomLevelState.WHEEL_MAGNIFICATION_CHANGE_PER_TICK, 2.0D);
+        assertEquals(expectedMagnification, shortAnimationState.getRenderedMagnification(true, true, 0.1F, 0.2F, 1.0F, 1000.0D), DOUBLE_TOLERANCE);
+        assertEquals(expectedMagnification, longAnimationState.getRenderedMagnification(true, true, 5.0F, 5.0F, 1.0F, 1000.0D), DOUBLE_TOLERANCE);
     }
 
     @Test
@@ -263,7 +267,8 @@ class ZoomLevelStateTest {
         zoomLevelState.tick(false, true, Options.DEFAULT_SMOOTH_ZOOM_SCROLL_SPEED, 1.0F, 1.0F, 1000.0D);
         clock.advanceMilliseconds(250L);
 
-        assertEquals(Math.pow(4.8D, 0.75D), zoomLevelState.getRenderedMagnification(false, true, 1.0F, 1.0F, 1.0F, 1000.0D), DOUBLE_TOLERANCE);
+        double smoothedMagnification = 4.0D * ZoomLevelState.WHEEL_MAGNIFICATION_CHANGE_PER_TICK;
+        assertEquals(Math.pow(smoothedMagnification, 0.75D), zoomLevelState.getRenderedMagnification(false, true, 1.0F, 1.0F, 1.0F, 1000.0D), DOUBLE_TOLERANCE);
     }
 
     @Test
@@ -314,7 +319,8 @@ class ZoomLevelStateTest {
 
         zoomLevelState.tick(true, true, Options.DEFAULT_SMOOTH_ZOOM_SCROLL_SPEED, 1.0F, 1.0F, 1000.0D);
 
-        assertEquals(Math.sqrt(4.0D * 4.8D), zoomLevelState.getRenderedMagnification(true, true, 1.0F, 1.0F, 0.5F, 1000.0D), DOUBLE_TOLERANCE);
+        double smoothedMagnification = 4.0D * ZoomLevelState.WHEEL_MAGNIFICATION_CHANGE_PER_TICK;
+        assertEquals(Math.sqrt(4.0D * smoothedMagnification), zoomLevelState.getRenderedMagnification(true, true, 1.0F, 1.0F, 0.5F, 1000.0D), DOUBLE_TOLERANCE);
     }
 
     private PersistenceData createPersistenceData() {
