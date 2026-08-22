@@ -16,7 +16,6 @@ public class JustZoom {
     public static final String LOADER = Services.PLATFORM.getPlatformName().toUpperCase();
     public static final File MOD_DIR = createDirectory(new File(GameDirectoryUtils.getGameDirectory(), "/config/justzoom"));
     public static final File OPTIONS_FILE = new File(MOD_DIR, "config.json");
-    public static final File LEGACY_OPTIONS_FILE = new File(MOD_DIR, "config.txt");
     public static final File INSTANCE_DATA_DIR = createDirectory(new File(GameDirectoryUtils.getGameDirectory(), "/justzoom_instance_data"));
     public static final File INSTANCE_PERSISTENCE_DATA = new File(INSTANCE_DATA_DIR, "persistence_data.json");
 

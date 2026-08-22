@@ -4,7 +4,6 @@ import de.keksuccino.justzoom.util.config.ConfigSection;
 import de.keksuccino.justzoom.util.config.ConfigValue;
 import de.keksuccino.justzoom.util.config.JsonConfig;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import java.io.File;
 
 public class Options extends JsonConfig {
@@ -37,11 +36,11 @@ public class Options extends JsonConfig {
     public final ConfigValue<SpyglassSoundsMode> spyglassSounds = this.spyglass.option("spyglass_sounds", SpyglassSoundsMode.SPYGLASS_AND_KEYBIND_ZOOM);
 
     public Options() {
-        this(JustZoom.OPTIONS_FILE, JustZoom.LEGACY_OPTIONS_FILE);
+        this(JustZoom.OPTIONS_FILE);
     }
 
-    Options(@NotNull File file, @Nullable File legacyFile) {
-        super(file, legacyFile);
+    Options(@NotNull File file) {
+        super(file);
         // DO NOT CLEAR/DELETE OLD CONFIG VALUES! JUST KEEP THEM IN THE FILE.
         this.save();
     }
