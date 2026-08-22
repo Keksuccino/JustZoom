@@ -156,11 +156,25 @@ class OptionsScreenTest {
     void maximumZoomFactorSliderUsesWholePercentageStepsAcrossTheCompleteRange() {
         assertEquals(0, OptionsScreen.sliderValueToMaximumZoomFactorPercentage(-1.0D));
         assertEquals(0, OptionsScreen.sliderValueToMaximumZoomFactorPercentage(0.0D));
+        assertEquals(0, OptionsScreen.sliderValueToMaximumZoomFactorPercentage(0.0049D));
+        assertEquals(1, OptionsScreen.sliderValueToMaximumZoomFactorPercentage(0.005D));
         assertEquals(1, OptionsScreen.sliderValueToMaximumZoomFactorPercentage(0.01D));
+        assertEquals(1, OptionsScreen.sliderValueToMaximumZoomFactorPercentage(0.0149D));
+        assertEquals(2, OptionsScreen.sliderValueToMaximumZoomFactorPercentage(0.015D));
         assertEquals(43, OptionsScreen.sliderValueToMaximumZoomFactorPercentage(0.43D));
         assertEquals(100, OptionsScreen.sliderValueToMaximumZoomFactorPercentage(1.0D));
         assertEquals(100, OptionsScreen.sliderValueToMaximumZoomFactorPercentage(2.0D));
         assertEquals(100, OptionsScreen.sliderValueToMaximumZoomFactorPercentage(Double.NaN));
+    }
+
+    @Test
+    void maximumZoomFactorSliderSnapsContinuousInputToWholePercentagePositions() {
+        assertEquals(0.0D, OptionsScreen.snapMaximumZoomFactorSliderValue(0.0049D));
+        assertEquals(0.01D, OptionsScreen.snapMaximumZoomFactorSliderValue(0.005D));
+        assertEquals(0.01D, OptionsScreen.snapMaximumZoomFactorSliderValue(0.0149D));
+        assertEquals(0.02D, OptionsScreen.snapMaximumZoomFactorSliderValue(0.015D));
+        assertEquals(0.43D, OptionsScreen.snapMaximumZoomFactorSliderValue(0.4321D));
+        assertEquals(1.0D, OptionsScreen.snapMaximumZoomFactorSliderValue(Double.NaN));
     }
 
     @Test

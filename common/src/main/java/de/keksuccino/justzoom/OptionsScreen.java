@@ -450,6 +450,10 @@ public class OptionsScreen extends Screen {
         return Options.normalizeMaximumZoomFactorPercentage(percentage) / (double) Options.MAXIMUM_ZOOM_FACTOR_PERCENTAGE;
     }
 
+    static double snapMaximumZoomFactorSliderValue(double sliderValue) {
+        return maximumZoomFactorPercentageToSliderValue(sliderValueToMaximumZoomFactorPercentage(sliderValue));
+    }
+
     static boolean shouldActivateMaximumZoomPreview(boolean inWorld, boolean advancedTabSelected, boolean sliderRecentlyMoved) {
         return inWorld && advancedTabSelected && sliderRecentlyMoved;
     }
@@ -710,9 +714,15 @@ public class OptionsScreen extends Screen {
         }
 
         @Override
+        protected void setValue(double newValue) {
+            // Vanilla passes the continuous mouse position through here. Snap before it compares and applies the value
+            // so the handle and callbacks only advance in complete percentage steps.
+            super.setValue(snapMaximumZoomFactorSliderValue(newValue));
+        }
+
+        @Override
         protected void applyValue() {
             int percentage = sliderValueToMaximumZoomFactorPercentage(this.value);
-            this.value = maximumZoomFactorPercentageToSliderValue(percentage);
             if (this.option.getValue() != percentage) {
                 this.option.setValue(percentage);
                 OptionsScreen.this.onMaximumZoomFactorSliderMoved();

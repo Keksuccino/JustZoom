@@ -37,12 +37,23 @@ class ZoomMathTest {
     }
 
     @Test
-    void scalesMaximumMagnificationAcrossTheConfiguredPercentageRange() {
-        double fullMaximum = ZoomMath.calculateMaximumMagnification(70.0F);
+    void scalesMaximumZoomLinearlyInFieldOfViewAcrossTheConfiguredPercentageRange() {
+        assertEquals(70.0F, calculateMaximumZoomedFov(70.0F, 0));
+        assertEquals(35.05F, calculateMaximumZoomedFov(70.0F, 50), 0.00001F);
+        assertEquals(ZoomMath.MIN_FOV, calculateMaximumZoomedFov(70.0F, 100));
+    }
 
-        assertEquals(ZoomMath.MIN_MAGNIFICATION, ZoomMath.calculateMaximumMagnification(70.0F, 0), DOUBLE_TOLERANCE);
-        assertEquals(ZoomMath.MIN_MAGNIFICATION + (fullMaximum - ZoomMath.MIN_MAGNIFICATION) * 0.5D, ZoomMath.calculateMaximumMagnification(70.0F, 50), DOUBLE_TOLERANCE);
-        assertEquals(fullMaximum, ZoomMath.calculateMaximumMagnification(70.0F, 100), DOUBLE_TOLERANCE);
+    @Test
+    void eachMaximumZoomPercentageChangesFieldOfViewByTheSameAmount() {
+        float normalFov = 70.0F;
+        float expectedStep = (normalFov - ZoomMath.MIN_FOV) / Options.MAXIMUM_ZOOM_FACTOR_PERCENTAGE;
+        float previousFov = calculateMaximumZoomedFov(normalFov, 0);
+
+        for (int percentage = 1; percentage <= Options.MAXIMUM_ZOOM_FACTOR_PERCENTAGE; percentage++) {
+            float currentFov = calculateMaximumZoomedFov(normalFov, percentage);
+            assertEquals(expectedStep, previousFov - currentFov, 0.00001F, "Percentage " + percentage + " must be one complete linear step");
+            previousFov = currentFov;
+        }
     }
 
     @Test
@@ -95,6 +106,10 @@ class ZoomMathTest {
         assertEquals(100.0D, ZoomMath.normalizeMagnification(Double.POSITIVE_INFINITY, 4.0D, 100.0D), DOUBLE_TOLERANCE);
         assertEquals(1.5D, ZoomMath.normalizeScrollMagnificationMultiplier(0.5D, 1.5D), DOUBLE_TOLERANCE);
         assertEquals(ZoomMath.MAX_SCROLL_MAGNIFICATION_MULTIPLIER, ZoomMath.normalizeScrollMagnificationMultiplier(100.0D, 1.5D), DOUBLE_TOLERANCE);
+    }
+
+    private static float calculateMaximumZoomedFov(float normalFov, int percentage) {
+        return ZoomMath.calculateZoomedFov(normalFov, ZoomMath.calculateMaximumMagnification(normalFov, percentage));
     }
 
 }
