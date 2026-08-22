@@ -139,7 +139,6 @@ public class OptionsScreen extends Screen {
         this.addToggleOption(tab, JustZoom.getOptions().smoothCameraOnZoom, "justzoom.options.smooth_camera_movement_on_zoom");
         this.addToggleOption(tab, JustZoom.getOptions().normalizeMouseSensitivityOnZoom, "justzoom.options.normalize_mouse_sensitivity_on_zoom");
         this.addToggleOption(tab, JustZoom.getOptions().improveThirdPersonZoom, "justzoom.options.improve_third_person_zoom");
-        this.addToggleOption(tab, JustZoom.getOptions().resetZoomFactorOnStopZooming, "justzoom.options.reset_zoom_factor_when_stop_zooming");
         this.addToggleOption(tab, JustZoom.getOptions().useJustZoomForSpyglass, "justzoom.options.use_just_zoom_for_spyglass");
         this.addToggleOption(tab, JustZoom.getOptions().hideArmsWhenZooming, "justzoom.options.hide_arms_when_zooming");
         this.addCycleOption(tab, JustZoom.getOptions().showHud, ShowHudMode::next, this::showHudMessage, "justzoom.options.show_hud.desc");
@@ -153,8 +152,9 @@ public class OptionsScreen extends Screen {
         OptionsTab tab = new OptionsTab(Component.translatable("justzoom.options.tab.advanced"));
         this.advancedTab = tab;
         this.addZoomFactorSlider(tab, JustZoom.getOptions().baseZoomFactor, "justzoom.options.base_zoom_factor", ZoomPreviewTarget.BASE_ZOOM);
-        this.addFloatInput(tab, JustZoom.getOptions().scrollMagnificationMultiplier, "justzoom.options.scroll_magnification_multiplier");
         this.addZoomFactorSlider(tab, JustZoom.getOptions().maximumZoomFactor, "justzoom.options.maximum_zoom_factor", ZoomPreviewTarget.MAXIMUM_ZOOM);
+        this.addToggleOption(tab, JustZoom.getOptions().resetZoomFactorOnStopZooming, "justzoom.options.reset_zoom_factor_when_stop_zooming");
+        this.addFloatInput(tab, JustZoom.getOptions().scrollMagnificationMultiplier, "justzoom.options.scroll_magnification_multiplier");
         this.addAnimationSpeedSlider(tab, JustZoom.getOptions().startZoomingAnimationSpeed, "justzoom.options.start_zooming_animation_speed");
         this.addAnimationSpeedSlider(tab, JustZoom.getOptions().stopZoomingAnimationSpeed, "justzoom.options.stop_zooming_animation_speed");
         return tab;
