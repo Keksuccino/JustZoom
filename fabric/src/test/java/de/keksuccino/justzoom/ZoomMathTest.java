@@ -37,6 +37,21 @@ class ZoomMathTest {
     }
 
     @Test
+    void scalesMaximumMagnificationAcrossTheConfiguredPercentageRange() {
+        double fullMaximum = ZoomMath.calculateMaximumMagnification(70.0F);
+
+        assertEquals(ZoomMath.MIN_MAGNIFICATION, ZoomMath.calculateMaximumMagnification(70.0F, 0), DOUBLE_TOLERANCE);
+        assertEquals(ZoomMath.MIN_MAGNIFICATION + (fullMaximum - ZoomMath.MIN_MAGNIFICATION) * 0.5D, ZoomMath.calculateMaximumMagnification(70.0F, 50), DOUBLE_TOLERANCE);
+        assertEquals(fullMaximum, ZoomMath.calculateMaximumMagnification(70.0F, 100), DOUBLE_TOLERANCE);
+    }
+
+    @Test
+    void clampsMaximumMagnificationPercentageBeforeScaling() {
+        assertEquals(ZoomMath.MIN_MAGNIFICATION, ZoomMath.calculateMaximumMagnification(70.0F, -1), DOUBLE_TOLERANCE);
+        assertEquals(ZoomMath.calculateMaximumMagnification(70.0F), ZoomMath.calculateMaximumMagnification(70.0F, 101), DOUBLE_TOLERANCE);
+    }
+
+    @Test
     void appliesReciprocalWheelSteps() {
         double zoomedIn = ZoomMath.applyScroll(4.0D, 1.0D, 1.5D, 1000.0D);
         double zoomedBackOut = ZoomMath.applyScroll(zoomedIn, -1.0D, 1.5D, 1000.0D);

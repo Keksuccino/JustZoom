@@ -26,6 +26,8 @@
   "justzoom.options.start_zooming_animation_speed.desc": "Die Dauer der Animation beim Starten des Zoomens in Sekunden.\n0,00 Sekunden lassen die Animation sofort ablaufen.",
   "justzoom.options.stop_zooming_animation_speed": "Animationsdauer beim Zoomstopp: %s",
   "justzoom.options.stop_zooming_animation_speed.desc": "Die Dauer der Animation beim Stoppen des Zoomens in Sekunden.\n0,00 Sekunden lassen die Animation sofort ablaufen.",
+  "justzoom.options.maximum_zoom_factor": "Maximaler Zoomfaktor: %s",
+  "justzoom.options.maximum_zoom_factor.desc": "Begrenzt, wie weit Just Zoom hineinzoomen kann.\n0 % verhindert zusätzlichen Zoom; 100 % erlaubt den vollen Bereich.\nBewege den Mauszeiger über den Regler oder fokussiere ihn, um die Grenze in der Welt als Vorschau zu sehen.",
   "justzoom.options.seconds": "%s s",
   "justzoom.options.smooth_camera_movement_on_zoom": "Smoothe Kamerabewegung: %s",
   "justzoom.options.smooth_camera_movement_on_zoom.desc": "Ob sich die Kamera beim Zoomen smooth (cinematisch) bewegen soll.",

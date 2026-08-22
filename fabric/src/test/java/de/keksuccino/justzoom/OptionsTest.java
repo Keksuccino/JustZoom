@@ -25,7 +25,7 @@ class OptionsTest {
             Path configFile = this.temporaryDirectory.resolve("config-" + legacyValue + ".json");
             Files.writeString(configFile, "{\"spyglass\":{\"show_spyglass_overlay\":" + legacyValue + "}}", StandardCharsets.UTF_8);
 
-            Options options = new Options(configFile.toFile(), null);
+            Options options = new Options(configFile.toFile());
 
             assertEquals(SpyglassOverlayMode.ONLY_SPYGLASS, options.spyglassOverlay.getValue());
             assertEquals(SpyglassSoundsMode.SPYGLASS_AND_KEYBIND_ZOOM, options.spyglassSounds.getValue());
@@ -40,7 +40,7 @@ class OptionsTest {
     void defaultsShowHudToNever() throws IOException {
         Path configFile = this.temporaryDirectory.resolve("new-config.json");
 
-        Options options = new Options(configFile.toFile(), null);
+        Options options = new Options(configFile.toFile());
 
         assertEquals(ShowHudMode.NEVER, options.showHud.getValue());
         JsonObject storedZoomOptions = JsonParser.parseString(Files.readString(configFile, StandardCharsets.UTF_8)).getAsJsonObject().getAsJsonObject("zoom");
@@ -53,7 +53,7 @@ class OptionsTest {
             Path configFile = this.temporaryDirectory.resolve("retired-mirrored-view-option-" + retiredValue + ".json");
             Files.writeString(configFile, "{\"zoom\":{\"allow_zoom_in_mirrored_view\":" + retiredValue + "}}", StandardCharsets.UTF_8);
 
-            new Options(configFile.toFile(), null);
+            new Options(configFile.toFile());
 
             JsonObject storedZoomOptions = JsonParser.parseString(Files.readString(configFile, StandardCharsets.UTF_8)).getAsJsonObject().getAsJsonObject("zoom");
             assertEquals(retiredValue, storedZoomOptions.get("allow_zoom_in_mirrored_view").getAsBoolean());
@@ -64,7 +64,7 @@ class OptionsTest {
     void defaultsImproveThirdPersonZoomToEnabled() throws IOException {
         Path configFile = this.temporaryDirectory.resolve("third-person-default.json");
 
-        Options options = new Options(configFile.toFile(), null);
+        Options options = new Options(configFile.toFile());
 
         assertTrue(options.improveThirdPersonZoom.getValue());
         JsonObject storedZoomOptions = JsonParser.parseString(Files.readString(configFile, StandardCharsets.UTF_8)).getAsJsonObject().getAsJsonObject("zoom");
@@ -75,7 +75,7 @@ class OptionsTest {
     void defaultsStartAndStopAnimationSpeedsToRequestedValues() throws IOException {
         Path configFile = this.temporaryDirectory.resolve("animation-speed-defaults.json");
 
-        Options options = new Options(configFile.toFile(), null);
+        Options options = new Options(configFile.toFile());
 
         assertEquals(Options.DEFAULT_START_ZOOMING_ANIMATION_SPEED, options.startZoomingAnimationSpeed.getValue());
         assertEquals(Options.DEFAULT_STOP_ZOOMING_ANIMATION_SPEED, options.stopZoomingAnimationSpeed.getValue());
@@ -85,11 +85,33 @@ class OptionsTest {
     }
 
     @Test
+    void defaultsMaximumZoomFactorToOneHundredPercent() throws IOException {
+        Path configFile = this.temporaryDirectory.resolve("maximum-zoom-factor-default.json");
+
+        Options options = new Options(configFile.toFile());
+
+        assertEquals(Options.DEFAULT_MAXIMUM_ZOOM_FACTOR_PERCENTAGE, options.maximumZoomFactor.getValue());
+        JsonObject storedZoomOptions = JsonParser.parseString(Files.readString(configFile, StandardCharsets.UTF_8)).getAsJsonObject().getAsJsonObject("zoom");
+        assertEquals(Options.DEFAULT_MAXIMUM_ZOOM_FACTOR_PERCENTAGE, storedZoomOptions.get("maximum_zoom_factor").getAsInt());
+    }
+
+    @Test
+    void persistsMaximumZoomFactorPercentage() {
+        Path configFile = this.temporaryDirectory.resolve("maximum-zoom-factor.json");
+        Options options = new Options(configFile.toFile());
+
+        options.maximumZoomFactor.setValue(37);
+        Options reloadedOptions = new Options(configFile.toFile());
+
+        assertEquals(37, reloadedOptions.maximumZoomFactor.getValue());
+    }
+
+    @Test
     void preservesTheDevelopmentTransitionSpeedNames() throws IOException {
         Path configFile = this.temporaryDirectory.resolve("development-transition-speed-names.json");
         Files.writeString(configFile, "{\"zoom\":{\"zoom_in_transition_speed\":1.0,\"zoom_out_transition_speed\":1.0}}", StandardCharsets.UTF_8);
 
-        Options options = new Options(configFile.toFile(), null);
+        Options options = new Options(configFile.toFile());
 
         assertEquals(Options.DEFAULT_START_ZOOMING_ANIMATION_SPEED, options.startZoomingAnimationSpeed.getValue());
         assertEquals(Options.DEFAULT_STOP_ZOOMING_ANIMATION_SPEED, options.stopZoomingAnimationSpeed.getValue());
@@ -101,11 +123,11 @@ class OptionsTest {
     @Test
     void persistsAnimationSpeedsIndependently() {
         Path configFile = this.temporaryDirectory.resolve("animation-speeds.json");
-        Options options = new Options(configFile.toFile(), null);
+        Options options = new Options(configFile.toFile());
 
         options.startZoomingAnimationSpeed.setValue(0.35F);
         options.stopZoomingAnimationSpeed.setValue(4.75F);
-        Options reloadedOptions = new Options(configFile.toFile(), null);
+        Options reloadedOptions = new Options(configFile.toFile());
 
         assertEquals(0.35F, reloadedOptions.startZoomingAnimationSpeed.getValue());
         assertEquals(4.75F, reloadedOptions.stopZoomingAnimationSpeed.getValue());
@@ -122,12 +144,21 @@ class OptionsTest {
     }
 
     @Test
+    void normalizesMaximumZoomFactorToPercentageRange() {
+        assertEquals(0, Options.normalizeMaximumZoomFactorPercentage(-1));
+        assertEquals(0, Options.normalizeMaximumZoomFactorPercentage(0));
+        assertEquals(43, Options.normalizeMaximumZoomFactorPercentage(43));
+        assertEquals(100, Options.normalizeMaximumZoomFactorPercentage(100));
+        assertEquals(100, Options.normalizeMaximumZoomFactorPercentage(101));
+    }
+
+    @Test
     void persistsDisabledImproveThirdPersonZoom() {
         Path configFile = this.temporaryDirectory.resolve("third-person-disabled.json");
-        Options options = new Options(configFile.toFile(), null);
+        Options options = new Options(configFile.toFile());
 
         options.improveThirdPersonZoom.setValue(false);
-        Options reloadedOptions = new Options(configFile.toFile(), null);
+        Options reloadedOptions = new Options(configFile.toFile());
 
         assertFalse(reloadedOptions.improveThirdPersonZoom.getValue());
     }

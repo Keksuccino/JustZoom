@@ -7,10 +7,13 @@
     "client.MixinAbstractClientPlayer",
     "client.MixinCamera",
     "client.MixinCameraType",
+    "client.MixinEditBox",
     "client.MixinGameRenderer",
     "client.MixinHud",
     "client.MixinKeyMapping_Category",
     "client.MixinMinecraft",
+    "client.MixinMenuTabBar",
+    "client.MixinMenuTabButton",
     "client.MixinMouseHandler",
     "client.MixinSpyglassItem"
   ],

@@ -26,6 +26,8 @@
   "justzoom.options.start_zooming_animation_speed.desc": "ズーム開始時のアニメーションにかかる時間（秒）です。\n0.00秒にするとアニメーションが即時になります。",
   "justzoom.options.stop_zooming_animation_speed": "ズーム停止アニメーション時間: %s",
   "justzoom.options.stop_zooming_animation_speed.desc": "ズーム停止時のアニメーションにかかる時間（秒）です。\n0.00秒にするとアニメーションが即時になります。",
+  "justzoom.options.maximum_zoom_factor": "最大ズーム倍率: %s",
+  "justzoom.options.maximum_zoom_factor.desc": "Just Zoom でどこまで拡大できるかを制限します。\n0% では追加のズームを行わず、100% では全範囲を使用できます。\nスライダーにカーソルを合わせるかフォーカスすると、ワールド内で上限をプレビューできます。",
   "justzoom.options.seconds": "%s秒",
   "justzoom.options.smooth_camera_movement_on_zoom": "スムーズカメラ移動: %s",
   "justzoom.options.smooth_camera_movement_on_zoom.desc": "ズーム時にカメラをスムーズ（シネマティック）に動かします。",

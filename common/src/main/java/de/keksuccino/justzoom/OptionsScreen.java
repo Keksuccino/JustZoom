@@ -15,6 +15,8 @@ import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.ScrollableLayout;
 import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.client.gui.components.events.ContainerEventHandler;
+import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.components.tabs.MenuTabBar;
 import net.minecraft.client.gui.components.tabs.Tab;
 import net.minecraft.client.gui.components.tabs.TabManager;
@@ -56,6 +58,7 @@ public class OptionsScreen extends Screen {
     protected static final int FLOAT_INPUT_GAP = 5;
     protected static final int FLOAT_INPUT_MIN_WIDTH = 40;
     protected static final int OPTION_ROW_ADVANCE = 26;
+    protected static final float PREVIEW_CONTROL_OPACITY = 0.2F;
     protected static final int RESET_BUTTON_WIDTH = 50;
     protected static final Identifier TAB_HEADER_BACKGROUND = Identifier.withDefaultNamespace("textures/gui/tab_header_background.png");
     protected static final KeybindSetting ZOOM_KEYBIND = new KeybindSetting(KeyMappings.KEY_TOGGLE_ZOOM, "justzoom.options.zoom_keybind", "justzoom.options.zoom_keybind.desc");
@@ -73,6 +76,11 @@ public class OptionsScreen extends Screen {
     private MenuTabBar tabNavigationBar;
     @Nullable
     private KeyMapping waitingForKeybind;
+    @Nullable
+    private OptionsTab advancedTab;
+    @Nullable
+    private MaximumZoomFactorSlider maximumZoomFactorSlider;
+    private boolean maximumZoomPreviewActive;
     private final List<Button> optionButtons = new ArrayList<>();
     private final List<FloatInputControl> floatInputControls = new ArrayList<>();
     private final List<AnimationSpeedSlider> animationSpeedSliders = new ArrayList<>();
@@ -93,6 +101,9 @@ public class OptionsScreen extends Screen {
         this.animationSpeedSliders.clear();
         this.optionControls.clear();
         this.keybindControls.clear();
+        this.advancedTab = null;
+        this.maximumZoomFactorSlider = null;
+        this.maximumZoomPreviewActive = false;
 
         OptionsTab generalTab = this.buildGeneralTab();
         OptionsTab advancedTab = this.buildAdvancedTab();
@@ -133,10 +144,12 @@ public class OptionsScreen extends Screen {
     @NotNull
     protected OptionsTab buildAdvancedTab() {
         OptionsTab tab = new OptionsTab(Component.translatable("justzoom.options.tab.advanced"));
+        this.advancedTab = tab;
         this.addFloatInput(tab, JustZoom.getOptions().baseMagnification, "justzoom.options.base_magnification");
         this.addFloatInput(tab, JustZoom.getOptions().scrollMagnificationMultiplier, "justzoom.options.scroll_magnification_multiplier");
         this.addAnimationSpeedSlider(tab, JustZoom.getOptions().startZoomingAnimationSpeed, "justzoom.options.start_zooming_animation_speed");
         this.addAnimationSpeedSlider(tab, JustZoom.getOptions().stopZoomingAnimationSpeed, "justzoom.options.stop_zooming_animation_speed");
+        this.addMaximumZoomFactorSlider(tab, JustZoom.getOptions().maximumZoomFactor, "justzoom.options.maximum_zoom_factor");
         return tab;
     }
 
@@ -182,6 +195,14 @@ public class OptionsScreen extends Screen {
         AnimationSpeedSlider slider = new AnimationSpeedSlider(option, labelBaseKey, this.getButtonWidth());
         Button resetButton = this.buildResetButton(option, slider::getMessage, slider::refreshFromOption);
         this.animationSpeedSliders.add(slider);
+        this.optionControls.add(new OptionControl(() -> isOptionDefault(option), resetButton));
+        tab.addChild(this.buildControlRowLayout(slider, resetButton));
+    }
+
+    protected void addMaximumZoomFactorSlider(@NotNull OptionsTab tab, @NotNull ConfigValue<Integer> option, @NotNull String labelBaseKey) {
+        MaximumZoomFactorSlider slider = new MaximumZoomFactorSlider(option, labelBaseKey, this.getButtonWidth());
+        Button resetButton = this.buildResetButton(option, slider::getMessage, slider::refreshFromOption);
+        this.maximumZoomFactorSlider = slider;
         this.optionControls.add(new OptionControl(() -> isOptionDefault(option), resetButton));
         tab.addChild(this.buildControlRowLayout(slider, resetButton));
     }
@@ -265,6 +286,9 @@ public class OptionsScreen extends Screen {
         }
         for (AnimationSpeedSlider slider : this.animationSpeedSliders) {
             slider.setWidth(controlWidth);
+        }
+        if (this.maximumZoomFactorSlider != null) {
+            this.maximumZoomFactorSlider.setWidth(controlWidth);
         }
         for (FloatInputControl control : this.floatInputControls) {
             FloatInputWidths widths = calculateFloatInputWidths(controlWidth, control.preferredLabelWidth());
@@ -411,6 +435,20 @@ public class OptionsScreen extends Screen {
         return step / (double) stepCount;
     }
 
+    static int sliderValueToMaximumZoomFactorPercentage(double sliderValue) {
+        double safeSliderValue = Double.isFinite(sliderValue) ? sliderValue : 1.0D;
+        double clampedSliderValue = Math.max(0.0D, Math.min(1.0D, safeSliderValue));
+        return Options.normalizeMaximumZoomFactorPercentage((int) Math.round(clampedSliderValue * Options.MAXIMUM_ZOOM_FACTOR_PERCENTAGE));
+    }
+
+    static double maximumZoomFactorPercentageToSliderValue(int percentage) {
+        return Options.normalizeMaximumZoomFactorPercentage(percentage) / (double) Options.MAXIMUM_ZOOM_FACTOR_PERCENTAGE;
+    }
+
+    static boolean shouldActivateMaximumZoomPreview(boolean inWorld, boolean advancedTabSelected, boolean sliderHovered, boolean sliderFocused) {
+        return inWorld && advancedTabSelected && (sliderHovered || sliderFocused);
+    }
+
     protected boolean hasKeybindCollision(@NotNull KeyMapping keyMapping) {
         return this.minecraft != null && hasKeybindCollision(keyMapping, this.minecraft.options.keyMappings);
     }
@@ -477,6 +515,39 @@ public class OptionsScreen extends Screen {
         return super.keyPressed(event);
     }
 
+    boolean isMaximumZoomPreviewActive() {
+        return this.maximumZoomPreviewActive;
+    }
+
+    private void updateMaximumZoomPreviewState(int mouseX, int mouseY) {
+        boolean advancedTabSelected = this.advancedTab != null && this.tabManager.getCurrentTab() == this.advancedTab;
+        boolean sliderHovered = this.maximumZoomFactorSlider != null && this.advancedTab != null && this.advancedTab.containsPoint(mouseX, mouseY) && this.maximumZoomFactorSlider.isMouseOver(mouseX, mouseY);
+        boolean sliderFocused = this.maximumZoomFactorSlider != null && this.maximumZoomFactorSlider.isFocused();
+        this.maximumZoomPreviewActive = shouldActivateMaximumZoomPreview(this.minecraft.level != null, advancedTabSelected, sliderHovered, sliderFocused);
+        this.updatePreviewControlOpacity();
+    }
+
+    private void updatePreviewControlOpacity() {
+        float opacity = this.maximumZoomPreviewActive ? PREVIEW_CONTROL_OPACITY : 1.0F;
+        for (GuiEventListener child : this.children()) {
+            this.updatePreviewControlOpacity(child, opacity);
+        }
+        if (this.maximumZoomFactorSlider != null) {
+            this.maximumZoomFactorSlider.setAlpha(1.0F);
+        }
+    }
+
+    private void updatePreviewControlOpacity(@NotNull GuiEventListener listener, float opacity) {
+        if (listener instanceof AbstractWidget widget && !(widget instanceof StringWidget) && widget != this.maximumZoomFactorSlider) {
+            widget.setAlpha(opacity);
+        }
+        if (listener instanceof ContainerEventHandler container) {
+            for (GuiEventListener child : container.children()) {
+                this.updatePreviewControlOpacity(child, opacity);
+            }
+        }
+    }
+
     @Override
     protected void repositionElements() {
         if (this.tabNavigationBar == null) {
@@ -492,8 +563,21 @@ public class OptionsScreen extends Screen {
 
     @Override
     public void extractRenderState(@NotNull GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
+        this.updateMaximumZoomPreviewState(mouseX, mouseY);
         super.extractRenderState(graphics, mouseX, mouseY, a);
-        graphics.blit(RenderPipelines.GUI_TEXTURED, Screen.FOOTER_SEPARATOR, 0, this.height - this.layout.getFooterHeight(), 0.0F, 0.0F, this.width, 2, 32, 2);
+        if (!this.maximumZoomPreviewActive) {
+            graphics.blit(RenderPipelines.GUI_TEXTURED, Screen.FOOTER_SEPARATOR, 0, this.height - this.layout.getFooterHeight(), 0.0F, 0.0F, this.width, 2, 32, 2);
+        }
+    }
+
+    @Override
+    public void extractBackground(@NotNull GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
+        this.updateMaximumZoomPreviewState(mouseX, mouseY);
+        if (this.maximumZoomPreviewActive) {
+            this.minecraft.gui.hud.extractDeferredSubtitles();
+            return;
+        }
+        super.extractBackground(graphics, mouseX, mouseY, a);
     }
 
     @Override
@@ -504,6 +588,8 @@ public class OptionsScreen extends Screen {
 
     @Override
     public void onClose() {
+        this.maximumZoomPreviewActive = false;
+        this.updatePreviewControlOpacity();
         Minecraft.getInstance().gui.setScreen(this.parent);
     }
 
@@ -567,6 +653,50 @@ public class OptionsScreen extends Screen {
 
     }
 
+    protected class MaximumZoomFactorSlider extends AbstractSliderButton {
+
+        private final ConfigValue<Integer> option;
+        private final String labelBaseKey;
+
+        protected MaximumZoomFactorSlider(@NotNull ConfigValue<Integer> option, @NotNull String labelBaseKey, int width) {
+            super(0, 0, width, BUTTON_HEIGHT, CommonComponents.EMPTY, maximumZoomFactorPercentageToSliderValue(option.getValue()));
+            this.option = option;
+            this.labelBaseKey = labelBaseKey;
+            this.setTooltip(Tooltip.create(Component.translatable(labelBaseKey + ".desc")));
+            this.updateMessage();
+        }
+
+        @Override
+        protected void updateMessage() {
+            int percentage = sliderValueToMaximumZoomFactorPercentage(this.value);
+            this.setMessage(Component.translatable(this.labelBaseKey, Component.literal(percentage + "%")));
+        }
+
+        @Override
+        protected void applyValue() {
+            int percentage = sliderValueToMaximumZoomFactorPercentage(this.value);
+            this.value = maximumZoomFactorPercentageToSliderValue(percentage);
+            if (this.option.getValue() != percentage) {
+                this.option.setValue(percentage);
+            }
+            OptionsScreen.this.updateOptionResetButtons();
+        }
+
+        @Override
+        public boolean keyPressed(@NotNull KeyEvent event) {
+            if (!this.canChangeValue || !event.isLeft() && !event.isRight()) return super.keyPressed(event);
+            double sliderStep = 1.0D / Options.MAXIMUM_ZOOM_FACTOR_PERCENTAGE;
+            this.setValue(this.value + (event.isLeft() ? -sliderStep : sliderStep));
+            return true;
+        }
+
+        protected void refreshFromOption() {
+            this.value = maximumZoomFactorPercentageToSliderValue(this.option.getValue());
+            this.updateMessage();
+        }
+
+    }
+
     protected class OptionsTab implements Tab {
 
         private final Component title;
@@ -619,6 +749,10 @@ public class OptionsScreen extends Screen {
         @Override
         public Layout getLayout() {
             return this.scrollableLayout;
+        }
+
+        protected boolean containsPoint(int x, int y) {
+            return this.scrollableLayout.getRectangle().containsPoint(x, y);
         }
 
     }

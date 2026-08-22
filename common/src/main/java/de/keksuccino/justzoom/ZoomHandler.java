@@ -8,13 +8,13 @@ public class ZoomHandler {
 
     private static final float SPYGLASS_OVERLAY_INITIAL_SCALE = 0.5F;
     private static final float SPYGLASS_OVERLAY_FINAL_SCALE = 1.125F;
-    private static final ZoomLevelState ZOOM_LEVEL_STATE = new ZoomLevelState(JustZoom.getPersistenceData(), JustZoom.getOptions().baseMagnification.getValue(), !JustZoom.getOptions().resetZoomFactorOnStopZooming.getValue());
 
     private static float cachedNormalFov = 70.0F;
     private static double cachedEffectiveMagnification = ZoomMath.MIN_MAGNIFICATION;
 
     public static boolean isZooming() {
         Minecraft minecraft = Minecraft.getInstance();
+        if (isMaximumZoomPreviewActive(minecraft)) return true;
         if (!isZoomAvailable(minecraft)) return false;
         boolean spyglassScoping = minecraft.player != null && minecraft.player.isScoping();
         return ZoomInput.isActive(KeyMappings.KEY_TOGGLE_ZOOM.isDown(), spyglassScoping, shouldUseJustZoomForSpyglass());
@@ -40,7 +40,7 @@ public class ZoomHandler {
     }
 
     public static float getSpyglassOverlayScale(boolean useJustZoomAnimation, float vanillaScale) {
-        return calculateSpyglassOverlayScale(useJustZoomAnimation, ZOOM_LEVEL_STATE.getToggleTransitionProgress(), vanillaScale);
+        return calculateSpyglassOverlayScale(useJustZoomAnimation, getZoomLevelState().getToggleTransitionProgress(), vanillaScale);
     }
 
     static float calculateSpyglassOverlayScale(boolean useJustZoomAnimation, double transitionProgress, float vanillaScale) {
@@ -77,17 +77,19 @@ public class ZoomHandler {
     }
 
     public static void onCameraTick() {
+        if (isMaximumZoomPreviewActive(Minecraft.getInstance())) return;
         boolean zooming = isZooming();
         Options options = JustZoom.getOptions();
         if (!zooming && options.resetZoomFactorOnStopZooming.getValue()) {
-            ZOOM_LEVEL_STATE.resetTargetMagnification(options.baseMagnification.getValue());
+            getZoomLevelState().resetTargetMagnification(options.baseMagnification.getValue());
         }
-        ZOOM_LEVEL_STATE.tick(zooming, options.smoothZoomInOut.getValue(), options.startZoomingAnimationSpeed.getValue(), options.stopZoomingAnimationSpeed.getValue(), ZoomMath.calculateMaximumMagnification(cachedNormalFov));
+        getZoomLevelState().tick(zooming, options.smoothZoomInOut.getValue(), options.startZoomingAnimationSpeed.getValue(), options.stopZoomingAnimationSpeed.getValue(), getConfiguredMaximumMagnification(cachedNormalFov));
     }
 
     public static void onInputTick() {
         int zoomInClicks = consumeClicks(KeyMappings.KEY_ZOOM_IN);
         int zoomOutClicks = consumeClicks(KeyMappings.KEY_ZOOM_OUT);
+        if (isMaximumZoomPreviewActive(Minecraft.getInstance())) return;
         if (isZooming()) {
             adjustMagnification(ZoomInput.calculateKeyAdjustment(zoomInClicks, zoomOutClicks));
         }
@@ -95,7 +97,9 @@ public class ZoomHandler {
 
     public static double getRenderedMagnification(float partialTicks, float normalFov) {
         Options options = JustZoom.getOptions();
-        return ZOOM_LEVEL_STATE.getRenderedMagnification(isZooming(), options.smoothZoomInOut.getValue(), options.startZoomingAnimationSpeed.getValue(), options.stopZoomingAnimationSpeed.getValue(), partialTicks, ZoomMath.calculateMaximumMagnification(normalFov));
+        double maximumMagnification = getConfiguredMaximumMagnification(normalFov);
+        if (isMaximumZoomPreviewActive(Minecraft.getInstance())) return maximumMagnification;
+        return getZoomLevelState().getRenderedMagnification(isZooming(), options.smoothZoomInOut.getValue(), options.startZoomingAnimationSpeed.getValue(), options.stopZoomingAnimationSpeed.getValue(), partialTicks, maximumMagnification);
     }
 
     public static void updateRenderedFov(float normalFov, float modifiedFov) {
@@ -106,13 +110,14 @@ public class ZoomHandler {
     public static double getMouseSensitivityScale() {
         double effectiveMagnification = cachedEffectiveMagnification;
         if (!shouldZoomInOutSmooth()) {
-            effectiveMagnification = isZooming() ? ZOOM_LEVEL_STATE.getTargetMagnification(ZoomMath.calculateMaximumMagnification(cachedNormalFov)) : ZoomMath.MIN_MAGNIFICATION;
+            effectiveMagnification = isZooming() ? getZoomLevelState().getTargetMagnification(getConfiguredMaximumMagnification(cachedNormalFov)) : ZoomMath.MIN_MAGNIFICATION;
         }
         return ZoomMath.calculateMouseSensitivityScale(effectiveMagnification);
     }
 
     public static void onMouseScroll(@NotNull MouseScrollFeedback feedback, double deltaY) {
 
+        if (isMaximumZoomPreviewActive(Minecraft.getInstance())) return;
         if (isZooming()) {
             boolean zoomInTriggered = KeyMappings.matchesMouseWheel(KeyMappings.KEY_ZOOM_IN, deltaY);
             boolean zoomOutTriggered = KeyMappings.matchesMouseWheel(KeyMappings.KEY_ZOOM_OUT, deltaY);
@@ -130,13 +135,27 @@ public class ZoomHandler {
 
     private static void adjustMagnification(double adjustment) {
         if (adjustment == 0.0D) return;
-        double maximumMagnification = ZoomMath.calculateMaximumMagnification(cachedNormalFov);
+        double maximumMagnification = getConfiguredMaximumMagnification(cachedNormalFov);
         double stepMultiplier = ZoomMath.normalizeScrollMagnificationMultiplier(JustZoom.getOptions().scrollMagnificationMultiplier.getValue(), Options.DEFAULT_SCROLL_MAGNIFICATION_MULTIPLIER);
-        ZOOM_LEVEL_STATE.adjustMagnification(adjustment, stepMultiplier, maximumMagnification);
+        getZoomLevelState().adjustMagnification(adjustment, stepMultiplier, maximumMagnification);
     }
 
     private static boolean isZoomAvailable(@NotNull Minecraft minecraft) {
         return isZoomAvailable(minecraft.gui.screen() != null);
+    }
+
+    private static double getConfiguredMaximumMagnification(float normalFov) {
+        return ZoomMath.calculateMaximumMagnification(normalFov, JustZoom.getOptions().maximumZoomFactor.getValue());
+    }
+
+    private static boolean isMaximumZoomPreviewActive(@NotNull Minecraft minecraft) {
+        return minecraft.gui.screen() instanceof OptionsScreen optionsScreen && optionsScreen.isMaximumZoomPreviewActive();
+    }
+
+    @NotNull
+    private static ZoomLevelState getZoomLevelState() {
+        // Delay client filesystem/config access until zoom runtime state is actually needed. Pure calculations can then stay Minecraft-light.
+        return ZoomLevelStateHolder.INSTANCE;
     }
 
     static boolean isZoomAvailable(boolean screenOpen) {
@@ -166,6 +185,12 @@ public class ZoomHandler {
             if (!Double.isFinite(deltaY) || deltaY == 0.0D || zoomInTriggered == zoomOutTriggered) return 0.0D;
             return zoomInTriggered ? Math.abs(deltaY) : -Math.abs(deltaY);
         }
+
+    }
+
+    private static final class ZoomLevelStateHolder {
+
+        private static final ZoomLevelState INSTANCE = new ZoomLevelState(JustZoom.getPersistenceData(), JustZoom.getOptions().baseMagnification.getValue(), !JustZoom.getOptions().resetZoomFactorOnStopZooming.getValue());
 
     }
 

@@ -26,6 +26,8 @@
   "justzoom.options.start_zooming_animation_speed.desc": "줌을 시작할 때 애니메이션에 걸리는 시간(초)입니다.\n0.00초로 설정하면 애니메이션이 즉시 완료됩니다.",
   "justzoom.options.stop_zooming_animation_speed": "줌 중지 애니메이션 지속 시간: %s",
   "justzoom.options.stop_zooming_animation_speed.desc": "줌을 중지할 때 애니메이션에 걸리는 시간(초)입니다.\n0.00초로 설정하면 애니메이션이 즉시 완료됩니다.",
+  "justzoom.options.maximum_zoom_factor": "최대 줌 배율: %s",
+  "justzoom.options.maximum_zoom_factor.desc": "Just Zoom이 확대할 수 있는 최대 범위를 제한합니다.\n0%는 추가 확대를 막고, 100%는 전체 범위를 허용합니다.\n슬라이더 위에 마우스를 올리거나 포커스하여 월드에서 한도를 미리 볼 수 있습니다.",
   "justzoom.options.seconds": "%s초",
   "justzoom.options.smooth_camera_movement_on_zoom": "부드러운 카메라 이동: %s",
   "justzoom.options.smooth_camera_movement_on_zoom.desc": "줌할 때 카메라가 부드럽게(시네마틱) 움직여야 하는지 여부입니다.",

@@ -12,6 +12,9 @@ public class Options extends JsonConfig {
     public static final float DEFAULT_SCROLL_MAGNIFICATION_MULTIPLIER = 1.5F;
     public static final float DEFAULT_START_ZOOMING_ANIMATION_SPEED = 0.30F;
     public static final float DEFAULT_STOP_ZOOMING_ANIMATION_SPEED = 0.2F;
+    public static final int DEFAULT_MAXIMUM_ZOOM_FACTOR_PERCENTAGE = 100;
+    public static final int MINIMUM_ZOOM_FACTOR_PERCENTAGE = 0;
+    public static final int MAXIMUM_ZOOM_FACTOR_PERCENTAGE = 100;
     public static final float MIN_ANIMATION_SPEED = 0.0F;
     public static final float MAX_ANIMATION_SPEED = 5.0F;
     public static final int ANIMATION_SPEED_STEPS_PER_SECOND = 20;
@@ -25,6 +28,7 @@ public class Options extends JsonConfig {
     public final ConfigValue<Boolean> smoothZoomInOut = this.zoom.option("smooth_zoom_in_out", true);
     public final ConfigValue<Float> startZoomingAnimationSpeed = this.zoom.option("start_zooming_animation_speed", DEFAULT_START_ZOOMING_ANIMATION_SPEED);
     public final ConfigValue<Float> stopZoomingAnimationSpeed = this.zoom.option("stop_zooming_animation_speed", DEFAULT_STOP_ZOOMING_ANIMATION_SPEED);
+    public final ConfigValue<Integer> maximumZoomFactor = this.zoom.option("maximum_zoom_factor", DEFAULT_MAXIMUM_ZOOM_FACTOR_PERCENTAGE);
     public final ConfigValue<Boolean> smoothCameraOnZoom = this.zoom.option("smooth_camera_movement_on_zoom", false);
     public final ConfigValue<Boolean> normalizeMouseSensitivityOnZoom = this.zoom.option("normalize_mouse_sensitivity_on_zoom", true);
     public final ConfigValue<Boolean> improveThirdPersonZoom = this.zoom.option("improve_third_person_zoom", true);
@@ -50,6 +54,10 @@ public class Options extends JsonConfig {
         float clampedSeconds = Math.max(MIN_ANIMATION_SPEED, Math.min(MAX_ANIMATION_SPEED, Float.isFinite(seconds) ? seconds : safeFallback));
         int step = Math.round((clampedSeconds - MIN_ANIMATION_SPEED) * ANIMATION_SPEED_STEPS_PER_SECOND);
         return MIN_ANIMATION_SPEED + step / (float) ANIMATION_SPEED_STEPS_PER_SECOND;
+    }
+
+    static int normalizeMaximumZoomFactorPercentage(int percentage) {
+        return Math.max(MINIMUM_ZOOM_FACTOR_PERCENTAGE, Math.min(MAXIMUM_ZOOM_FACTOR_PERCENTAGE, percentage));
     }
 
 }

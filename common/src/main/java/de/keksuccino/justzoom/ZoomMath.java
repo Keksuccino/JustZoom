@@ -43,6 +43,12 @@ public final class ZoomMath {
         return Math.max(MIN_MAGNIFICATION, Math.tan(normalHalfAngle) / Math.tan(minimumHalfAngle));
     }
 
+    public static double calculateMaximumMagnification(float normalFov, int maximumZoomFactorPercentage) {
+        double fullMaximum = calculateMaximumMagnification(normalFov);
+        double percentage = Options.normalizeMaximumZoomFactorPercentage(maximumZoomFactorPercentage) / 100.0D;
+        return MIN_MAGNIFICATION + (fullMaximum - MIN_MAGNIFICATION) * percentage;
+    }
+
     public static double calculateEffectiveMagnification(float normalFov, float zoomedFov) {
         double normalHalfAngle = Math.toRadians(clampFov(normalFov)) * 0.5D;
         double zoomedHalfAngle = Math.toRadians(clampFov(zoomedFov)) * 0.5D;

@@ -99,7 +99,7 @@ class OptionsScreenTest {
 
     @Test
     void generalOptionResetStateTracksWhetherTheValueDiffersFromItsDefault() {
-        Options options = new Options(this.temporaryDirectory.resolve("options.json").toFile(), null);
+        Options options = new Options(this.temporaryDirectory.resolve("options.json").toFile());
 
         assertTrue(OptionsScreen.isOptionDefault(options.baseMagnification));
 
@@ -112,7 +112,7 @@ class OptionsScreenTest {
 
     @Test
     void floatInputResetStateTreatsEquivalentTextAsDefaultAndInvalidTextAsChanged() {
-        Options options = new Options(this.temporaryDirectory.resolve("float-input-options.json").toFile(), null);
+        Options options = new Options(this.temporaryDirectory.resolve("float-input-options.json").toFile());
 
         assertTrue(OptionsScreen.isFloatInputDefault(options.baseMagnification, "4.0"));
         assertTrue(OptionsScreen.isFloatInputDefault(options.baseMagnification, "4"));
@@ -143,6 +143,33 @@ class OptionsScreenTest {
         assertEquals(0.09D, OptionsScreen.animationSpeedToSliderValue(Float.NaN, 0.45F), 0.000000001D);
         assertEquals(0.04D, OptionsScreen.animationSpeedToSliderValue(Float.NaN, 0.2F), 0.000000001D);
         assertEquals(Options.DEFAULT_START_ZOOMING_ANIMATION_SPEED, OptionsScreen.sliderValueToAnimationSpeed(Double.NaN));
+    }
+
+    @Test
+    void maximumZoomFactorSliderUsesWholePercentageStepsAcrossTheCompleteRange() {
+        assertEquals(0, OptionsScreen.sliderValueToMaximumZoomFactorPercentage(-1.0D));
+        assertEquals(0, OptionsScreen.sliderValueToMaximumZoomFactorPercentage(0.0D));
+        assertEquals(1, OptionsScreen.sliderValueToMaximumZoomFactorPercentage(0.01D));
+        assertEquals(43, OptionsScreen.sliderValueToMaximumZoomFactorPercentage(0.43D));
+        assertEquals(100, OptionsScreen.sliderValueToMaximumZoomFactorPercentage(1.0D));
+        assertEquals(100, OptionsScreen.sliderValueToMaximumZoomFactorPercentage(2.0D));
+        assertEquals(100, OptionsScreen.sliderValueToMaximumZoomFactorPercentage(Double.NaN));
+    }
+
+    @Test
+    void maximumZoomFactorPercentageNormalizesBeforeBecomingASliderValue() {
+        assertEquals(0.0D, OptionsScreen.maximumZoomFactorPercentageToSliderValue(-1));
+        assertEquals(0.43D, OptionsScreen.maximumZoomFactorPercentageToSliderValue(43), 0.000000001D);
+        assertEquals(1.0D, OptionsScreen.maximumZoomFactorPercentageToSliderValue(101));
+    }
+
+    @Test
+    void maximumZoomPreviewRequiresAnInWorldSelectedAdvancedSliderInteraction() {
+        assertTrue(OptionsScreen.shouldActivateMaximumZoomPreview(true, true, true, false));
+        assertTrue(OptionsScreen.shouldActivateMaximumZoomPreview(true, true, false, true));
+        assertFalse(OptionsScreen.shouldActivateMaximumZoomPreview(false, true, true, true));
+        assertFalse(OptionsScreen.shouldActivateMaximumZoomPreview(true, false, true, true));
+        assertFalse(OptionsScreen.shouldActivateMaximumZoomPreview(true, true, false, false));
     }
 
     @Test
@@ -177,7 +204,7 @@ class OptionsScreenTest {
     }
 
     @Test
-    void everyBundledLanguageNamesTheAdvancedTab() throws IOException {
+    void everyBundledLanguageNamesTheAdvancedTabAndMaximumZoomFactor() throws IOException {
         for (String language : List.of("de_de", "en_us", "es_mx", "fr_fr", "ja_jp", "ko_kr", "ru_ru", "tr_tr", "uk_ua", "zh_cn")) {
             String resourcePath = "assets/justzoom/lang/" + language + ".json";
             try (InputStream stream = OptionsScreenTest.class.getClassLoader().getResourceAsStream(resourcePath)) {
@@ -185,6 +212,10 @@ class OptionsScreenTest {
                 JsonObject translations = JsonParser.parseReader(new InputStreamReader(stream, StandardCharsets.UTF_8)).getAsJsonObject();
                 assertTrue(translations.has("justzoom.options.tab.advanced"), language);
                 assertFalse(translations.get("justzoom.options.tab.advanced").getAsString().isBlank(), language);
+                assertTrue(translations.has("justzoom.options.maximum_zoom_factor"), language);
+                assertFalse(translations.get("justzoom.options.maximum_zoom_factor").getAsString().isBlank(), language);
+                assertTrue(translations.has("justzoom.options.maximum_zoom_factor.desc"), language);
+                assertFalse(translations.get("justzoom.options.maximum_zoom_factor.desc").getAsString().isBlank(), language);
             }
         }
     }
