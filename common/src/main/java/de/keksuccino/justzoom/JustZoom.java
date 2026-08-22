@@ -11,7 +11,7 @@ public class JustZoom {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    public static final String VERSION = "2.2.0";
+    public static final String VERSION = "3.0.0";
     public static final String MOD_ID = "justzoom";
     public static final String LOADER = Services.PLATFORM.getPlatformName().toUpperCase();
     public static final File MOD_DIR = createDirectory(new File(GameDirectoryUtils.getGameDirectory(), "/config/justzoom"));
@@ -26,9 +26,9 @@ public class JustZoom {
     public static void init() {
 
         if (Services.PLATFORM.isOnClient()) {
-            LOGGER.info("[JUST ZOOM] Starting version " + VERSION + " on " + Services.PLATFORM.getPlatformDisplayName() + "..");
+            LOGGER.info("[JUST ZOOM] Initializing version " + VERSION + " on " + Services.PLATFORM.getPlatformDisplayName() + "..");
         } else {
-            LOGGER.warn("[JUST ZOOM] Disabling 'Just Zoom' since it's a client-side mod and current environment is server!");
+            LOGGER.warn("[JUST ZOOM] Just Zoom is a CLIENT mod. It will do nothing on a server and is not supposed to be present server-side.");
         }
 
     }
