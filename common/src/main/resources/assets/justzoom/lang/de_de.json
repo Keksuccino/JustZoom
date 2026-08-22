@@ -52,13 +52,13 @@
   "justzoom.options.spyglass_overlay.only_spyglass": "Nur Fernrohr",
   "justzoom.options.spyglass_overlay.only_keybind_zoom": "Nur Zoom-Taste",
   "justzoom.options.spyglass_overlay.spyglass_and_keybind_zoom": "Fernrohr & Zoom-Taste",
-  "justzoom.options.spyglass_overlay.disabled": "Deaktiviert",
+  "justzoom.options.spyglass_overlay.never": "Nie",
   "justzoom.options.spyglass_sounds": "Fernrohr-Geräusche abspielen: %s",
   "justzoom.options.spyglass_sounds.desc": "Legt fest, wann die Geräusche des Fernrohrs abgespielt werden.",
   "justzoom.options.spyglass_sounds.only_spyglass": "Nur Fernrohr",
   "justzoom.options.spyglass_sounds.only_keybind_zoom": "Nur Zoom-Taste",
   "justzoom.options.spyglass_sounds.spyglass_and_keybind_zoom": "Fernrohr & Zoom-Taste",
-  "justzoom.options.spyglass_sounds.disabled": "Deaktiviert",
+  "justzoom.options.spyglass_sounds.never": "Nie",
   "justzoom.options.toggle.enabled": "Aktiviert",
   "justzoom.options.toggle.disabled": "Deaktiviert"
 }

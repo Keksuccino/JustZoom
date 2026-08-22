@@ -52,13 +52,13 @@
   "justzoom.options.spyglass_overlay.only_spyglass": "仅望远镜",
   "justzoom.options.spyglass_overlay.only_keybind_zoom": "仅缩放按键",
   "justzoom.options.spyglass_overlay.spyglass_and_keybind_zoom": "望远镜和缩放按键",
-  "justzoom.options.spyglass_overlay.disabled": "禁用",
+  "justzoom.options.spyglass_overlay.never": "从不",
   "justzoom.options.spyglass_sounds": "播放望远镜音效：%s",
   "justzoom.options.spyglass_sounds.desc": "控制何时播放望远镜音效。",
   "justzoom.options.spyglass_sounds.only_spyglass": "仅望远镜",
   "justzoom.options.spyglass_sounds.only_keybind_zoom": "仅缩放按键",
   "justzoom.options.spyglass_sounds.spyglass_and_keybind_zoom": "望远镜和缩放按键",
-  "justzoom.options.spyglass_sounds.disabled": "禁用",
+  "justzoom.options.spyglass_sounds.never": "从不",
   "justzoom.options.toggle.enabled": "启用",
   "justzoom.options.toggle.disabled": "禁用"
 }

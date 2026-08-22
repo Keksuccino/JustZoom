@@ -52,13 +52,13 @@
   "justzoom.options.spyglass_overlay.only_spyglass": "Только подзорная труба",
   "justzoom.options.spyglass_overlay.only_keybind_zoom": "Только клавиша зума",
   "justzoom.options.spyglass_overlay.spyglass_and_keybind_zoom": "Подзорная труба и клавиша зума",
-  "justzoom.options.spyglass_overlay.disabled": "Выключено",
+  "justzoom.options.spyglass_overlay.never": "Никогда",
   "justzoom.options.spyglass_sounds": "Воспроизводить звуки подзорной трубы: %s",
   "justzoom.options.spyglass_sounds.desc": "Определяет, когда воспроизводятся звуки подзорной трубы.",
   "justzoom.options.spyglass_sounds.only_spyglass": "Только подзорная труба",
   "justzoom.options.spyglass_sounds.only_keybind_zoom": "Только клавиша зума",
   "justzoom.options.spyglass_sounds.spyglass_and_keybind_zoom": "Подзорная труба и клавиша зума",
-  "justzoom.options.spyglass_sounds.disabled": "Выключено",
+  "justzoom.options.spyglass_sounds.never": "Никогда",
   "justzoom.options.toggle.enabled": "Включено",
   "justzoom.options.toggle.disabled": "Выключено"
 }

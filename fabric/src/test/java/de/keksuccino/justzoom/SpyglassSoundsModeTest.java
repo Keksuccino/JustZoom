@@ -12,8 +12,8 @@ class SpyglassSoundsModeTest {
     void cyclesThroughEveryModeInDisplayOrder() {
         assertSame(SpyglassSoundsMode.ONLY_KEYBIND_ZOOM, SpyglassSoundsMode.ONLY_SPYGLASS.next());
         assertSame(SpyglassSoundsMode.SPYGLASS_AND_KEYBIND_ZOOM, SpyglassSoundsMode.ONLY_KEYBIND_ZOOM.next());
-        assertSame(SpyglassSoundsMode.DISABLED, SpyglassSoundsMode.SPYGLASS_AND_KEYBIND_ZOOM.next());
-        assertSame(SpyglassSoundsMode.ONLY_SPYGLASS, SpyglassSoundsMode.DISABLED.next());
+        assertSame(SpyglassSoundsMode.NEVER, SpyglassSoundsMode.SPYGLASS_AND_KEYBIND_ZOOM.next());
+        assertSame(SpyglassSoundsMode.ONLY_SPYGLASS, SpyglassSoundsMode.NEVER.next());
     }
 
     @Test
@@ -35,9 +35,9 @@ class SpyglassSoundsModeTest {
     }
 
     @Test
-    void disabledModeIgnoresBothInputs() {
-        assertFalse(SpyglassSoundsMode.DISABLED.shouldPlayForSpyglass());
-        assertFalse(SpyglassSoundsMode.DISABLED.shouldPlayForKeybindZoom());
+    void neverModeIgnoresBothInputs() {
+        assertFalse(SpyglassSoundsMode.NEVER.shouldPlayForSpyglass());
+        assertFalse(SpyglassSoundsMode.NEVER.shouldPlayForKeybindZoom());
     }
 
 }

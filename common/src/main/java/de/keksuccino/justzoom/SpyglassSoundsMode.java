@@ -11,8 +11,8 @@ public enum SpyglassSoundsMode {
     ONLY_KEYBIND_ZOOM("justzoom.options.spyglass_sounds.only_keybind_zoom", false, true),
     @SerializedName("spyglass_and_keybind_zoom")
     SPYGLASS_AND_KEYBIND_ZOOM("justzoom.options.spyglass_sounds.spyglass_and_keybind_zoom", true, true),
-    @SerializedName("disabled")
-    DISABLED("justzoom.options.spyglass_sounds.disabled", false, false);
+    @SerializedName("never")
+    NEVER("justzoom.options.spyglass_sounds.never", false, false);
 
     private static final SpyglassSoundsMode[] VALUES = values();
 

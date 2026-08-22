@@ -54,7 +54,7 @@ public class OptionsScreen extends Screen {
     protected static final int BUTTON_HEIGHT = 20;
     protected static final int BUTTON_ROW_MAX_WIDTH = 360;
     protected static final int CYCLE_VALUE_COLOR = 0xFFAA00;
-    protected static final int DISABLED_CYCLE_VALUE_COLOR = 0xFF5555;
+    protected static final int NEVER_CYCLE_VALUE_COLOR = 0xFF5555;
     protected static final int CONTROL_GAP = 5;
     protected static final int FLOAT_INPUT_GAP = 5;
     protected static final int FLOAT_INPUT_MIN_WIDTH = 40;
@@ -337,7 +337,7 @@ public class OptionsScreen extends Screen {
     }
 
     static int showHudValueColor(@NotNull ShowHudMode mode) {
-        return spyglassCycleValueColor(mode == ShowHudMode.NEVER);
+        return cycleValueColor(mode == ShowHudMode.NEVER);
     }
 
     @NotNull
@@ -347,7 +347,7 @@ public class OptionsScreen extends Screen {
     }
 
     static int spyglassOverlayValueColor(@NotNull SpyglassOverlayMode mode) {
-        return spyglassCycleValueColor(mode == SpyglassOverlayMode.DISABLED);
+        return cycleValueColor(mode == SpyglassOverlayMode.NEVER);
     }
 
     @NotNull
@@ -357,11 +357,11 @@ public class OptionsScreen extends Screen {
     }
 
     static int spyglassSoundsValueColor(@NotNull SpyglassSoundsMode mode) {
-        return spyglassCycleValueColor(mode == SpyglassSoundsMode.DISABLED);
+        return cycleValueColor(mode == SpyglassSoundsMode.NEVER);
     }
 
-    private static int spyglassCycleValueColor(boolean disabled) {
-        return disabled ? DISABLED_CYCLE_VALUE_COLOR : CYCLE_VALUE_COLOR;
+    private static int cycleValueColor(boolean neverSelected) {
+        return neverSelected ? NEVER_CYCLE_VALUE_COLOR : CYCLE_VALUE_COLOR;
     }
 
     @NotNull

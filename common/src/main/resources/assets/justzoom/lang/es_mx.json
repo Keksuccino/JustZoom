@@ -52,13 +52,13 @@
   "justzoom.options.spyglass_overlay.only_spyglass": "Solo Catalejo",
   "justzoom.options.spyglass_overlay.only_keybind_zoom": "Solo Tecla de Zoom",
   "justzoom.options.spyglass_overlay.spyglass_and_keybind_zoom": "Catalejo y Tecla de Zoom",
-  "justzoom.options.spyglass_overlay.disabled": "Desactivado",
+  "justzoom.options.spyglass_overlay.never": "Nunca",
   "justzoom.options.spyglass_sounds": "Reproducir sonidos del catalejo: %s",
   "justzoom.options.spyglass_sounds.desc": "Controla cuándo se reproducen los sonidos del catalejo.",
   "justzoom.options.spyglass_sounds.only_spyglass": "Solo Catalejo",
   "justzoom.options.spyglass_sounds.only_keybind_zoom": "Solo Tecla de Zoom",
   "justzoom.options.spyglass_sounds.spyglass_and_keybind_zoom": "Catalejo y Tecla de Zoom",
-  "justzoom.options.spyglass_sounds.disabled": "Desactivado",
+  "justzoom.options.spyglass_sounds.never": "Nunca",
   "justzoom.options.toggle.enabled": "Activado",
   "justzoom.options.toggle.disabled": "Desactivado"
 }

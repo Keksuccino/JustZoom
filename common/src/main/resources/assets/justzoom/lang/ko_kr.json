@@ -52,13 +52,13 @@
   "justzoom.options.spyglass_overlay.only_spyglass": "망원경만",
   "justzoom.options.spyglass_overlay.only_keybind_zoom": "줌 키만",
   "justzoom.options.spyglass_overlay.spyglass_and_keybind_zoom": "망원경 및 줌 키",
-  "justzoom.options.spyglass_overlay.disabled": "비활성화됨",
+  "justzoom.options.spyglass_overlay.never": "표시 안 함",
   "justzoom.options.spyglass_sounds": "망원경 소리 재생: %s",
   "justzoom.options.spyglass_sounds.desc": "망원경 소리가 재생되는 시기를 설정합니다.",
   "justzoom.options.spyglass_sounds.only_spyglass": "망원경만",
   "justzoom.options.spyglass_sounds.only_keybind_zoom": "줌 키만",
   "justzoom.options.spyglass_sounds.spyglass_and_keybind_zoom": "망원경 및 줌 키",
-  "justzoom.options.spyglass_sounds.disabled": "비활성화됨",
+  "justzoom.options.spyglass_sounds.never": "재생 안 함",
   "justzoom.options.toggle.enabled": "활성화됨",
   "justzoom.options.toggle.disabled": "비활성화됨"
 }

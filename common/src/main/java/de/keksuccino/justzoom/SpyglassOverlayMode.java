@@ -11,8 +11,8 @@ public enum SpyglassOverlayMode {
     ONLY_KEYBIND_ZOOM("justzoom.options.spyglass_overlay.only_keybind_zoom", false, true),
     @SerializedName("spyglass_and_keybind_zoom")
     SPYGLASS_AND_KEYBIND_ZOOM("justzoom.options.spyglass_overlay.spyglass_and_keybind_zoom", true, true),
-    @SerializedName("disabled")
-    DISABLED("justzoom.options.spyglass_overlay.disabled", false, false);
+    @SerializedName("never")
+    NEVER("justzoom.options.spyglass_overlay.never", false, false);
 
     private static final SpyglassOverlayMode[] VALUES = values();
 

@@ -12,8 +12,8 @@ class SpyglassOverlayModeTest {
     void cyclesThroughEveryModeInDisplayOrder() {
         assertSame(SpyglassOverlayMode.ONLY_KEYBIND_ZOOM, SpyglassOverlayMode.ONLY_SPYGLASS.next());
         assertSame(SpyglassOverlayMode.SPYGLASS_AND_KEYBIND_ZOOM, SpyglassOverlayMode.ONLY_KEYBIND_ZOOM.next());
-        assertSame(SpyglassOverlayMode.DISABLED, SpyglassOverlayMode.SPYGLASS_AND_KEYBIND_ZOOM.next());
-        assertSame(SpyglassOverlayMode.ONLY_SPYGLASS, SpyglassOverlayMode.DISABLED.next());
+        assertSame(SpyglassOverlayMode.NEVER, SpyglassOverlayMode.SPYGLASS_AND_KEYBIND_ZOOM.next());
+        assertSame(SpyglassOverlayMode.ONLY_SPYGLASS, SpyglassOverlayMode.NEVER.next());
     }
 
     @Test
@@ -36,10 +36,10 @@ class SpyglassOverlayModeTest {
     }
 
     @Test
-    void disabledModeIgnoresBothInputs() {
-        assertFalse(SpyglassOverlayMode.DISABLED.shouldShow(true, false));
-        assertFalse(SpyglassOverlayMode.DISABLED.shouldShow(false, true));
-        assertFalse(SpyglassOverlayMode.DISABLED.shouldShow(true, true));
+    void neverModeIgnoresBothInputs() {
+        assertFalse(SpyglassOverlayMode.NEVER.shouldShow(true, false));
+        assertFalse(SpyglassOverlayMode.NEVER.shouldShow(false, true));
+        assertFalse(SpyglassOverlayMode.NEVER.shouldShow(true, true));
     }
 
 }

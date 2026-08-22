@@ -52,13 +52,13 @@
   "justzoom.options.spyglass_overlay.only_spyglass": "Only Spyglass",
   "justzoom.options.spyglass_overlay.only_keybind_zoom": "Only Keybind Zoom",
   "justzoom.options.spyglass_overlay.spyglass_and_keybind_zoom": "Spyglass & Keybind Zoom",
-  "justzoom.options.spyglass_overlay.disabled": "Disabled",
+  "justzoom.options.spyglass_overlay.never": "Never",
   "justzoom.options.spyglass_sounds": "Play Spyglass Sounds: %s",
   "justzoom.options.spyglass_sounds.desc": "Controls when the spyglass sounds are played.",
   "justzoom.options.spyglass_sounds.only_spyglass": "Only Spyglass",
   "justzoom.options.spyglass_sounds.only_keybind_zoom": "Only Keybind Zoom",
   "justzoom.options.spyglass_sounds.spyglass_and_keybind_zoom": "Spyglass & Keybind Zoom",
-  "justzoom.options.spyglass_sounds.disabled": "Disabled",
+  "justzoom.options.spyglass_sounds.never": "Never",
   "justzoom.options.toggle.enabled": "Enabled",
   "justzoom.options.toggle.disabled": "Disabled"
 }
