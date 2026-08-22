@@ -87,6 +87,7 @@ public class OptionsScreen extends Screen {
     private final List<Button> optionButtons = new ArrayList<>();
     private final List<FloatInputControl> floatInputControls = new ArrayList<>();
     private final List<AnimationSpeedSlider> animationSpeedSliders = new ArrayList<>();
+    private final List<SmoothZoomScrollSpeedSlider> smoothZoomScrollSpeedSliders = new ArrayList<>();
     private final List<ZoomFactorSlider> zoomFactorSliders = new ArrayList<>();
     private final List<OptionControl> optionControls = new ArrayList<>();
     private final List<KeybindControl> keybindControls = new ArrayList<>();
@@ -104,6 +105,7 @@ public class OptionsScreen extends Screen {
         this.optionButtons.clear();
         this.floatInputControls.clear();
         this.animationSpeedSliders.clear();
+        this.smoothZoomScrollSpeedSliders.clear();
         this.zoomFactorSliders.clear();
         this.optionControls.clear();
         this.keybindControls.clear();
@@ -157,6 +159,7 @@ public class OptionsScreen extends Screen {
         this.addFloatInput(tab, JustZoom.getOptions().scrollMagnificationMultiplier, "justzoom.options.scroll_magnification_multiplier");
         this.addAnimationSpeedSlider(tab, JustZoom.getOptions().startZoomingAnimationSpeed, "justzoom.options.start_zooming_animation_speed");
         this.addAnimationSpeedSlider(tab, JustZoom.getOptions().stopZoomingAnimationSpeed, "justzoom.options.stop_zooming_animation_speed");
+        this.addSmoothZoomScrollSpeedSlider(tab, JustZoom.getOptions().smoothZoomScrollSpeed, "justzoom.options.smooth_zoom_scroll_speed");
         return tab;
     }
 
@@ -202,6 +205,14 @@ public class OptionsScreen extends Screen {
         AnimationSpeedSlider slider = new AnimationSpeedSlider(option, labelBaseKey, this.getButtonWidth());
         Button resetButton = this.buildResetButton(option, slider::getMessage, slider::refreshFromOption);
         this.animationSpeedSliders.add(slider);
+        this.optionControls.add(new OptionControl(() -> isOptionDefault(option), resetButton));
+        tab.addChild(this.buildControlRowLayout(slider, resetButton));
+    }
+
+    protected void addSmoothZoomScrollSpeedSlider(@NotNull OptionsTab tab, @NotNull ConfigValue<Float> option, @NotNull String labelBaseKey) {
+        SmoothZoomScrollSpeedSlider slider = new SmoothZoomScrollSpeedSlider(option, labelBaseKey, this.getButtonWidth());
+        Button resetButton = this.buildResetButton(option, slider::getMessage, slider::refreshFromOption);
+        this.smoothZoomScrollSpeedSliders.add(slider);
         this.optionControls.add(new OptionControl(() -> isOptionDefault(option), resetButton));
         tab.addChild(this.buildControlRowLayout(slider, resetButton));
     }
@@ -292,6 +303,9 @@ public class OptionsScreen extends Screen {
             button.setWidth(controlWidth);
         }
         for (AnimationSpeedSlider slider : this.animationSpeedSliders) {
+            slider.setWidth(controlWidth);
+        }
+        for (SmoothZoomScrollSpeedSlider slider : this.smoothZoomScrollSpeedSliders) {
             slider.setWidth(controlWidth);
         }
         for (ZoomFactorSlider slider : this.zoomFactorSliders) {
@@ -440,6 +454,36 @@ public class OptionsScreen extends Screen {
         int step = Math.round((normalizedSpeed - Options.MIN_ANIMATION_SPEED) * Options.ANIMATION_SPEED_STEPS_PER_SECOND);
         int stepCount = Math.round((Options.MAX_ANIMATION_SPEED - Options.MIN_ANIMATION_SPEED) * Options.ANIMATION_SPEED_STEPS_PER_SECOND);
         return step / (double) stepCount;
+    }
+
+    static float sliderValueToSmoothZoomScrollSpeed(double sliderValue) {
+        double fallback = smoothZoomScrollSpeedToSliderValue(Options.DEFAULT_SMOOTH_ZOOM_SCROLL_SPEED, Options.DEFAULT_SMOOTH_ZOOM_SCROLL_SPEED);
+        double safeSliderValue = Double.isFinite(sliderValue) ? sliderValue : fallback;
+        double clampedSliderValue = Math.max(0.0D, Math.min(1.0D, safeSliderValue));
+        int minimumStep = Math.round(Options.MIN_SMOOTH_ZOOM_SCROLL_SPEED * Options.SMOOTH_ZOOM_SCROLL_SPEED_STEPS_PER_MULTIPLIER);
+        int maximumStep = Math.round(Options.MAX_SMOOTH_ZOOM_SCROLL_SPEED * Options.SMOOTH_ZOOM_SCROLL_SPEED_STEPS_PER_MULTIPLIER);
+        int step = minimumStep + (int) Math.round(clampedSliderValue * (maximumStep - minimumStep));
+        return step / (float) Options.SMOOTH_ZOOM_SCROLL_SPEED_STEPS_PER_MULTIPLIER;
+    }
+
+    static double smoothZoomScrollSpeedToSliderValue(float speedMultiplier, float fallback) {
+        float normalizedSpeed = Options.normalizeSmoothZoomScrollSpeed(speedMultiplier, fallback);
+        int minimumStep = Math.round(Options.MIN_SMOOTH_ZOOM_SCROLL_SPEED * Options.SMOOTH_ZOOM_SCROLL_SPEED_STEPS_PER_MULTIPLIER);
+        int maximumStep = Math.round(Options.MAX_SMOOTH_ZOOM_SCROLL_SPEED * Options.SMOOTH_ZOOM_SCROLL_SPEED_STEPS_PER_MULTIPLIER);
+        int step = Math.round(normalizedSpeed * Options.SMOOTH_ZOOM_SCROLL_SPEED_STEPS_PER_MULTIPLIER);
+        return (step - minimumStep) / (double) (maximumStep - minimumStep);
+    }
+
+    static double snapSmoothZoomScrollSpeedSliderValue(double sliderValue) {
+        float speedMultiplier = sliderValueToSmoothZoomScrollSpeed(sliderValue);
+        return smoothZoomScrollSpeedToSliderValue(speedMultiplier, Options.DEFAULT_SMOOTH_ZOOM_SCROLL_SPEED);
+    }
+
+    @NotNull
+    static String formatSmoothZoomScrollSpeed(float speedMultiplier) {
+        float normalizedSpeed = Options.normalizeSmoothZoomScrollSpeed(speedMultiplier, Options.DEFAULT_SMOOTH_ZOOM_SCROLL_SPEED);
+        String formattedSpeed = String.format(Locale.ROOT, "%.2f", normalizedSpeed);
+        return formattedSpeed.endsWith("0") ? formattedSpeed.substring(0, formattedSpeed.length() - 1) : formattedSpeed;
     }
 
     static int sliderValueToZoomFactorPercentage(double sliderValue) {
@@ -701,6 +745,54 @@ public class OptionsScreen extends Screen {
 
         protected void refreshFromOption() {
             this.value = animationSpeedToSliderValue(this.option.getValue(), this.option.getDefaultValue());
+            this.updateMessage();
+        }
+
+    }
+
+    protected class SmoothZoomScrollSpeedSlider extends AbstractSliderButton {
+
+        private final ConfigValue<Float> option;
+        private final String labelBaseKey;
+
+        protected SmoothZoomScrollSpeedSlider(@NotNull ConfigValue<Float> option, @NotNull String labelBaseKey, int width) {
+            super(0, 0, width, BUTTON_HEIGHT, CommonComponents.EMPTY, smoothZoomScrollSpeedToSliderValue(option.getValue(), option.getDefaultValue()));
+            this.option = option;
+            this.labelBaseKey = labelBaseKey;
+            this.setTooltip(Tooltip.create(Component.translatable(labelBaseKey + ".desc")));
+            this.updateMessage();
+        }
+
+        @Override
+        protected void updateMessage() {
+            String speedMultiplier = formatSmoothZoomScrollSpeed(sliderValueToSmoothZoomScrollSpeed(this.value));
+            this.setMessage(Component.translatable(this.labelBaseKey, Component.literal("x" + speedMultiplier)));
+        }
+
+        @Override
+        protected void setValue(double newValue) {
+            super.setValue(snapSmoothZoomScrollSpeedSliderValue(newValue));
+        }
+
+        @Override
+        protected void applyValue() {
+            float speedMultiplier = sliderValueToSmoothZoomScrollSpeed(this.value);
+            if (Float.compare(this.option.getValue(), speedMultiplier) != 0) {
+                this.option.setValue(speedMultiplier);
+            }
+            OptionsScreen.this.updateOptionResetButtons();
+        }
+
+        @Override
+        public boolean keyPressed(@NotNull KeyEvent event) {
+            if (!this.canChangeValue || !event.isLeft() && !event.isRight()) return super.keyPressed(event);
+            double sliderStep = Options.SMOOTH_ZOOM_SCROLL_SPEED_STEP / (Options.MAX_SMOOTH_ZOOM_SCROLL_SPEED - Options.MIN_SMOOTH_ZOOM_SCROLL_SPEED);
+            this.setValue(this.value + (event.isLeft() ? -sliderStep : sliderStep));
+            return true;
+        }
+
+        protected void refreshFromOption() {
+            this.value = smoothZoomScrollSpeedToSliderValue(this.option.getValue(), this.option.getDefaultValue());
             this.updateMessage();
         }
 

@@ -26,6 +26,8 @@
   "justzoom.options.start_zooming_animation_speed.desc": "Время в секундах, за которое выполняется анимация при начале зума.\n0,00 секунды делает анимацию мгновенной.",
   "justzoom.options.stop_zooming_animation_speed": "Длительность анимации остановки зума: %s",
   "justzoom.options.stop_zooming_animation_speed.desc": "Время в секундах, за которое выполняется анимация при остановке зума.\n0,00 секунды делает анимацию мгновенной.",
+  "justzoom.options.smooth_zoom_scroll_speed": "Скорость плавного зума при прокрутке: %s",
+  "justzoom.options.smooth_zoom_scroll_speed.desc": "Определяет скорость реакции плавного зума на настройку колесом мыши.\nЧем выше множитель, тем быстрее достигается выбранный уровень зума.",
   "justzoom.options.maximum_zoom_factor": "Максимальный зум: %s",
   "justzoom.options.maximum_zoom_factor.desc": "Ограничивает максимальное приближение Just Zoom.\n0 % полностью запрещает приближение; 100 % разрешает полный диапазон.\nПеремещайте ползунок, чтобы в реальном времени увидеть предел в мире.",
   "justzoom.options.seconds": "%s с",

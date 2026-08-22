@@ -26,6 +26,8 @@
   "justzoom.options.start_zooming_animation_speed.desc": "The time, in seconds, the animation takes when starting to zoom.\n0.00 seconds makes the animation instant.",
   "justzoom.options.stop_zooming_animation_speed": "Stop Zooming Animation Duration: %s",
   "justzoom.options.stop_zooming_animation_speed.desc": "The time, in seconds, the animation takes when stopping zoom.\n0.00 seconds makes the animation instant.",
+  "justzoom.options.smooth_zoom_scroll_speed": "Smooth Zoom Scroll Speed: %s",
+  "justzoom.options.smooth_zoom_scroll_speed.desc": "Controls how quickly smooth zooming reacts to mouse-wheel zoom adjustments.\nHigher multipliers make the zoom factor reach the selected level faster.",
   "justzoom.options.maximum_zoom_factor": "Maximum Zoom: %s",
   "justzoom.options.maximum_zoom_factor.desc": "Limits how far Just Zoom can zoom in.\n0% prevents zoom completely; 100% allows the full range.\nMove the slider to preview the limit live in the world.",
   "justzoom.options.seconds": "%s s",

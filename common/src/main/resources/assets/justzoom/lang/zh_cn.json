@@ -26,6 +26,8 @@
   "justzoom.options.start_zooming_animation_speed.desc": "开始缩放动画所需的时间（以秒为单位）。\n设为0.00秒时将立即完成动画。",
   "justzoom.options.stop_zooming_animation_speed": "停止缩放动画时长：%s",
   "justzoom.options.stop_zooming_animation_speed.desc": "停止缩放动画所需的时间（以秒为单位）。\n设为0.00秒时将立即完成动画。",
+  "justzoom.options.smooth_zoom_scroll_speed": "平滑缩放滚动速度：%s",
+  "justzoom.options.smooth_zoom_scroll_speed.desc": "控制平滑缩放响应鼠标滚轮调整的速度。\n倍率越高，缩放越快达到所选级别。",
   "justzoom.options.maximum_zoom_factor": "最大缩放：%s",
   "justzoom.options.maximum_zoom_factor.desc": "限制 Just Zoom 能够放大的最大程度。\n0% 会完全禁止放大；100% 允许使用完整范围。\n移动滑块即可在世界中实时预览上限。",
   "justzoom.options.seconds": "%s秒",

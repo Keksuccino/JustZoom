@@ -84,7 +84,7 @@ public class ZoomHandler {
         if (!zooming && options.resetZoomFactorOnStopZooming.getValue()) {
             getZoomLevelState().resetTargetMagnification();
         }
-        getZoomLevelState().tick(zooming, options.smoothZoomInOut.getValue(), options.startZoomingAnimationSpeed.getValue(), options.stopZoomingAnimationSpeed.getValue(), getConfiguredMaximumMagnification(cachedNormalFov));
+        getZoomLevelState().tick(zooming, options.smoothZoomInOut.getValue(), options.smoothZoomScrollSpeed.getValue(), options.startZoomingAnimationSpeed.getValue(), options.stopZoomingAnimationSpeed.getValue(), getConfiguredMaximumMagnification(cachedNormalFov));
     }
 
     public static void onInputTick() {

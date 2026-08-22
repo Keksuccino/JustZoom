@@ -67,7 +67,7 @@ final class ZoomLevelState {
         this.usingBaseMagnification = true;
     }
 
-    void tick(boolean zooming, boolean smooth, float startZoomingAnimationSpeed, float stopZoomingAnimationSpeed, double maximumMagnification) {
+    void tick(boolean zooming, boolean smooth, float smoothZoomScrollSpeed, float startZoomingAnimationSpeed, float stopZoomingAnimationSpeed, double maximumMagnification) {
         this.updateToggleTransition(zooming, smooth, startZoomingAnimationSpeed, stopZoomingAnimationSpeed);
         this.previousSmoothedActiveMagnification = normalize(this.smoothedActiveMagnification, this.getTargetMagnification(maximumMagnification), maximumMagnification);
         if (!smooth) {
@@ -79,8 +79,10 @@ final class ZoomLevelState {
         double activeTarget = this.getTargetMagnification(maximumMagnification);
         this.smoothedActiveMagnification = normalize(this.smoothedActiveMagnification, activeTarget, maximumMagnification);
         if (zooming) {
-            // Only wheel-driven target changes use the deliberately slower magnification follower.
-            this.smoothedActiveMagnification = ZoomMath.moveMagnificationTowards(this.smoothedActiveMagnification, activeTarget, WHEEL_MAGNIFICATION_CHANGE_PER_TICK);
+            // Magnification is followed in logarithmic space, so exponentiating the legacy rate scales its speed while x1.0 keeps the original behavior.
+            float normalizedScrollSpeed = Options.normalizeSmoothZoomScrollSpeed(smoothZoomScrollSpeed, Options.DEFAULT_SMOOTH_ZOOM_SCROLL_SPEED);
+            double changeMultiplier = Math.pow(WHEEL_MAGNIFICATION_CHANGE_PER_TICK, normalizedScrollSpeed);
+            this.smoothedActiveMagnification = ZoomMath.moveMagnificationTowards(this.smoothedActiveMagnification, activeTarget, changeMultiplier);
         }
 
         this.preloadActiveMagnificationIfInactive(zooming, maximumMagnification);

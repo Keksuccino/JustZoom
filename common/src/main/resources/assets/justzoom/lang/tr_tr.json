@@ -26,6 +26,8 @@
   "justzoom.options.start_zooming_animation_speed.desc": "Yakınlaştırmayı başlatma animasyonunun saniye cinsinden süresi.\n0.00 saniye animasyonu anlık yapar.",
   "justzoom.options.stop_zooming_animation_speed": "Yakınlaştırmayı Durdurma Animasyon Süresi: %s",
   "justzoom.options.stop_zooming_animation_speed.desc": "Yakınlaştırmayı durdurma animasyonunun saniye cinsinden süresi.\n0.00 saniye animasyonu anlık yapar.",
+  "justzoom.options.smooth_zoom_scroll_speed": "Yumuşak Yakınlaştırma Kaydırma Hızı: %s",
+  "justzoom.options.smooth_zoom_scroll_speed.desc": "Yumuşak yakınlaştırmanın fare tekerleği ayarlamalarına ne kadar hızlı tepki verdiğini belirler.\nDaha yüksek çarpanlar seçilen yakınlaştırma seviyesine daha hızlı ulaşır.",
   "justzoom.options.maximum_zoom_factor": "Maksimum Yakınlaştırma: %s",
   "justzoom.options.maximum_zoom_factor.desc": "Just Zoom'un ne kadar yakınlaştırabileceğini sınırlar.\n%0 yakınlaştırmayı tamamen engeller; %100 tam aralığa izin verir.\nDünyadaki sınırı canlı olarak önizlemek için kaydırıcıyı hareket ettirin.",
   "justzoom.options.seconds": "%s sn",

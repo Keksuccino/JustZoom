@@ -146,6 +146,40 @@ class OptionsScreenTest {
     }
 
     @Test
+    void smoothZoomScrollSpeedSliderUsesTheCompleteRangeInPointZeroOneSteps() {
+        double sliderStep = 1.0D / 999.0D;
+
+        assertEquals(0.01F, OptionsScreen.sliderValueToSmoothZoomScrollSpeed(-1.0D));
+        assertEquals(0.01F, OptionsScreen.sliderValueToSmoothZoomScrollSpeed(0.0D));
+        assertEquals(0.02F, OptionsScreen.sliderValueToSmoothZoomScrollSpeed(sliderStep));
+        assertEquals(1.0F, OptionsScreen.sliderValueToSmoothZoomScrollSpeed(99.0D / 999.0D));
+        assertEquals(10.0F, OptionsScreen.sliderValueToSmoothZoomScrollSpeed(1.0D));
+        assertEquals(10.0F, OptionsScreen.sliderValueToSmoothZoomScrollSpeed(2.0D));
+        assertEquals(Options.DEFAULT_SMOOTH_ZOOM_SCROLL_SPEED, OptionsScreen.sliderValueToSmoothZoomScrollSpeed(Double.NaN));
+    }
+
+    @Test
+    void smoothZoomScrollSpeedSliderSnapsContinuousInputAndNormalizesStoredValues() {
+        double sliderStep = 1.0D / 999.0D;
+
+        assertEquals(0.0D, OptionsScreen.smoothZoomScrollSpeedToSliderValue(-1.0F, 1.0F));
+        assertEquals(99.0D / 999.0D, OptionsScreen.smoothZoomScrollSpeedToSliderValue(1.0F, 1.0F), 0.000000001D);
+        assertEquals(1.0D, OptionsScreen.smoothZoomScrollSpeedToSliderValue(11.0F, 1.0F));
+        assertEquals(99.0D / 999.0D, OptionsScreen.smoothZoomScrollSpeedToSliderValue(Float.NaN, 1.0F), 0.000000001D);
+        assertEquals(sliderStep, OptionsScreen.snapSmoothZoomScrollSpeedSliderValue(sliderStep * 1.4D), 0.000000001D);
+        assertEquals(sliderStep * 2.0D, OptionsScreen.snapSmoothZoomScrollSpeedSliderValue(sliderStep * 1.5D), 0.000000001D);
+    }
+
+    @Test
+    void smoothZoomScrollSpeedUsesTimesNotationWithoutUnnecessaryHundredths() {
+        assertEquals("0.01", OptionsScreen.formatSmoothZoomScrollSpeed(0.01F));
+        assertEquals("1.0", OptionsScreen.formatSmoothZoomScrollSpeed(1.0F));
+        assertEquals("1.5", OptionsScreen.formatSmoothZoomScrollSpeed(1.5F));
+        assertEquals("1.23", OptionsScreen.formatSmoothZoomScrollSpeed(1.23F));
+        assertEquals("10.0", OptionsScreen.formatSmoothZoomScrollSpeed(10.0F));
+    }
+
+    @Test
     void zoomFactorSlidersUseWholePercentageStepsAcrossTheCompleteRange() {
         assertEquals(0, OptionsScreen.sliderValueToZoomFactorPercentage(-1.0D));
         assertEquals(0, OptionsScreen.sliderValueToZoomFactorPercentage(0.0D));
