@@ -19,5 +19,6 @@ CHANGELOG | JUST ZOOM v3.0.0 [ W I P !!! NOT PUBLIC YET !!! ]
 - Added setting to adjust the maximum zoom factor (how far you can zoom in) (#5)
 - Fixed max zoom level is capped to the spyglass zoom level when smooth zooming is enabled
 - Fixed mod creating config folders in the system root when loaded server-side (#46)
+- Fixed "Hide Hand" setting not working when Iris shaders are enabled (#42)
 
 
