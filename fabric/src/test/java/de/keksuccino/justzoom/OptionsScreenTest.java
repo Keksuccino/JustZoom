@@ -101,25 +101,25 @@ class OptionsScreenTest {
     void generalOptionResetStateTracksWhetherTheValueDiffersFromItsDefault() {
         Options options = new Options(this.temporaryDirectory.resolve("options.json").toFile());
 
-        assertTrue(OptionsScreen.isOptionDefault(options.baseMagnification));
+        assertTrue(OptionsScreen.isOptionDefault(options.baseZoomFactor));
 
-        options.baseMagnification.setValue(8.0F);
-        assertFalse(OptionsScreen.isOptionDefault(options.baseMagnification));
+        options.baseZoomFactor.setValue(50);
+        assertFalse(OptionsScreen.isOptionDefault(options.baseZoomFactor));
 
-        options.baseMagnification.resetToDefault();
-        assertTrue(OptionsScreen.isOptionDefault(options.baseMagnification));
+        options.baseZoomFactor.resetToDefault();
+        assertTrue(OptionsScreen.isOptionDefault(options.baseZoomFactor));
     }
 
     @Test
     void floatInputResetStateTreatsEquivalentTextAsDefaultAndInvalidTextAsChanged() {
         Options options = new Options(this.temporaryDirectory.resolve("float-input-options.json").toFile());
 
-        assertTrue(OptionsScreen.isFloatInputDefault(options.baseMagnification, "4.0"));
-        assertTrue(OptionsScreen.isFloatInputDefault(options.baseMagnification, "4"));
-        assertFalse(OptionsScreen.isFloatInputDefault(options.baseMagnification, "invalid"));
+        assertTrue(OptionsScreen.isFloatInputDefault(options.scrollMagnificationMultiplier, "1.5"));
+        assertTrue(OptionsScreen.isFloatInputDefault(options.scrollMagnificationMultiplier, "1.50"));
+        assertFalse(OptionsScreen.isFloatInputDefault(options.scrollMagnificationMultiplier, "invalid"));
 
-        options.baseMagnification.setValue(8.0F);
-        assertFalse(OptionsScreen.isFloatInputDefault(options.baseMagnification, "4.0"));
+        options.scrollMagnificationMultiplier.setValue(2.0F);
+        assertFalse(OptionsScreen.isFloatInputDefault(options.scrollMagnificationMultiplier, "1.5"));
     }
 
     @Test
@@ -146,56 +146,56 @@ class OptionsScreenTest {
     }
 
     @Test
-    void maximumZoomFactorSliderUsesWholePercentageStepsAcrossTheCompleteRange() {
-        assertEquals(0, OptionsScreen.sliderValueToMaximumZoomFactorPercentage(-1.0D));
-        assertEquals(0, OptionsScreen.sliderValueToMaximumZoomFactorPercentage(0.0D));
-        assertEquals(0, OptionsScreen.sliderValueToMaximumZoomFactorPercentage(0.0049D));
-        assertEquals(1, OptionsScreen.sliderValueToMaximumZoomFactorPercentage(0.005D));
-        assertEquals(1, OptionsScreen.sliderValueToMaximumZoomFactorPercentage(0.01D));
-        assertEquals(1, OptionsScreen.sliderValueToMaximumZoomFactorPercentage(0.0149D));
-        assertEquals(2, OptionsScreen.sliderValueToMaximumZoomFactorPercentage(0.015D));
-        assertEquals(43, OptionsScreen.sliderValueToMaximumZoomFactorPercentage(0.43D));
-        assertEquals(100, OptionsScreen.sliderValueToMaximumZoomFactorPercentage(1.0D));
-        assertEquals(100, OptionsScreen.sliderValueToMaximumZoomFactorPercentage(2.0D));
-        assertEquals(100, OptionsScreen.sliderValueToMaximumZoomFactorPercentage(Double.NaN));
+    void zoomFactorSlidersUseWholePercentageStepsAcrossTheCompleteRange() {
+        assertEquals(0, OptionsScreen.sliderValueToZoomFactorPercentage(-1.0D));
+        assertEquals(0, OptionsScreen.sliderValueToZoomFactorPercentage(0.0D));
+        assertEquals(0, OptionsScreen.sliderValueToZoomFactorPercentage(0.0049D));
+        assertEquals(1, OptionsScreen.sliderValueToZoomFactorPercentage(0.005D));
+        assertEquals(1, OptionsScreen.sliderValueToZoomFactorPercentage(0.01D));
+        assertEquals(1, OptionsScreen.sliderValueToZoomFactorPercentage(0.0149D));
+        assertEquals(2, OptionsScreen.sliderValueToZoomFactorPercentage(0.015D));
+        assertEquals(43, OptionsScreen.sliderValueToZoomFactorPercentage(0.43D));
+        assertEquals(100, OptionsScreen.sliderValueToZoomFactorPercentage(1.0D));
+        assertEquals(100, OptionsScreen.sliderValueToZoomFactorPercentage(2.0D));
+        assertEquals(100, OptionsScreen.sliderValueToZoomFactorPercentage(Double.NaN));
     }
 
     @Test
-    void maximumZoomFactorSliderSnapsContinuousInputToWholePercentagePositions() {
-        assertEquals(0.0D, OptionsScreen.snapMaximumZoomFactorSliderValue(0.0049D));
-        assertEquals(0.01D, OptionsScreen.snapMaximumZoomFactorSliderValue(0.005D));
-        assertEquals(0.01D, OptionsScreen.snapMaximumZoomFactorSliderValue(0.0149D));
-        assertEquals(0.02D, OptionsScreen.snapMaximumZoomFactorSliderValue(0.015D));
-        assertEquals(0.43D, OptionsScreen.snapMaximumZoomFactorSliderValue(0.4321D));
-        assertEquals(1.0D, OptionsScreen.snapMaximumZoomFactorSliderValue(Double.NaN));
+    void zoomFactorSlidersSnapContinuousInputToWholePercentagePositions() {
+        assertEquals(0.0D, OptionsScreen.snapZoomFactorSliderValue(0.0049D));
+        assertEquals(0.01D, OptionsScreen.snapZoomFactorSliderValue(0.005D));
+        assertEquals(0.01D, OptionsScreen.snapZoomFactorSliderValue(0.0149D));
+        assertEquals(0.02D, OptionsScreen.snapZoomFactorSliderValue(0.015D));
+        assertEquals(0.43D, OptionsScreen.snapZoomFactorSliderValue(0.4321D));
+        assertEquals(1.0D, OptionsScreen.snapZoomFactorSliderValue(Double.NaN));
     }
 
     @Test
-    void maximumZoomFactorPercentageNormalizesBeforeBecomingASliderValue() {
-        assertEquals(0.0D, OptionsScreen.maximumZoomFactorPercentageToSliderValue(-1));
-        assertEquals(0.43D, OptionsScreen.maximumZoomFactorPercentageToSliderValue(43), 0.000000001D);
-        assertEquals(1.0D, OptionsScreen.maximumZoomFactorPercentageToSliderValue(101));
+    void zoomFactorPercentageNormalizesBeforeBecomingASliderValue() {
+        assertEquals(0.0D, OptionsScreen.zoomFactorPercentageToSliderValue(-1));
+        assertEquals(0.43D, OptionsScreen.zoomFactorPercentageToSliderValue(43), 0.000000001D);
+        assertEquals(1.0D, OptionsScreen.zoomFactorPercentageToSliderValue(101));
     }
 
     @Test
-    void maximumZoomPreviewRequiresAnInWorldSelectedAdvancedTabAndRecentSliderMovement() {
-        assertTrue(OptionsScreen.shouldActivateMaximumZoomPreview(true, true, true));
-        assertFalse(OptionsScreen.shouldActivateMaximumZoomPreview(false, true, true));
-        assertFalse(OptionsScreen.shouldActivateMaximumZoomPreview(true, false, true));
-        assertFalse(OptionsScreen.shouldActivateMaximumZoomPreview(true, true, false));
+    void zoomPreviewRequiresAnInWorldSelectedAdvancedTabAndRecentSliderMovement() {
+        assertTrue(OptionsScreen.shouldActivateZoomPreview(true, true, true));
+        assertFalse(OptionsScreen.shouldActivateZoomPreview(false, true, true));
+        assertFalse(OptionsScreen.shouldActivateZoomPreview(true, false, true));
+        assertFalse(OptionsScreen.shouldActivateZoomPreview(true, true, false));
     }
 
     @Test
-    void maximumZoomPreviewStartsOnMovementAndLingersForOneSecond() {
+    void zoomPreviewStartsOnMovementAndLingersForOneSecond() {
         TestNanoClock clock = new TestNanoClock();
-        OptionsScreen.MaximumZoomPreviewTimer timer = new OptionsScreen.MaximumZoomPreviewTimer(clock);
+        OptionsScreen.ZoomPreviewTimer timer = new OptionsScreen.ZoomPreviewTimer(clock);
 
         assertFalse(timer.isActive());
 
         timer.recordMovement();
         assertTrue(timer.isActive());
 
-        clock.advanceNanos(OptionsScreen.MAXIMUM_ZOOM_PREVIEW_LINGER_NANOS);
+        clock.advanceNanos(OptionsScreen.ZOOM_PREVIEW_LINGER_NANOS);
         assertTrue(timer.isActive());
 
         clock.advanceNanos(1L);
@@ -203,14 +203,14 @@ class OptionsScreenTest {
     }
 
     @Test
-    void maximumZoomPreviewMovementRefreshesTheLingerWindow() {
+    void zoomPreviewMovementRefreshesTheLingerWindow() {
         TestNanoClock clock = new TestNanoClock();
-        OptionsScreen.MaximumZoomPreviewTimer timer = new OptionsScreen.MaximumZoomPreviewTimer(clock);
+        OptionsScreen.ZoomPreviewTimer timer = new OptionsScreen.ZoomPreviewTimer(clock);
         timer.recordMovement();
-        clock.advanceNanos(OptionsScreen.MAXIMUM_ZOOM_PREVIEW_LINGER_NANOS);
+        clock.advanceNanos(OptionsScreen.ZOOM_PREVIEW_LINGER_NANOS);
 
         timer.recordMovement();
-        clock.advanceNanos(OptionsScreen.MAXIMUM_ZOOM_PREVIEW_LINGER_NANOS);
+        clock.advanceNanos(OptionsScreen.ZOOM_PREVIEW_LINGER_NANOS);
 
         assertTrue(timer.isActive());
         clock.advanceNanos(1L);
@@ -218,9 +218,9 @@ class OptionsScreenTest {
     }
 
     @Test
-    void maximumZoomPreviewTimerCanBeResetWhenTheScreenLifecycleRestarts() {
+    void zoomPreviewTimerCanBeResetWhenTheScreenLifecycleRestarts() {
         TestNanoClock clock = new TestNanoClock();
-        OptionsScreen.MaximumZoomPreviewTimer timer = new OptionsScreen.MaximumZoomPreviewTimer(clock);
+        OptionsScreen.ZoomPreviewTimer timer = new OptionsScreen.ZoomPreviewTimer(clock);
         timer.recordMovement();
 
         timer.reset();

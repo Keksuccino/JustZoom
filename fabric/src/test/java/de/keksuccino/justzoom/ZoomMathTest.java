@@ -58,8 +58,8 @@ class ZoomMathTest {
 
     @Test
     void clampsMaximumMagnificationPercentageBeforeScaling() {
-        assertEquals(ZoomMath.MIN_MAGNIFICATION, ZoomMath.calculateMaximumMagnification(70.0F, -1), DOUBLE_TOLERANCE);
-        assertEquals(ZoomMath.calculateMaximumMagnification(70.0F), ZoomMath.calculateMaximumMagnification(70.0F, 101), DOUBLE_TOLERANCE);
+        assertEquals(ZoomMath.MIN_MAGNIFICATION, ZoomMath.calculateMagnification(70.0F, -1), DOUBLE_TOLERANCE);
+        assertEquals(ZoomMath.calculateMaximumMagnification(70.0F), ZoomMath.calculateMagnification(70.0F, 101), DOUBLE_TOLERANCE);
     }
 
     @Test
@@ -109,7 +109,7 @@ class ZoomMathTest {
     }
 
     private static float calculateMaximumZoomedFov(float normalFov, int percentage) {
-        return ZoomMath.calculateZoomedFov(normalFov, ZoomMath.calculateMaximumMagnification(normalFov, percentage));
+        return ZoomMath.calculateZoomedFov(normalFov, ZoomMath.calculateMagnification(normalFov, percentage));
     }
 
 }

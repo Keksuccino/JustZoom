@@ -2,6 +2,7 @@ package de.keksuccino.justzoom;
 
 import org.jetbrains.annotations.NotNull;
 import java.util.Objects;
+import java.util.function.DoubleSupplier;
 import java.util.function.LongSupplier;
 
 final class ZoomLevelState {
@@ -10,31 +11,44 @@ final class ZoomLevelState {
     private static final double NANOSECONDS_PER_SECOND = 1_000_000_000.0D;
 
     private final PersistenceData persistenceData;
+    private final DoubleSupplier baseMagnificationSupplier;
     private final LongSupplier nanoTimeSource;
     private double targetMagnification;
     private double previousSmoothedActiveMagnification;
     private double smoothedActiveMagnification;
     private double toggleTransitionProgress;
     private long lastTransitionUpdateNanos;
+    private boolean usingBaseMagnification;
     private boolean transitionTimeInitialized;
     private boolean transitionDirectionZooming;
 
-    ZoomLevelState(@NotNull PersistenceData persistenceData, float baseMagnification, boolean applyLastMagnification) {
-        this(persistenceData, baseMagnification, applyLastMagnification, System::nanoTime);
+    ZoomLevelState(@NotNull PersistenceData persistenceData, double baseMagnification, boolean applyLastMagnification) {
+        this(persistenceData, () -> baseMagnification, applyLastMagnification, System::nanoTime);
     }
 
-    ZoomLevelState(@NotNull PersistenceData persistenceData, float baseMagnification, boolean applyLastMagnification, @NotNull LongSupplier nanoTimeSource) {
+    ZoomLevelState(@NotNull PersistenceData persistenceData, double baseMagnification, boolean applyLastMagnification, @NotNull LongSupplier nanoTimeSource) {
+        this(persistenceData, () -> baseMagnification, applyLastMagnification, nanoTimeSource);
+    }
+
+    ZoomLevelState(@NotNull PersistenceData persistenceData, @NotNull DoubleSupplier baseMagnificationSupplier, boolean applyLastMagnification) {
+        this(persistenceData, baseMagnificationSupplier, applyLastMagnification, System::nanoTime);
+    }
+
+    ZoomLevelState(@NotNull PersistenceData persistenceData, @NotNull DoubleSupplier baseMagnificationSupplier, boolean applyLastMagnification, @NotNull LongSupplier nanoTimeSource) {
         this.persistenceData = Objects.requireNonNull(persistenceData);
+        this.baseMagnificationSupplier = Objects.requireNonNull(baseMagnificationSupplier);
         this.nanoTimeSource = Objects.requireNonNull(nanoTimeSource);
-        double normalizedBaseMagnification = normalize(baseMagnification, Options.DEFAULT_BASE_MAGNIFICATION, ZoomMath.MAX_MAGNIFICATION);
-        float lastMagnification = persistenceData.lastMagnification.getValueOrDefault((float) normalizedBaseMagnification);
-        this.targetMagnification = normalize(applyLastMagnification ? lastMagnification : normalizedBaseMagnification, normalizedBaseMagnification, ZoomMath.MAX_MAGNIFICATION);
+        double baseMagnification = this.getBaseMagnification(ZoomMath.MAX_MAGNIFICATION);
+        Float lastMagnification = persistenceData.lastMagnification.getValueOrNull();
+        this.usingBaseMagnification = !applyLastMagnification || lastMagnification == null;
+        this.targetMagnification = this.usingBaseMagnification ? baseMagnification : normalize(lastMagnification, baseMagnification, ZoomMath.MAX_MAGNIFICATION);
         this.previousSmoothedActiveMagnification = this.targetMagnification;
         this.smoothedActiveMagnification = this.targetMagnification;
     }
 
     double getTargetMagnification(double maximumMagnification) {
-        return normalize(this.targetMagnification, ZoomMath.MIN_MAGNIFICATION, maximumMagnification);
+        double magnification = this.usingBaseMagnification ? this.getBaseMagnification(maximumMagnification) : this.targetMagnification;
+        return normalize(magnification, ZoomMath.MIN_MAGNIFICATION, maximumMagnification);
     }
 
     double getToggleTransitionProgress() {
@@ -44,12 +58,13 @@ final class ZoomLevelState {
     void adjustMagnification(double scrollDelta, double stepMultiplier, double maximumMagnification) {
         double currentMagnification = this.getTargetMagnification(maximumMagnification);
         this.targetMagnification = ZoomMath.applyScroll(currentMagnification, scrollDelta, stepMultiplier, maximumMagnification);
+        this.usingBaseMagnification = false;
         this.persistenceData.lastMagnification.setValue((float) this.targetMagnification);
     }
 
-    void resetTargetMagnification(float baseMagnification) {
+    void resetTargetMagnification() {
         // Resetting controls the active session only. The persisted magnification must remain available if applying it is enabled later.
-        this.targetMagnification = normalize(baseMagnification, Options.DEFAULT_BASE_MAGNIFICATION, ZoomMath.MAX_MAGNIFICATION);
+        this.usingBaseMagnification = true;
     }
 
     void tick(boolean zooming, boolean smooth, float startZoomingAnimationSpeed, float stopZoomingAnimationSpeed, double maximumMagnification) {
@@ -85,6 +100,10 @@ final class ZoomLevelState {
 
     private static double normalize(double magnification, double fallback, double maximumMagnification) {
         return ZoomMath.normalizeMagnification(magnification, fallback, maximumMagnification);
+    }
+
+    private double getBaseMagnification(double maximumMagnification) {
+        return normalize(this.baseMagnificationSupplier.getAsDouble(), ZoomMath.MIN_MAGNIFICATION, maximumMagnification);
     }
 
     private void preloadActiveMagnificationIfInactive(boolean zooming, double maximumMagnification) {

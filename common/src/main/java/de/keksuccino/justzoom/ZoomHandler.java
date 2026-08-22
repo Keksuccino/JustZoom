@@ -3,6 +3,7 @@ package de.keksuccino.justzoom;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class ZoomHandler {
 
@@ -14,7 +15,7 @@ public class ZoomHandler {
 
     public static boolean isZooming() {
         Minecraft minecraft = Minecraft.getInstance();
-        if (isMaximumZoomPreviewActive(minecraft)) return true;
+        if (getActiveZoomPreviewTarget(minecraft) != null) return true;
         if (!isZoomAvailable(minecraft)) return false;
         boolean spyglassScoping = minecraft.player != null && minecraft.player.isScoping();
         return ZoomInput.isActive(KeyMappings.KEY_TOGGLE_ZOOM.isDown(), spyglassScoping, shouldUseJustZoomForSpyglass());
@@ -77,11 +78,11 @@ public class ZoomHandler {
     }
 
     public static void onCameraTick() {
-        if (isMaximumZoomPreviewActive(Minecraft.getInstance())) return;
+        if (getActiveZoomPreviewTarget(Minecraft.getInstance()) != null) return;
         boolean zooming = isZooming();
         Options options = JustZoom.getOptions();
         if (!zooming && options.resetZoomFactorOnStopZooming.getValue()) {
-            getZoomLevelState().resetTargetMagnification(options.baseMagnification.getValue());
+            getZoomLevelState().resetTargetMagnification();
         }
         getZoomLevelState().tick(zooming, options.smoothZoomInOut.getValue(), options.startZoomingAnimationSpeed.getValue(), options.stopZoomingAnimationSpeed.getValue(), getConfiguredMaximumMagnification(cachedNormalFov));
     }
@@ -89,16 +90,18 @@ public class ZoomHandler {
     public static void onInputTick() {
         int zoomInClicks = consumeClicks(KeyMappings.KEY_ZOOM_IN);
         int zoomOutClicks = consumeClicks(KeyMappings.KEY_ZOOM_OUT);
-        if (isMaximumZoomPreviewActive(Minecraft.getInstance())) return;
+        if (getActiveZoomPreviewTarget(Minecraft.getInstance()) != null) return;
         if (isZooming()) {
             adjustMagnification(ZoomInput.calculateKeyAdjustment(zoomInClicks, zoomOutClicks));
         }
     }
 
     public static double getRenderedMagnification(float partialTicks, float normalFov) {
+        cachedNormalFov = normalFov;
         Options options = JustZoom.getOptions();
         double maximumMagnification = getConfiguredMaximumMagnification(normalFov);
-        if (isMaximumZoomPreviewActive(Minecraft.getInstance())) return maximumMagnification;
+        OptionsScreen.ZoomPreviewTarget previewTarget = getActiveZoomPreviewTarget(Minecraft.getInstance());
+        if (previewTarget != null) return calculateZoomPreviewMagnification(normalFov, options.baseZoomFactor.getValue(), options.maximumZoomFactor.getValue(), previewTarget);
         return getZoomLevelState().getRenderedMagnification(isZooming(), options.smoothZoomInOut.getValue(), options.startZoomingAnimationSpeed.getValue(), options.stopZoomingAnimationSpeed.getValue(), partialTicks, maximumMagnification);
     }
 
@@ -109,7 +112,11 @@ public class ZoomHandler {
 
     public static double getMouseSensitivityScale() {
         double effectiveMagnification = cachedEffectiveMagnification;
-        if (!shouldZoomInOutSmooth()) {
+        OptionsScreen.ZoomPreviewTarget previewTarget = getActiveZoomPreviewTarget(Minecraft.getInstance());
+        if (previewTarget != null) {
+            Options options = JustZoom.getOptions();
+            effectiveMagnification = calculateZoomPreviewMagnification(cachedNormalFov, options.baseZoomFactor.getValue(), options.maximumZoomFactor.getValue(), previewTarget);
+        } else if (!shouldZoomInOutSmooth()) {
             effectiveMagnification = isZooming() ? getZoomLevelState().getTargetMagnification(getConfiguredMaximumMagnification(cachedNormalFov)) : ZoomMath.MIN_MAGNIFICATION;
         }
         return ZoomMath.calculateMouseSensitivityScale(effectiveMagnification);
@@ -117,7 +124,7 @@ public class ZoomHandler {
 
     public static void onMouseScroll(@NotNull MouseScrollFeedback feedback, double deltaY) {
 
-        if (isMaximumZoomPreviewActive(Minecraft.getInstance())) return;
+        if (getActiveZoomPreviewTarget(Minecraft.getInstance()) != null) return;
         if (isZooming()) {
             boolean zoomInTriggered = KeyMappings.matchesMouseWheel(KeyMappings.KEY_ZOOM_IN, deltaY);
             boolean zoomOutTriggered = KeyMappings.matchesMouseWheel(KeyMappings.KEY_ZOOM_OUT, deltaY);
@@ -145,11 +152,23 @@ public class ZoomHandler {
     }
 
     private static double getConfiguredMaximumMagnification(float normalFov) {
-        return ZoomMath.calculateMaximumMagnification(normalFov, JustZoom.getOptions().maximumZoomFactor.getValue());
+        return ZoomMath.calculateMagnification(normalFov, JustZoom.getOptions().maximumZoomFactor.getValue());
     }
 
-    private static boolean isMaximumZoomPreviewActive(@NotNull Minecraft minecraft) {
-        return minecraft.gui.screen() instanceof OptionsScreen optionsScreen && optionsScreen.isMaximumZoomPreviewActive();
+    private static double getConfiguredBaseMagnification(float normalFov) {
+        Options options = JustZoom.getOptions();
+        return calculateZoomPreviewMagnification(normalFov, options.baseZoomFactor.getValue(), options.maximumZoomFactor.getValue(), OptionsScreen.ZoomPreviewTarget.BASE_ZOOM);
+    }
+
+    static double calculateZoomPreviewMagnification(float normalFov, int baseZoomFactorPercentage, int maximumZoomFactorPercentage, @NotNull OptionsScreen.ZoomPreviewTarget previewTarget) {
+        double maximumMagnification = ZoomMath.calculateMagnification(normalFov, maximumZoomFactorPercentage);
+        if (previewTarget == OptionsScreen.ZoomPreviewTarget.MAXIMUM_ZOOM) return maximumMagnification;
+        return Math.min(ZoomMath.calculateMagnification(normalFov, baseZoomFactorPercentage), maximumMagnification);
+    }
+
+    @Nullable
+    private static OptionsScreen.ZoomPreviewTarget getActiveZoomPreviewTarget(@NotNull Minecraft minecraft) {
+        return minecraft.gui.screen() instanceof OptionsScreen optionsScreen ? optionsScreen.getActiveZoomPreviewTarget() : null;
     }
 
     @NotNull
@@ -190,7 +209,7 @@ public class ZoomHandler {
 
     private static final class ZoomLevelStateHolder {
 
-        private static final ZoomLevelState INSTANCE = new ZoomLevelState(JustZoom.getPersistenceData(), JustZoom.getOptions().baseMagnification.getValue(), !JustZoom.getOptions().resetZoomFactorOnStopZooming.getValue());
+        private static final ZoomLevelState INSTANCE = new ZoomLevelState(JustZoom.getPersistenceData(), () -> getConfiguredBaseMagnification(cachedNormalFov), !JustZoom.getOptions().resetZoomFactorOnStopZooming.getValue());
 
     }
 

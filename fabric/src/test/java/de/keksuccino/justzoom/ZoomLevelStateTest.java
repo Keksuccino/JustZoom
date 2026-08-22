@@ -36,6 +36,19 @@ class ZoomLevelStateTest {
     }
 
     @Test
+    void followsDynamicBaseMagnificationUntilManuallyAdjusted() {
+        double[] baseMagnification = {4.0D};
+        ZoomLevelState zoomLevelState = new ZoomLevelState(this.createPersistenceData(), () -> baseMagnification[0], false);
+
+        baseMagnification[0] = 6.0D;
+        assertEquals(6.0D, zoomLevelState.getTargetMagnification(1000.0D), DOUBLE_TOLERANCE);
+
+        zoomLevelState.adjustMagnification(1.0D, 1.5D, 1000.0D);
+        baseMagnification[0] = 10.0D;
+        assertEquals(9.0D, zoomLevelState.getTargetMagnification(1000.0D), DOUBLE_TOLERANCE);
+    }
+
+    @Test
     void savesAdjustedMagnification() {
         PersistenceData persistenceData = this.createPersistenceData();
         ZoomLevelState zoomLevelState = new ZoomLevelState(persistenceData, 4.0F, false);
@@ -74,7 +87,7 @@ class ZoomLevelStateTest {
         ZoomLevelState zoomLevelState = new ZoomLevelState(persistenceData, 4.0F, false);
         zoomLevelState.adjustMagnification(1.0D, 1.5D, 1000.0D);
 
-        zoomLevelState.resetTargetMagnification(4.0F);
+        zoomLevelState.resetTargetMagnification();
 
         assertEquals(4.0D, zoomLevelState.getTargetMagnification(1000.0D), DOUBLE_TOLERANCE);
         PersistenceData reloadedData = this.createPersistenceData();

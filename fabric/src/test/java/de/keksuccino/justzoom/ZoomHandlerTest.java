@@ -8,6 +8,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ZoomHandlerTest {
 
+    private static final double DOUBLE_TOLERANCE = 0.000000001D;
+
     @Test
     void activatesZoomForTheNormalKeybind() {
         assertTrue(ZoomHandler.ZoomInput.isActive(true, false, false));
@@ -41,6 +43,27 @@ class ZoomHandlerTest {
     @Test
     void blocksZoomWhileAScreenIsOpen() {
         assertFalse(ZoomHandler.isZoomAvailable(true));
+    }
+
+    @Test
+    void baseZoomPreviewUsesTheConfiguredBasePercentage() {
+        double previewMagnification = ZoomHandler.calculateZoomPreviewMagnification(70.0F, 75, 100, OptionsScreen.ZoomPreviewTarget.BASE_ZOOM);
+
+        assertEquals(ZoomMath.calculateMagnification(70.0F, 75), previewMagnification, DOUBLE_TOLERANCE);
+    }
+
+    @Test
+    void baseZoomPreviewRespectsTheMaximumZoomLimit() {
+        double previewMagnification = ZoomHandler.calculateZoomPreviewMagnification(70.0F, 75, 50, OptionsScreen.ZoomPreviewTarget.BASE_ZOOM);
+
+        assertEquals(ZoomMath.calculateMagnification(70.0F, 50), previewMagnification, DOUBLE_TOLERANCE);
+    }
+
+    @Test
+    void maximumZoomPreviewUsesTheMaximumPercentageIndependentlyOfBaseZoom() {
+        double previewMagnification = ZoomHandler.calculateZoomPreviewMagnification(70.0F, 25, 80, OptionsScreen.ZoomPreviewTarget.MAXIMUM_ZOOM);
+
+        assertEquals(ZoomMath.calculateMagnification(70.0F, 80), previewMagnification, DOUBLE_TOLERANCE);
     }
 
     @Test

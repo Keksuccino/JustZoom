@@ -43,16 +43,16 @@ public final class ZoomMath {
         return Math.max(MIN_MAGNIFICATION, Math.tan(normalHalfAngle) / Math.tan(minimumHalfAngle));
     }
 
-    public static double calculateMaximumMagnification(float normalFov, int maximumZoomFactorPercentage) {
+    public static double calculateMagnification(float normalFov, int zoomFactorPercentage) {
         float safeNormalFov = clampFov(normalFov);
-        int normalizedPercentage = Options.normalizeMaximumZoomFactorPercentage(maximumZoomFactorPercentage);
+        int normalizedPercentage = Options.normalizeZoomFactorPercentage(zoomFactorPercentage);
         if (normalizedPercentage == Options.MINIMUM_ZOOM_FACTOR_PERCENTAGE) return MIN_MAGNIFICATION;
         if (normalizedPercentage == Options.MAXIMUM_ZOOM_FACTOR_PERCENTAGE) return calculateMaximumMagnification(safeNormalFov);
         double percentage = normalizedPercentage / (double) Options.MAXIMUM_ZOOM_FACTOR_PERCENTAGE;
-        double maximumZoomedFov = safeNormalFov + (MIN_FOV - safeNormalFov) * percentage;
+        double zoomedFov = safeNormalFov + (MIN_FOV - safeNormalFov) * percentage;
         double normalHalfAngle = Math.toRadians(safeNormalFov) * 0.5D;
-        double maximumZoomedHalfAngle = Math.toRadians(maximumZoomedFov) * 0.5D;
-        return Math.max(MIN_MAGNIFICATION, Math.tan(normalHalfAngle) / Math.tan(maximumZoomedHalfAngle));
+        double zoomedHalfAngle = Math.toRadians(zoomedFov) * 0.5D;
+        return Math.max(MIN_MAGNIFICATION, Math.tan(normalHalfAngle) / Math.tan(zoomedHalfAngle));
     }
 
     public static double calculateEffectiveMagnification(float normalFov, float zoomedFov) {

@@ -85,6 +85,41 @@ class OptionsTest {
     }
 
     @Test
+    void defaultsBaseZoomFactorToSeventyFivePercent() throws IOException {
+        Path configFile = this.temporaryDirectory.resolve("base-zoom-factor-default.json");
+
+        Options options = new Options(configFile.toFile());
+
+        assertEquals(Options.DEFAULT_BASE_ZOOM_FACTOR_PERCENTAGE, options.baseZoomFactor.getValue());
+        JsonObject storedZoomOptions = JsonParser.parseString(Files.readString(configFile, StandardCharsets.UTF_8)).getAsJsonObject().getAsJsonObject("zoom");
+        assertEquals(Options.DEFAULT_BASE_ZOOM_FACTOR_PERCENTAGE, storedZoomOptions.get("base_zoom_factor").getAsInt());
+    }
+
+    @Test
+    void persistsBaseZoomFactorPercentage() {
+        Path configFile = this.temporaryDirectory.resolve("base-zoom-factor.json");
+        Options options = new Options(configFile.toFile());
+
+        options.baseZoomFactor.setValue(37);
+        Options reloadedOptions = new Options(configFile.toFile());
+
+        assertEquals(37, reloadedOptions.baseZoomFactor.getValue());
+    }
+
+    @Test
+    void doesNotCarryOverRetiredBaseMagnification() throws IOException {
+        Path configFile = this.temporaryDirectory.resolve("retired-base-magnification.json");
+        Files.writeString(configFile, "{\"zoom\":{\"base_magnification\":4.0}}", StandardCharsets.UTF_8);
+
+        Options options = new Options(configFile.toFile());
+
+        assertEquals(Options.DEFAULT_BASE_ZOOM_FACTOR_PERCENTAGE, options.baseZoomFactor.getValue());
+        JsonObject storedZoomOptions = JsonParser.parseString(Files.readString(configFile, StandardCharsets.UTF_8)).getAsJsonObject().getAsJsonObject("zoom");
+        assertEquals(4.0F, storedZoomOptions.get("base_magnification").getAsFloat());
+        assertEquals(Options.DEFAULT_BASE_ZOOM_FACTOR_PERCENTAGE, storedZoomOptions.get("base_zoom_factor").getAsInt());
+    }
+
+    @Test
     void defaultsMaximumZoomFactorToOneHundredPercent() throws IOException {
         Path configFile = this.temporaryDirectory.resolve("maximum-zoom-factor-default.json");
 
@@ -144,12 +179,12 @@ class OptionsTest {
     }
 
     @Test
-    void normalizesMaximumZoomFactorToPercentageRange() {
-        assertEquals(0, Options.normalizeMaximumZoomFactorPercentage(-1));
-        assertEquals(0, Options.normalizeMaximumZoomFactorPercentage(0));
-        assertEquals(43, Options.normalizeMaximumZoomFactorPercentage(43));
-        assertEquals(100, Options.normalizeMaximumZoomFactorPercentage(100));
-        assertEquals(100, Options.normalizeMaximumZoomFactorPercentage(101));
+    void normalizesZoomFactorsToPercentageRange() {
+        assertEquals(0, Options.normalizeZoomFactorPercentage(-1));
+        assertEquals(0, Options.normalizeZoomFactorPercentage(0));
+        assertEquals(43, Options.normalizeZoomFactorPercentage(43));
+        assertEquals(100, Options.normalizeZoomFactorPercentage(100));
+        assertEquals(100, Options.normalizeZoomFactorPercentage(101));
     }
 
     @Test
