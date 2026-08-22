@@ -30,7 +30,6 @@
 - When leveraging Mixin Extras (`WrapOperation`, `WrapWithCondition`, etc.), name helpers after the intent (`wrap_..._JustZoom`, `cancel_..._JustZoom`) and call the provided `Operation` when returning to vanilla flow.
 
 ## Workflow Guidelines
-- When the user gives you a log snippet, always search for the full log file containing that snippet, and scan the whole log, so you have a complete picture of what was happening.
 - Everything always needs to be compatible with Sodium and Iris. To check compatibility for these, scan the Sodium and Iris sources in the places you touch, to check if Sodium/Iris touch it too, and then see if both work well together.
 - When you work with Vanilla Minecraft code, or Iris/Sodium, always deeply analyze the source code for these, so you really understand what you are working with and how the related code works.
 
