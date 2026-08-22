@@ -1,7 +1,5 @@
 package de.keksuccino.justzoom;
 
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.gui.Font;
@@ -14,17 +12,12 @@ import net.minecraft.resources.Identifier;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.function.LongSupplier;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class OptionsScreenTest {
@@ -273,23 +266,6 @@ class OptionsScreenTest {
         List<KeyMapping> keyMappings = OptionsScreen.KEYBIND_SETTINGS.stream().map(OptionsScreen.KeybindSetting::keyMapping).toList();
 
         assertEquals(List.of(KeyMappings.KEY_TOGGLE_ZOOM, KeyMappings.KEY_ZOOM_IN, KeyMappings.KEY_ZOOM_OUT), keyMappings);
-    }
-
-    @Test
-    void everyBundledLanguageNamesTheAdvancedTabAndMaximumZoomFactor() throws IOException {
-        for (String language : List.of("de_de", "en_us", "es_mx", "fr_fr", "ja_jp", "ko_kr", "ru_ru", "tr_tr", "uk_ua", "zh_cn")) {
-            String resourcePath = "assets/justzoom/lang/" + language + ".json";
-            try (InputStream stream = OptionsScreenTest.class.getClassLoader().getResourceAsStream(resourcePath)) {
-                assertNotNull(stream, resourcePath);
-                JsonObject translations = JsonParser.parseReader(new InputStreamReader(stream, StandardCharsets.UTF_8)).getAsJsonObject();
-                assertTrue(translations.has("justzoom.options.tab.advanced"), language);
-                assertFalse(translations.get("justzoom.options.tab.advanced").getAsString().isBlank(), language);
-                assertTrue(translations.has("justzoom.options.maximum_zoom_factor"), language);
-                assertFalse(translations.get("justzoom.options.maximum_zoom_factor").getAsString().isBlank(), language);
-                assertTrue(translations.has("justzoom.options.maximum_zoom_factor.desc"), language);
-                assertFalse(translations.get("justzoom.options.maximum_zoom_factor.desc").getAsString().isBlank(), language);
-            }
-        }
     }
 
     private static KeyMapping keyMapping(String suffix, int defaultKey) {

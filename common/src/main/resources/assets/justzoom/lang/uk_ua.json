@@ -27,7 +27,7 @@
   "justzoom.options.stop_zooming_animation_speed": "Тривалість анімації зупинки зуму: %s",
   "justzoom.options.stop_zooming_animation_speed.desc": "Час у секундах, за який виконується анімація при зупинці зуму.\n0,00 секунди робить анімацію миттєвою.",
   "justzoom.options.maximum_zoom_factor": "Максимальний коефіцієнт зуму: %s",
-  "justzoom.options.maximum_zoom_factor.desc": "Обмежує максимальне наближення Just Zoom.\n0 % забороняє додаткове наближення; 100 % дозволяє повний діапазон.\nНаведіть курсор на повзунок або виберіть його, щоб побачити межу у світі.",
+  "justzoom.options.maximum_zoom_factor.desc": "Обмежує максимальне наближення Just Zoom.\n0 % повністю забороняє наближення; 100 % дозволяє повний діапазон.\nПереміщуйте повзунок, щоб наживо переглянути межу у світі.",
   "justzoom.options.seconds": "%s с",
   "justzoom.options.smooth_camera_movement_on_zoom": "Плавний рух камери: %s",
   "justzoom.options.smooth_camera_movement_on_zoom.desc": "Чи має камера рухатися плавно (кінематографічно) при зумі.",

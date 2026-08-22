@@ -27,7 +27,7 @@
   "justzoom.options.stop_zooming_animation_speed": "停止缩放动画时长：%s",
   "justzoom.options.stop_zooming_animation_speed.desc": "停止缩放动画所需的时间（以秒为单位）。\n设为0.00秒时将立即完成动画。",
   "justzoom.options.maximum_zoom_factor": "最大缩放倍数：%s",
-  "justzoom.options.maximum_zoom_factor.desc": "限制 Just Zoom 能够放大的最大程度。\n0% 不允许额外放大；100% 允许使用完整范围。\n将鼠标悬停在滑块上或聚焦滑块，可在世界中预览上限。",
+  "justzoom.options.maximum_zoom_factor.desc": "限制 Just Zoom 能够放大的最大程度。\n0% 会完全禁止放大；100% 允许使用完整范围。\n移动滑块即可在世界中实时预览上限。",
   "justzoom.options.seconds": "%s秒",
   "justzoom.options.smooth_camera_movement_on_zoom": "平滑镜头移动：%s",
   "justzoom.options.smooth_camera_movement_on_zoom.desc": "缩放时镜头是否应该平滑（电影化）移动。",

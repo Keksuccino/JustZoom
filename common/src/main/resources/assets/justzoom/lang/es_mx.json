@@ -27,7 +27,7 @@
   "justzoom.options.stop_zooming_animation_speed": "Duración de la Animación al Detener el Zoom: %s",
   "justzoom.options.stop_zooming_animation_speed.desc": "El tiempo, en segundos, que tarda la animación al detener el zoom.\n0.00 segundos hace que la animación sea instantánea.",
   "justzoom.options.maximum_zoom_factor": "Factor de zoom máximo: %s",
-  "justzoom.options.maximum_zoom_factor.desc": "Limita cuánto puede acercar Just Zoom.\n0 % impide el zoom adicional; 100 % permite el rango completo.\nPasa el cursor sobre el control o enfócalo para previsualizar el límite en el mundo.",
+  "justzoom.options.maximum_zoom_factor.desc": "Limita cuánto puede acercar Just Zoom.\n0 % impide por completo usar el zoom; 100 % permite el rango completo.\nMueve el control deslizante para previsualizar el límite en tiempo real en el mundo.",
   "justzoom.options.seconds": "%s s",
   "justzoom.options.smooth_camera_movement_on_zoom": "Movimiento de Cámara Suave: %s",
   "justzoom.options.smooth_camera_movement_on_zoom.desc": "Si la cámara debe moverse suavemente (cinemático) al hacer zoom.",
