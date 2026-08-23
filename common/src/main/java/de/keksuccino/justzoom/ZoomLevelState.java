@@ -55,9 +55,9 @@ final class ZoomLevelState {
         return this.toggleTransitionProgress;
     }
 
-    void adjustMagnification(double scrollDelta, double stepMultiplier, double maximumMagnification) {
+    void adjustMagnification(double adjustment, double stepMultiplier, double maximumMagnification) {
         double currentMagnification = this.getTargetMagnification(maximumMagnification);
-        this.targetMagnification = ZoomMath.applyScroll(currentMagnification, scrollDelta, stepMultiplier, maximumMagnification);
+        this.targetMagnification = ZoomMath.applyZoomAdjustment(currentMagnification, adjustment, stepMultiplier, maximumMagnification);
         this.usingBaseMagnification = false;
         this.persistenceData.lastMagnification.setValue((float) this.targetMagnification);
     }

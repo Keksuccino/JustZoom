@@ -96,6 +96,28 @@ class OptionsTest {
     }
 
     @Test
+    void defaultsZoomStepSizeToOneHundredPercent() throws IOException {
+        Path configFile = this.temporaryDirectory.resolve("zoom-step-size-default.json");
+
+        Options options = new Options(configFile.toFile());
+
+        assertEquals(Options.DEFAULT_ZOOM_STEP_SIZE_PERCENTAGE, options.zoomStepSize.getValue());
+        JsonObject storedZoomOptions = JsonParser.parseString(Files.readString(configFile, StandardCharsets.UTF_8)).getAsJsonObject().getAsJsonObject("zoom");
+        assertEquals(Options.DEFAULT_ZOOM_STEP_SIZE_PERCENTAGE, storedZoomOptions.get("zoom_step_size").getAsInt());
+    }
+
+    @Test
+    void persistsZoomStepSizePercentage() {
+        Path configFile = this.temporaryDirectory.resolve("zoom-step-size.json");
+        Options options = new Options(configFile.toFile());
+
+        options.zoomStepSize.setValue(237);
+        Options reloadedOptions = new Options(configFile.toFile());
+
+        assertEquals(237, reloadedOptions.zoomStepSize.getValue());
+    }
+
+    @Test
     void defaultsBaseZoomFactorToSeventyFivePercent() throws IOException {
         Path configFile = this.temporaryDirectory.resolve("base-zoom-factor-default.json");
 
@@ -222,6 +244,15 @@ class OptionsTest {
         assertEquals(43, Options.normalizeZoomFactorPercentage(43));
         assertEquals(100, Options.normalizeZoomFactorPercentage(100));
         assertEquals(100, Options.normalizeZoomFactorPercentage(101));
+    }
+
+    @Test
+    void normalizesZoomStepSizeToPercentageRange() {
+        assertEquals(1, Options.normalizeZoomStepSizePercentage(0));
+        assertEquals(1, Options.normalizeZoomStepSizePercentage(1));
+        assertEquals(100, Options.normalizeZoomStepSizePercentage(100));
+        assertEquals(400, Options.normalizeZoomStepSizePercentage(400));
+        assertEquals(400, Options.normalizeZoomStepSizePercentage(401));
     }
 
     @Test

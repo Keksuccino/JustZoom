@@ -2,12 +2,6 @@ package de.keksuccino.justzoom;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
-import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GlyphSource;
-import net.minecraft.client.gui.components.StringWidget;
-import net.minecraft.client.gui.font.glyphs.EffectGlyph;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.FontDescription;
 import net.minecraft.resources.Identifier;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -79,25 +73,6 @@ class OptionsScreenTest {
     }
 
     @Test
-    void generalFloatInputAndResetButtonFillTheOptionRowWidth() {
-        int controlWidth = OptionsScreen.calculatePrimaryControlWidth(360);
-        OptionsScreen.FloatInputWidths widths = OptionsScreen.calculateFloatInputWidths(controlWidth, 100);
-
-        assertEquals(100, widths.labelWidth());
-        assertEquals(200, widths.inputWidth());
-        assertEquals(360, widths.labelWidth() + OptionsScreen.FLOAT_INPUT_GAP + widths.inputWidth() + OptionsScreen.CONTROL_GAP + OptionsScreen.RESET_BUTTON_WIDTH);
-    }
-
-    @Test
-    void longFloatInputLabelLeavesTheInputUsable() {
-        OptionsScreen.FloatInputWidths widths = OptionsScreen.calculateFloatInputWidths(100, 100);
-
-        assertEquals(55, widths.labelWidth());
-        assertEquals(OptionsScreen.FLOAT_INPUT_MIN_WIDTH, widths.inputWidth());
-        assertEquals(100, widths.labelWidth() + OptionsScreen.FLOAT_INPUT_GAP + widths.inputWidth());
-    }
-
-    @Test
     void generalOptionResetStateTracksWhetherTheValueDiffersFromItsDefault() {
         Options options = new Options(this.temporaryDirectory.resolve("options.json").toFile());
 
@@ -108,18 +83,6 @@ class OptionsScreenTest {
 
         options.baseZoomFactor.resetToDefault();
         assertTrue(OptionsScreen.isOptionDefault(options.baseZoomFactor));
-    }
-
-    @Test
-    void floatInputResetStateTreatsEquivalentTextAsDefaultAndInvalidTextAsChanged() {
-        Options options = new Options(this.temporaryDirectory.resolve("float-input-options.json").toFile());
-
-        assertTrue(OptionsScreen.isFloatInputDefault(options.scrollMagnificationMultiplier, "1.5"));
-        assertTrue(OptionsScreen.isFloatInputDefault(options.scrollMagnificationMultiplier, "1.50"));
-        assertFalse(OptionsScreen.isFloatInputDefault(options.scrollMagnificationMultiplier, "invalid"));
-
-        options.scrollMagnificationMultiplier.setValue(2.0F);
-        assertFalse(OptionsScreen.isFloatInputDefault(options.scrollMagnificationMultiplier, "1.5"));
     }
 
     @Test
@@ -177,6 +140,30 @@ class OptionsScreenTest {
         assertEquals("1.5", OptionsScreen.formatSmoothZoomScrollSpeed(1.5F));
         assertEquals("1.23", OptionsScreen.formatSmoothZoomScrollSpeed(1.23F));
         assertEquals("10.0", OptionsScreen.formatSmoothZoomScrollSpeed(10.0F));
+    }
+
+    @Test
+    void zoomStepSizeSliderUsesWholePercentagesAcrossTheCompleteRange() {
+        double sliderStep = 1.0D / 399.0D;
+
+        assertEquals(1, OptionsScreen.sliderValueToZoomStepSizePercentage(-1.0D));
+        assertEquals(1, OptionsScreen.sliderValueToZoomStepSizePercentage(0.0D));
+        assertEquals(2, OptionsScreen.sliderValueToZoomStepSizePercentage(sliderStep));
+        assertEquals(100, OptionsScreen.sliderValueToZoomStepSizePercentage(99.0D / 399.0D));
+        assertEquals(400, OptionsScreen.sliderValueToZoomStepSizePercentage(1.0D));
+        assertEquals(400, OptionsScreen.sliderValueToZoomStepSizePercentage(2.0D));
+        assertEquals(Options.DEFAULT_ZOOM_STEP_SIZE_PERCENTAGE, OptionsScreen.sliderValueToZoomStepSizePercentage(Double.NaN));
+    }
+
+    @Test
+    void zoomStepSizeSliderSnapsContinuousInputAndNormalizesStoredValues() {
+        double sliderStep = 1.0D / 399.0D;
+
+        assertEquals(0.0D, OptionsScreen.zoomStepSizePercentageToSliderValue(0));
+        assertEquals(99.0D / 399.0D, OptionsScreen.zoomStepSizePercentageToSliderValue(100), 0.000000001D);
+        assertEquals(1.0D, OptionsScreen.zoomStepSizePercentageToSliderValue(401));
+        assertEquals(sliderStep, OptionsScreen.snapZoomStepSizeSliderValue(sliderStep * 1.4D), 0.000000001D);
+        assertEquals(sliderStep * 2.0D, OptionsScreen.snapZoomStepSizeSliderValue(sliderStep * 1.5D), 0.000000001D);
     }
 
     @Test
@@ -263,15 +250,6 @@ class OptionsScreenTest {
     }
 
     @Test
-    void previewOpacityIncludesInputSettingLabels() {
-        StringWidget inputSettingLabel = new StringWidget(100, 9, Component.literal("Input label"), nonRenderingFont());
-
-        OptionsScreen.updatePreviewControlOpacity(inputSettingLabel, null, OptionsScreen.PREVIEW_CONTROL_OPACITY);
-
-        assertEquals(OptionsScreen.PREVIEW_CONTROL_OPACITY, inputSettingLabel.getAlpha());
-    }
-
-    @Test
     void spyglassOverlayCycleUsesOrangeExceptWhenNeverSelected() {
         assertEquals(OptionsScreen.CYCLE_VALUE_COLOR, OptionsScreen.spyglassOverlayValueColor(SpyglassOverlayMode.ONLY_SPYGLASS));
         assertEquals(OptionsScreen.CYCLE_VALUE_COLOR, OptionsScreen.spyglassOverlayValueColor(SpyglassOverlayMode.ONLY_KEYBIND_ZOOM));
@@ -304,22 +282,6 @@ class OptionsScreenTest {
 
     private static KeyMapping keyMapping(String suffix, int defaultKey) {
         return new KeyMapping("justzoom.test." + suffix, defaultKey, CATEGORY);
-    }
-
-    private static Font nonRenderingFont() {
-        return new Font(new Font.Provider() {
-
-            @Override
-            public GlyphSource glyphs(FontDescription font) {
-                throw new AssertionError("This opacity-only test must not render text");
-            }
-
-            @Override
-            public EffectGlyph effect() {
-                throw new AssertionError("This opacity-only test must not render text");
-            }
-
-        });
     }
 
     private static final class TestNanoClock implements LongSupplier {

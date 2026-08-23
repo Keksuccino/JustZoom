@@ -6,7 +6,8 @@ public final class ZoomMath {
     public static final float MIN_FOV = 0.1F;
     public static final double MIN_MAGNIFICATION = 1.0D;
     public static final double MAX_MAGNIFICATION = calculateMaximumMagnification(MAX_FOV);
-    public static final double MAX_SCROLL_MAGNIFICATION_MULTIPLIER = 10.0D;
+    public static final double NORMAL_ZOOM_STEP_MULTIPLIER = 1.5D;
+    public static final double MAX_MAGNIFICATION_CHANGE_MULTIPLIER = 10.0D;
 
     private ZoomMath() {
     }
@@ -23,10 +24,16 @@ public final class ZoomMath {
         return Math.max(MIN_MAGNIFICATION, Math.min(safeMaximum, safeMagnification));
     }
 
-    public static double normalizeScrollMagnificationMultiplier(double multiplier, double fallback) {
+    public static double normalizeMagnificationChangeMultiplier(double multiplier, double fallback) {
         double safeFallback = fallback > MIN_MAGNIFICATION && Double.isFinite(fallback) ? fallback : MIN_MAGNIFICATION;
         double safeMultiplier = multiplier > MIN_MAGNIFICATION && Double.isFinite(multiplier) ? multiplier : safeFallback;
-        return Math.min(MAX_SCROLL_MAGNIFICATION_MULTIPLIER, safeMultiplier);
+        return Math.min(MAX_MAGNIFICATION_CHANGE_MULTIPLIER, safeMultiplier);
+    }
+
+    public static double calculateZoomStepMultiplier(int zoomStepSizePercentage) {
+        int normalizedPercentage = Options.normalizeZoomStepSizePercentage(zoomStepSizePercentage);
+        // Scale the logarithmic step strength so two 50% adjustments exactly equal one 100% adjustment.
+        return Math.pow(NORMAL_ZOOM_STEP_MULTIPLIER, normalizedPercentage / (double) Options.DEFAULT_ZOOM_STEP_SIZE_PERCENTAGE);
     }
 
     public static float calculateZoomedFov(float normalFov, double magnification) {
@@ -61,18 +68,18 @@ public final class ZoomMath {
         return normalizeMagnification(Math.tan(normalHalfAngle) / Math.tan(zoomedHalfAngle), MIN_MAGNIFICATION, calculateMaximumMagnification(normalFov));
     }
 
-    public static double applyScroll(double magnification, double scrollDelta, double stepMultiplier, double maximum) {
+    public static double applyZoomAdjustment(double magnification, double adjustment, double stepMultiplier, double maximum) {
         double safeMagnification = normalizeMagnification(magnification, MIN_MAGNIFICATION, maximum);
-        double safeStepMultiplier = normalizeScrollMagnificationMultiplier(stepMultiplier, MIN_MAGNIFICATION);
-        if (!Double.isFinite(scrollDelta) || scrollDelta == 0.0D || safeStepMultiplier == MIN_MAGNIFICATION) return safeMagnification;
-        double adjustedMagnification = safeMagnification * Math.pow(safeStepMultiplier, scrollDelta);
+        double safeStepMultiplier = normalizeMagnificationChangeMultiplier(stepMultiplier, MIN_MAGNIFICATION);
+        if (!Double.isFinite(adjustment) || adjustment == 0.0D || safeStepMultiplier == MIN_MAGNIFICATION) return safeMagnification;
+        double adjustedMagnification = safeMagnification * Math.pow(safeStepMultiplier, adjustment);
         return normalizeMagnification(adjustedMagnification, safeMagnification, maximum);
     }
 
     public static double moveMagnificationTowards(double current, double target, double maximumChangeMultiplier) {
         double safeCurrent = normalizeMagnification(current, MIN_MAGNIFICATION, MAX_MAGNIFICATION);
         double safeTarget = normalizeMagnification(target, MIN_MAGNIFICATION, MAX_MAGNIFICATION);
-        double safeChangeMultiplier = normalizeScrollMagnificationMultiplier(maximumChangeMultiplier, MIN_MAGNIFICATION);
+        double safeChangeMultiplier = normalizeMagnificationChangeMultiplier(maximumChangeMultiplier, MIN_MAGNIFICATION);
         if (safeCurrent == safeTarget || safeChangeMultiplier == MIN_MAGNIFICATION) return safeTarget;
         double maximumLogChange = Math.log(safeChangeMultiplier);
         double currentLog = Math.log(safeCurrent);

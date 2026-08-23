@@ -9,13 +9,15 @@ import java.io.File;
 public class Options extends JsonConfig {
 
     public static final int DEFAULT_BASE_ZOOM_FACTOR_PERCENTAGE = 75;
-    public static final float DEFAULT_SCROLL_MAGNIFICATION_MULTIPLIER = 1.5F;
+    public static final int DEFAULT_ZOOM_STEP_SIZE_PERCENTAGE = 100;
     public static final float DEFAULT_SMOOTH_ZOOM_SCROLL_SPEED = 1.0F;
     public static final float DEFAULT_START_ZOOMING_ANIMATION_SPEED = 0.30F;
     public static final float DEFAULT_STOP_ZOOMING_ANIMATION_SPEED = 0.2F;
     public static final int DEFAULT_MAXIMUM_ZOOM_FACTOR_PERCENTAGE = 100;
     public static final int MINIMUM_ZOOM_FACTOR_PERCENTAGE = 0;
     public static final int MAXIMUM_ZOOM_FACTOR_PERCENTAGE = 100;
+    public static final int MINIMUM_ZOOM_STEP_SIZE_PERCENTAGE = 1;
+    public static final int MAXIMUM_ZOOM_STEP_SIZE_PERCENTAGE = 400;
     public static final float MIN_ANIMATION_SPEED = 0.0F;
     public static final float MAX_ANIMATION_SPEED = 5.0F;
     public static final int ANIMATION_SPEED_STEPS_PER_SECOND = 20;
@@ -29,7 +31,7 @@ public class Options extends JsonConfig {
     private final ConfigSection spyglass = this.section("spyglass");
 
     public final ConfigValue<Integer> baseZoomFactor = this.zoom.option("base_zoom_factor", DEFAULT_BASE_ZOOM_FACTOR_PERCENTAGE);
-    public final ConfigValue<Float> scrollMagnificationMultiplier = this.zoom.option("scroll_magnification_multiplier", DEFAULT_SCROLL_MAGNIFICATION_MULTIPLIER);
+    public final ConfigValue<Integer> zoomStepSize = this.zoom.option("zoom_step_size", DEFAULT_ZOOM_STEP_SIZE_PERCENTAGE);
     public final ConfigValue<Boolean> smoothZoomInOut = this.zoom.option("smooth_zoom_in_out", true);
     public final ConfigValue<Float> startZoomingAnimationSpeed = this.zoom.option("start_zooming_animation_speed", DEFAULT_START_ZOOMING_ANIMATION_SPEED);
     public final ConfigValue<Float> stopZoomingAnimationSpeed = this.zoom.option("stop_zooming_animation_speed", DEFAULT_STOP_ZOOMING_ANIMATION_SPEED);
@@ -71,6 +73,10 @@ public class Options extends JsonConfig {
 
     static int normalizeZoomFactorPercentage(int percentage) {
         return Math.max(MINIMUM_ZOOM_FACTOR_PERCENTAGE, Math.min(MAXIMUM_ZOOM_FACTOR_PERCENTAGE, percentage));
+    }
+
+    static int normalizeZoomStepSizePercentage(int percentage) {
+        return Math.max(MINIMUM_ZOOM_STEP_SIZE_PERCENTAGE, Math.min(MAXIMUM_ZOOM_STEP_SIZE_PERCENTAGE, percentage));
     }
 
 }

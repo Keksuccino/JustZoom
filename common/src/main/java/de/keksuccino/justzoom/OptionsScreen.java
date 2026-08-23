@@ -3,7 +3,6 @@ package de.keksuccino.justzoom;
 import com.mojang.blaze3d.platform.InputConstants;
 import de.keksuccino.justzoom.platform.Services;
 import de.keksuccino.justzoom.util.config.ConfigValue;
-import de.keksuccino.konkrete.math.MathUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
@@ -11,9 +10,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.ScrollableLayout;
-import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.events.ContainerEventHandler;
 import net.minecraft.client.gui.components.events.GuiEventListener;
@@ -56,8 +53,6 @@ public class OptionsScreen extends Screen {
     protected static final int CYCLE_VALUE_COLOR = 0xFFAA00;
     protected static final int NEVER_CYCLE_VALUE_COLOR = 0xFF5555;
     protected static final int CONTROL_GAP = 5;
-    protected static final int FLOAT_INPUT_GAP = 5;
-    protected static final int FLOAT_INPUT_MIN_WIDTH = 40;
     protected static final long ZOOM_PREVIEW_LINGER_NANOS = 1_000_000_000L;
     protected static final int OPTION_ROW_ADVANCE = 26;
     protected static final float PREVIEW_CONTROL_OPACITY = 0.2F;
@@ -85,9 +80,9 @@ public class OptionsScreen extends Screen {
     private final ZoomPreviewTimer zoomPreviewTimer;
     private boolean zoomPreviewActive;
     private final List<Button> optionButtons = new ArrayList<>();
-    private final List<FloatInputControl> floatInputControls = new ArrayList<>();
     private final List<AnimationSpeedSlider> animationSpeedSliders = new ArrayList<>();
     private final List<SmoothZoomScrollSpeedSlider> smoothZoomScrollSpeedSliders = new ArrayList<>();
+    private final List<ZoomStepSizeSlider> zoomStepSizeSliders = new ArrayList<>();
     private final List<ZoomFactorSlider> zoomFactorSliders = new ArrayList<>();
     private final List<OptionControl> optionControls = new ArrayList<>();
     private final List<KeybindControl> keybindControls = new ArrayList<>();
@@ -103,9 +98,9 @@ public class OptionsScreen extends Screen {
 
         this.layout.removeChildren();
         this.optionButtons.clear();
-        this.floatInputControls.clear();
         this.animationSpeedSliders.clear();
         this.smoothZoomScrollSpeedSliders.clear();
+        this.zoomStepSizeSliders.clear();
         this.zoomFactorSliders.clear();
         this.optionControls.clear();
         this.keybindControls.clear();
@@ -156,7 +151,7 @@ public class OptionsScreen extends Screen {
         this.addZoomFactorSlider(tab, JustZoom.getOptions().baseZoomFactor, "justzoom.options.base_zoom_factor", ZoomPreviewTarget.BASE_ZOOM);
         this.addZoomFactorSlider(tab, JustZoom.getOptions().maximumZoomFactor, "justzoom.options.maximum_zoom_factor", ZoomPreviewTarget.MAXIMUM_ZOOM);
         this.addToggleOption(tab, JustZoom.getOptions().resetZoomFactorOnStopZooming, "justzoom.options.reset_zoom_factor_when_stop_zooming");
-        this.addFloatInput(tab, JustZoom.getOptions().scrollMagnificationMultiplier, "justzoom.options.scroll_magnification_multiplier");
+        this.addZoomStepSizeSlider(tab, JustZoom.getOptions().zoomStepSize, "justzoom.options.zoom_step_size");
         this.addAnimationSpeedSlider(tab, JustZoom.getOptions().startZoomingAnimationSpeed, "justzoom.options.start_zooming_animation_speed");
         this.addAnimationSpeedSlider(tab, JustZoom.getOptions().stopZoomingAnimationSpeed, "justzoom.options.stop_zooming_animation_speed");
         this.addSmoothZoomScrollSpeedSlider(tab, JustZoom.getOptions().smoothZoomScrollSpeed, "justzoom.options.smooth_zoom_scroll_speed");
@@ -170,31 +165,6 @@ public class OptionsScreen extends Screen {
             this.addKeybindRow(tab, setting);
         }
         return tab;
-    }
-
-    protected void addFloatInput(@NotNull OptionsTab tab, @NotNull ConfigValue<Float> option, @NotNull String labelBaseKey) {
-        Component label = Component.translatable(labelBaseKey);
-        Tooltip tooltip = Tooltip.create(Component.translatable(labelBaseKey + ".desc"));
-        StringWidget labelWidget = new StringWidget(label, this.font);
-        labelWidget.setTooltip(tooltip);
-
-        EditBox input = new EditBox(this.font, FLOAT_INPUT_MIN_WIDTH, BUTTON_HEIGHT, label);
-        input.setValue(Float.toString(option.getValue()));
-        input.setResponder(value -> {
-            if (MathUtils.isFloat(value)) {
-                option.setValue(Float.parseFloat(value));
-            }
-            this.updateOptionResetButtons();
-        });
-        input.setTooltip(tooltip);
-
-        LinearLayout inputControl = LinearLayout.horizontal().spacing(FLOAT_INPUT_GAP);
-        inputControl.addChild(labelWidget, settings -> settings.alignVerticallyMiddle());
-        inputControl.addChild(input);
-        Button resetButton = this.buildResetButton(option, () -> label, () -> input.setValue(Float.toString(option.getValue())));
-        this.floatInputControls.add(new FloatInputControl(labelWidget, input, labelWidget.getWidth()));
-        this.optionControls.add(new OptionControl(() -> isFloatInputDefault(option, input.getValue()), resetButton));
-        tab.addChild(this.buildControlRowLayout(inputControl, resetButton));
     }
 
     protected void addToggleOption(@NotNull OptionsTab tab, @NotNull ConfigValue<Boolean> option, @NotNull String labelBaseKey) {
@@ -213,6 +183,14 @@ public class OptionsScreen extends Screen {
         SmoothZoomScrollSpeedSlider slider = new SmoothZoomScrollSpeedSlider(option, labelBaseKey, this.getButtonWidth());
         Button resetButton = this.buildResetButton(option, slider::getMessage, slider::refreshFromOption);
         this.smoothZoomScrollSpeedSliders.add(slider);
+        this.optionControls.add(new OptionControl(() -> isOptionDefault(option), resetButton));
+        tab.addChild(this.buildControlRowLayout(slider, resetButton));
+    }
+
+    protected void addZoomStepSizeSlider(@NotNull OptionsTab tab, @NotNull ConfigValue<Integer> option, @NotNull String labelBaseKey) {
+        ZoomStepSizeSlider slider = new ZoomStepSizeSlider(option, labelBaseKey, this.getButtonWidth());
+        Button resetButton = this.buildResetButton(option, slider::getMessage, slider::refreshFromOption);
+        this.zoomStepSizeSliders.add(slider);
         this.optionControls.add(new OptionControl(() -> isOptionDefault(option), resetButton));
         tab.addChild(this.buildControlRowLayout(slider, resetButton));
     }
@@ -308,13 +286,11 @@ public class OptionsScreen extends Screen {
         for (SmoothZoomScrollSpeedSlider slider : this.smoothZoomScrollSpeedSliders) {
             slider.setWidth(controlWidth);
         }
-        for (ZoomFactorSlider slider : this.zoomFactorSliders) {
+        for (ZoomStepSizeSlider slider : this.zoomStepSizeSliders) {
             slider.setWidth(controlWidth);
         }
-        for (FloatInputControl control : this.floatInputControls) {
-            FloatInputWidths widths = calculateFloatInputWidths(controlWidth, control.preferredLabelWidth());
-            control.label().setWidth(widths.labelWidth());
-            control.input().setWidth(widths.inputWidth());
+        for (ZoomFactorSlider slider : this.zoomFactorSliders) {
+            slider.setWidth(controlWidth);
         }
         for (OptionControl control : this.optionControls) {
             control.resetButton().setWidth(RESET_BUTTON_WIDTH);
@@ -437,10 +413,6 @@ public class OptionsScreen extends Screen {
         return Objects.equals(option.getValue(), option.getDefaultValue());
     }
 
-    static boolean isFloatInputDefault(@NotNull ConfigValue<Float> option, @NotNull String inputValue) {
-        return isOptionDefault(option) && MathUtils.isFloat(inputValue) && Float.compare(Float.parseFloat(inputValue), option.getDefaultValue()) == 0;
-    }
-
     static float sliderValueToAnimationSpeed(double sliderValue) {
         double safeSliderValue = Double.isFinite(sliderValue) ? sliderValue : animationSpeedToSliderValue(Options.DEFAULT_START_ZOOMING_ANIMATION_SPEED, Options.DEFAULT_START_ZOOMING_ANIMATION_SPEED);
         double clampedSliderValue = Math.max(0.0D, Math.min(1.0D, safeSliderValue));
@@ -486,6 +458,25 @@ public class OptionsScreen extends Screen {
         return formattedSpeed.endsWith("0") ? formattedSpeed.substring(0, formattedSpeed.length() - 1) : formattedSpeed;
     }
 
+    static int sliderValueToZoomStepSizePercentage(double sliderValue) {
+        double fallback = zoomStepSizePercentageToSliderValue(Options.DEFAULT_ZOOM_STEP_SIZE_PERCENTAGE);
+        double safeSliderValue = Double.isFinite(sliderValue) ? sliderValue : fallback;
+        double clampedSliderValue = Math.max(0.0D, Math.min(1.0D, safeSliderValue));
+        int percentageRange = Options.MAXIMUM_ZOOM_STEP_SIZE_PERCENTAGE - Options.MINIMUM_ZOOM_STEP_SIZE_PERCENTAGE;
+        int percentage = Options.MINIMUM_ZOOM_STEP_SIZE_PERCENTAGE + (int) Math.round(clampedSliderValue * percentageRange);
+        return Options.normalizeZoomStepSizePercentage(percentage);
+    }
+
+    static double zoomStepSizePercentageToSliderValue(int percentage) {
+        int normalizedPercentage = Options.normalizeZoomStepSizePercentage(percentage);
+        int percentageRange = Options.MAXIMUM_ZOOM_STEP_SIZE_PERCENTAGE - Options.MINIMUM_ZOOM_STEP_SIZE_PERCENTAGE;
+        return (normalizedPercentage - Options.MINIMUM_ZOOM_STEP_SIZE_PERCENTAGE) / (double) percentageRange;
+    }
+
+    static double snapZoomStepSizeSliderValue(double sliderValue) {
+        return zoomStepSizePercentageToSliderValue(sliderValueToZoomStepSizePercentage(sliderValue));
+    }
+
     static int sliderValueToZoomFactorPercentage(double sliderValue) {
         double safeSliderValue = Double.isFinite(sliderValue) ? sliderValue : 1.0D;
         double clampedSliderValue = Math.max(0.0D, Math.min(1.0D, safeSliderValue));
@@ -518,14 +509,6 @@ public class OptionsScreen extends Screen {
             }
         }
         return false;
-    }
-
-    @NotNull
-    static FloatInputWidths calculateFloatInputWidths(int rowWidth, int preferredLabelWidth) {
-        // Keep the complete row at the button width so its centered layout shares both button edges.
-        int availableWidth = Math.max(2, rowWidth - FLOAT_INPUT_GAP);
-        int labelWidth = Math.min(Math.max(1, preferredLabelWidth), Math.max(1, availableWidth - FLOAT_INPUT_MIN_WIDTH));
-        return new FloatInputWidths(labelWidth, availableWidth - labelWidth);
     }
 
     protected void afterKeybindChanged() {
@@ -659,12 +642,6 @@ public class OptionsScreen extends Screen {
     protected record KeybindSetting(@NotNull KeyMapping keyMapping, @NotNull String labelKey, @NotNull String descriptionKey) {
     }
 
-    static record FloatInputWidths(int labelWidth, int inputWidth) {
-    }
-
-    private record FloatInputControl(@NotNull StringWidget label, @NotNull EditBox input, int preferredLabelWidth) {
-    }
-
     private record OptionControl(@NotNull BooleanSupplier defaultState, @NotNull Button resetButton) {
     }
 
@@ -793,6 +770,55 @@ public class OptionsScreen extends Screen {
 
         protected void refreshFromOption() {
             this.value = smoothZoomScrollSpeedToSliderValue(this.option.getValue(), this.option.getDefaultValue());
+            this.updateMessage();
+        }
+
+    }
+
+    protected class ZoomStepSizeSlider extends AbstractSliderButton {
+
+        private final ConfigValue<Integer> option;
+        private final String labelBaseKey;
+
+        protected ZoomStepSizeSlider(@NotNull ConfigValue<Integer> option, @NotNull String labelBaseKey, int width) {
+            super(0, 0, width, BUTTON_HEIGHT, CommonComponents.EMPTY, zoomStepSizePercentageToSliderValue(option.getValue()));
+            this.option = option;
+            this.labelBaseKey = labelBaseKey;
+            this.setTooltip(Tooltip.create(Component.translatable(labelBaseKey + ".desc")));
+            this.updateMessage();
+        }
+
+        @Override
+        protected void updateMessage() {
+            int percentage = sliderValueToZoomStepSizePercentage(this.value);
+            this.setMessage(Component.translatable(this.labelBaseKey, Component.literal(percentage + "%")));
+        }
+
+        @Override
+        protected void setValue(double newValue) {
+            // Snap before vanilla compares and applies the value so dragging and keyboard input can never store partial percentages.
+            super.setValue(snapZoomStepSizeSliderValue(newValue));
+        }
+
+        @Override
+        protected void applyValue() {
+            int percentage = sliderValueToZoomStepSizePercentage(this.value);
+            if (this.option.getValue() != percentage) {
+                this.option.setValue(percentage);
+            }
+            OptionsScreen.this.updateOptionResetButtons();
+        }
+
+        @Override
+        public boolean keyPressed(@NotNull KeyEvent event) {
+            if (!this.canChangeValue || !event.isLeft() && !event.isRight()) return super.keyPressed(event);
+            double sliderStep = 1.0D / (Options.MAXIMUM_ZOOM_STEP_SIZE_PERCENTAGE - Options.MINIMUM_ZOOM_STEP_SIZE_PERCENTAGE);
+            this.setValue(this.value + (event.isLeft() ? -sliderStep : sliderStep));
+            return true;
+        }
+
+        protected void refreshFromOption() {
+            this.value = zoomStepSizePercentageToSliderValue(this.option.getValue());
             this.updateMessage();
         }
 

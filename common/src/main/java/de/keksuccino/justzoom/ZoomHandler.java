@@ -143,7 +143,7 @@ public class ZoomHandler {
     private static void adjustMagnification(double adjustment) {
         if (adjustment == 0.0D) return;
         double maximumMagnification = getConfiguredMaximumMagnification(cachedNormalFov);
-        double stepMultiplier = ZoomMath.normalizeScrollMagnificationMultiplier(JustZoom.getOptions().scrollMagnificationMultiplier.getValue(), Options.DEFAULT_SCROLL_MAGNIFICATION_MULTIPLIER);
+        double stepMultiplier = ZoomMath.calculateZoomStepMultiplier(JustZoom.getOptions().zoomStepSize.getValue());
         getZoomLevelState().adjustMagnification(adjustment, stepMultiplier, maximumMagnification);
     }
 

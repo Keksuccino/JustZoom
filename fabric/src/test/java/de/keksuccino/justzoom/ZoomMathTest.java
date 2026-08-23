@@ -63,9 +63,24 @@ class ZoomMathTest {
     }
 
     @Test
-    void appliesReciprocalWheelSteps() {
-        double zoomedIn = ZoomMath.applyScroll(4.0D, 1.0D, 1.5D, 1000.0D);
-        double zoomedBackOut = ZoomMath.applyScroll(zoomedIn, -1.0D, 1.5D, 1000.0D);
+    void convertsZoomStepSizePercentagesToExponentiallyScaledMultipliers() {
+        assertEquals(Math.pow(ZoomMath.NORMAL_ZOOM_STEP_MULTIPLIER, 0.01D), ZoomMath.calculateZoomStepMultiplier(1), DOUBLE_TOLERANCE);
+        assertEquals(Math.sqrt(ZoomMath.NORMAL_ZOOM_STEP_MULTIPLIER), ZoomMath.calculateZoomStepMultiplier(50), DOUBLE_TOLERANCE);
+        assertEquals(ZoomMath.NORMAL_ZOOM_STEP_MULTIPLIER, ZoomMath.calculateZoomStepMultiplier(100), DOUBLE_TOLERANCE);
+        assertEquals(Math.pow(ZoomMath.NORMAL_ZOOM_STEP_MULTIPLIER, 2.0D), ZoomMath.calculateZoomStepMultiplier(200), DOUBLE_TOLERANCE);
+        assertEquals(Math.pow(ZoomMath.NORMAL_ZOOM_STEP_MULTIPLIER, 4.0D), ZoomMath.calculateZoomStepMultiplier(400), DOUBLE_TOLERANCE);
+    }
+
+    @Test
+    void clampsZoomStepSizePercentageBeforeCalculatingTheMultiplier() {
+        assertEquals(ZoomMath.calculateZoomStepMultiplier(1), ZoomMath.calculateZoomStepMultiplier(0), DOUBLE_TOLERANCE);
+        assertEquals(ZoomMath.calculateZoomStepMultiplier(400), ZoomMath.calculateZoomStepMultiplier(401), DOUBLE_TOLERANCE);
+    }
+
+    @Test
+    void appliesReciprocalZoomAdjustmentSteps() {
+        double zoomedIn = ZoomMath.applyZoomAdjustment(4.0D, 1.0D, 1.5D, 1000.0D);
+        double zoomedBackOut = ZoomMath.applyZoomAdjustment(zoomedIn, -1.0D, 1.5D, 1000.0D);
 
         assertEquals(6.0D, zoomedIn, DOUBLE_TOLERANCE);
         assertEquals(4.0D, zoomedBackOut, DOUBLE_TOLERANCE);
@@ -73,13 +88,13 @@ class ZoomMathTest {
 
     @Test
     void appliesFractionalWheelMovementProportionally() {
-        assertEquals(4.0D * Math.sqrt(1.5D), ZoomMath.applyScroll(4.0D, 0.5D, 1.5D, 1000.0D), DOUBLE_TOLERANCE);
+        assertEquals(4.0D * Math.sqrt(1.5D), ZoomMath.applyZoomAdjustment(4.0D, 0.5D, 1.5D, 1000.0D), DOUBLE_TOLERANCE);
     }
 
     @Test
     void clampsWheelMovementAtBothLimits() {
-        assertEquals(100.0D, ZoomMath.applyScroll(80.0D, 10.0D, 1.5D, 100.0D), DOUBLE_TOLERANCE);
-        assertEquals(ZoomMath.MIN_MAGNIFICATION, ZoomMath.applyScroll(2.0D, -10.0D, 1.5D, 100.0D), DOUBLE_TOLERANCE);
+        assertEquals(100.0D, ZoomMath.applyZoomAdjustment(80.0D, 10.0D, 1.5D, 100.0D), DOUBLE_TOLERANCE);
+        assertEquals(ZoomMath.MIN_MAGNIFICATION, ZoomMath.applyZoomAdjustment(2.0D, -10.0D, 1.5D, 100.0D), DOUBLE_TOLERANCE);
     }
 
     @Test
@@ -104,8 +119,8 @@ class ZoomMathTest {
     void normalizesInvalidConfigurationValues() {
         assertEquals(4.0D, ZoomMath.normalizeMagnification(Double.NaN, 4.0D, 100.0D), DOUBLE_TOLERANCE);
         assertEquals(100.0D, ZoomMath.normalizeMagnification(Double.POSITIVE_INFINITY, 4.0D, 100.0D), DOUBLE_TOLERANCE);
-        assertEquals(1.5D, ZoomMath.normalizeScrollMagnificationMultiplier(0.5D, 1.5D), DOUBLE_TOLERANCE);
-        assertEquals(ZoomMath.MAX_SCROLL_MAGNIFICATION_MULTIPLIER, ZoomMath.normalizeScrollMagnificationMultiplier(100.0D, 1.5D), DOUBLE_TOLERANCE);
+        assertEquals(1.5D, ZoomMath.normalizeMagnificationChangeMultiplier(0.5D, 1.5D), DOUBLE_TOLERANCE);
+        assertEquals(ZoomMath.MAX_MAGNIFICATION_CHANGE_MULTIPLIER, ZoomMath.normalizeMagnificationChangeMultiplier(100.0D, 1.5D), DOUBLE_TOLERANCE);
     }
 
     private static float calculateMaximumZoomedFov(float normalFov, int percentage) {
