@@ -273,7 +273,7 @@ class OptionsScreenTest {
     void controlsTabContainsEveryJustZoomKeybind() {
         List<KeyMapping> keyMappings = OptionsScreen.KEYBIND_SETTINGS.stream().map(OptionsScreen.KeybindSetting::keyMapping).toList();
 
-        assertEquals(List.of(KeyMappings.KEY_TOGGLE_ZOOM, KeyMappings.KEY_ZOOM_IN, KeyMappings.KEY_ZOOM_OUT), keyMappings);
+        assertEquals(List.of(KeyMappings.KEY_TOGGLE_ZOOM, KeyMappings.KEY_ZOOM_IN, KeyMappings.KEY_ZOOM_OUT, KeyMappings.KEY_OPEN_OPTIONS), keyMappings);
     }
 
     private static KeyMapping keyMapping(String suffix, int defaultKey) {

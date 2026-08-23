@@ -61,7 +61,8 @@ public class OptionsScreen extends Screen {
     protected static final KeybindSetting ZOOM_KEYBIND = new KeybindSetting(KeyMappings.KEY_TOGGLE_ZOOM, "justzoom.options.zoom_keybind", "justzoom.options.zoom_keybind.desc");
     protected static final KeybindSetting ZOOM_IN_KEYBIND = new KeybindSetting(KeyMappings.KEY_ZOOM_IN, "justzoom.options.zoom_in_keybind", "justzoom.options.zoom_in_keybind.desc");
     protected static final KeybindSetting ZOOM_OUT_KEYBIND = new KeybindSetting(KeyMappings.KEY_ZOOM_OUT, "justzoom.options.zoom_out_keybind", "justzoom.options.zoom_out_keybind.desc");
-    protected static final List<KeybindSetting> KEYBIND_SETTINGS = List.of(ZOOM_KEYBIND, ZOOM_IN_KEYBIND, ZOOM_OUT_KEYBIND);
+    protected static final KeybindSetting OPEN_OPTIONS_KEYBIND = new KeybindSetting(KeyMappings.KEY_OPEN_OPTIONS, "justzoom.options.open_options_keybind", "justzoom.options.open_options_keybind.desc");
+    protected static final List<KeybindSetting> KEYBIND_SETTINGS = List.of(ZOOM_KEYBIND, ZOOM_IN_KEYBIND, ZOOM_OUT_KEYBIND, OPEN_OPTIONS_KEYBIND);
     private static final Consumer<LayoutSettings> NO_LAYOUT_ADJUSTMENTS = ignored -> {
     };
 
@@ -90,6 +91,13 @@ public class OptionsScreen extends Screen {
         super(Component.translatable("justzoom.options"));
         this.parent = parent;
         this.zoomPreviewTimer = new ZoomPreviewTimer(System::nanoTime);
+    }
+
+    public static void openFromKeybind() {
+        boolean pressed = false;
+        while (KeyMappings.KEY_OPEN_OPTIONS.consumeClick()) pressed = true;
+        if (!pressed) return;
+        Minecraft.getInstance().gui.setScreen(new OptionsScreen(null));
     }
 
     @Override

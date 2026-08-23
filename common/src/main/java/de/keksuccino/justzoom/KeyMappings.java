@@ -18,6 +18,7 @@ public final class KeyMappings {
     public static final KeyMapping KEY_TOGGLE_ZOOM = new KeyMapping("justzoom.keybinds.keybind.zoom", InputConstants.KEY_Z, JUST_ZOOM_KEYMAPPING_CATEGORY);
     public static final KeyMapping KEY_ZOOM_IN = new KeyMapping("justzoom.keybinds.keybind.zoom_in", InputConstants.Type.MOUSE, MOUSE_WHEEL_UP_KEY_VALUE, JUST_ZOOM_KEYMAPPING_CATEGORY);
     public static final KeyMapping KEY_ZOOM_OUT = new KeyMapping("justzoom.keybinds.keybind.zoom_out", InputConstants.Type.MOUSE, MOUSE_WHEEL_DOWN_KEY_VALUE, JUST_ZOOM_KEYMAPPING_CATEGORY);
+    public static final KeyMapping KEY_OPEN_OPTIONS = new KeyMapping("justzoom.keybinds.keybind.open_options", InputConstants.KEY_B, JUST_ZOOM_KEYMAPPING_CATEGORY);
 
     private KeyMappings() {
     }

@@ -10,6 +10,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class KeyMappingsTest {
 
     @Test
+    void opensOptionsWithBByDefault() {
+        assertEquals(InputConstants.Type.KEYSYM.getOrCreate(InputConstants.KEY_B), KeyMappings.KEY_OPEN_OPTIONS.getDefaultKey());
+    }
+
+    @Test
     void usesSerializableWheelDirectionsAsDefaults() {
         assertEquals("key.mouse.9", KeyMappings.KEY_ZOOM_IN.getDefaultKey().getName());
         assertEquals("key.mouse.10", KeyMappings.KEY_ZOOM_OUT.getDefaultKey().getName());
@@ -51,6 +56,7 @@ class KeyMappingsTest {
         assertTrue(KeyMappings.isZoomAdjustment(KeyMappings.KEY_ZOOM_IN));
         assertTrue(KeyMappings.isZoomAdjustment(KeyMappings.KEY_ZOOM_OUT));
         assertFalse(KeyMappings.isZoomAdjustment(KeyMappings.KEY_TOGGLE_ZOOM));
+        assertFalse(KeyMappings.isZoomAdjustment(KeyMappings.KEY_OPEN_OPTIONS));
     }
 
 }

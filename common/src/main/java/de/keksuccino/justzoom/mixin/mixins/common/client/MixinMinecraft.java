@@ -1,5 +1,6 @@
 package de.keksuccino.justzoom.mixin.mixins.common.client;
 
+import de.keksuccino.justzoom.OptionsScreen;
 import de.keksuccino.justzoom.SpyglassSoundHandler;
 import de.keksuccino.justzoom.ZoomHandler;
 import net.minecraft.client.Minecraft;
@@ -19,6 +20,11 @@ public class MixinMinecraft {
     @Inject(method = "handleKeybinds", at = @At("HEAD"))
     private void before_handleKeybinds_JustZoom(CallbackInfo info) {
         ZoomHandler.onInputTick();
+    }
+
+    @Inject(method = "handleKeybinds", at = @At("TAIL"))
+    private void after_handleKeybinds_JustZoom(CallbackInfo info) {
+        OptionsScreen.openFromKeybind();
     }
 
 }

@@ -29,6 +29,7 @@ public class JustZoomNeoForge {
             e.register(KeyMappings.KEY_TOGGLE_ZOOM);
             e.register(KeyMappings.KEY_ZOOM_IN);
             e.register(KeyMappings.KEY_ZOOM_OUT);
+            e.register(KeyMappings.KEY_OPEN_OPTIONS);
         }
 
     }
