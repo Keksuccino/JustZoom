@@ -97,6 +97,7 @@ public class OptionsScreen extends Screen {
         boolean pressed = false;
         while (KeyMappings.KEY_OPEN_OPTIONS.consumeClick()) pressed = true;
         if (!pressed) return;
+        OpenOptionsToastHandler.onOpenOptionsKeyPressed();
         Minecraft.getInstance().gui.setScreen(new OptionsScreen(null));
     }
 

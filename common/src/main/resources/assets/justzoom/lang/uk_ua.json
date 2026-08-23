@@ -18,6 +18,7 @@
   "justzoom.options.zoom_out_keybind.desc": "Клавіша, кнопка миші або напрямок колеса, що зменшує наближення під час зуму.",
   "justzoom.options.open_options_keybind": "Відкрити налаштування: %s",
   "justzoom.options.open_options_keybind.desc": "Клавіша клавіатури або кнопка миші, що використовується для відкриття налаштувань Just Zoom.",
+  "justzoom.open_settings_toast": "Натисніть %s, щоб відкрити налаштування зуму.",
   "justzoom.options.keybind.duplicate_desc": "Ця клавіша також використовується для:\n%s",
   "justzoom.options.base_zoom_factor": "Базовий зум: %s",
   "justzoom.options.base_zoom_factor.desc": "Визначає рівень зуму під час його ввімкнення.\nЗа 0 % зум починається без наближення; за 100 % — із повним наближенням, якщо його не обмежує максимальний зум.\nПереміщуйте повзунок, щоб наживо переглядати початковий зум у світі.",

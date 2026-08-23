@@ -18,6 +18,7 @@
   "justzoom.options.zoom_out_keybind.desc": "La touche, le bouton de la souris ou le sens de la molette utilisé pour réduire le grossissement pendant le zoom.",
   "justzoom.options.open_options_keybind": "Ouvrir les options : %s",
   "justzoom.options.open_options_keybind.desc": "La touche du clavier ou le bouton de la souris utilisé pour ouvrir les options de Just Zoom.",
+  "justzoom.open_settings_toast": "Appuyez sur %s pour ouvrir les options de zoom.",
   "justzoom.options.keybind.duplicate_desc": "Cette touche est aussi utilisée pour :\n%s",
   "justzoom.options.base_zoom_factor": "Zoom de base : %s",
   "justzoom.options.base_zoom_factor.desc": "Définit le niveau de zoom utilisé au début du zoom.\n0 % commence sans zoom ; 100 % commence au zoom maximal, sauf limitation par le zoom maximal configuré.\nDéplacez le curseur pour prévisualiser le zoom initial en direct dans le monde.",

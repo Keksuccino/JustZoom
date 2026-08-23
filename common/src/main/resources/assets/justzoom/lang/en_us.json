@@ -18,6 +18,7 @@
   "justzoom.options.zoom_out_keybind.desc": "The key, mouse button, or mouse wheel direction used to decrease magnification while zooming.",
   "justzoom.options.open_options_keybind": "Open Options: %s",
   "justzoom.options.open_options_keybind.desc": "The key or mouse button used to open Just Zoom's options screen.",
+  "justzoom.open_settings_toast": "Press %s to open the zoom options.",
   "justzoom.options.keybind.duplicate_desc": "This key is also used for:\n%s",
   "justzoom.options.base_zoom_factor": "Base Zoom: %s",
   "justzoom.options.base_zoom_factor.desc": "Sets the zoom level used when zooming starts.\n0% starts without zooming; 100% starts at full zoom unless limited by Maximum Zoom.\nMove the slider to preview the starting zoom live in the world.",

@@ -1,5 +1,6 @@
 package de.keksuccino.justzoom.mixin.mixins.common.client;
 
+import de.keksuccino.justzoom.OpenOptionsToastHandler;
 import de.keksuccino.justzoom.OptionsScreen;
 import de.keksuccino.justzoom.SpyglassSoundHandler;
 import de.keksuccino.justzoom.ZoomHandler;
@@ -15,6 +16,7 @@ public class MixinMinecraft {
     @Inject(method = "tick", at = @At("TAIL"))
     private void after_tick_JustZoom(CallbackInfo info) {
         SpyglassSoundHandler.onClientTick();
+        OpenOptionsToastHandler.onClientTick();
     }
 
     @Inject(method = "handleKeybinds", at = @At("HEAD"))

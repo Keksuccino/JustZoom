@@ -18,6 +18,7 @@
   "justzoom.options.zoom_out_keybind.desc": "ズーム中に倍率を下げるためのキー、マウスボタン、またはマウスホイールの方向です。",
   "justzoom.options.open_options_keybind": "設定を開く: %s",
   "justzoom.options.open_options_keybind.desc": "Just Zoom の設定画面を開くためのキーまたはマウスボタンです。",
+  "justzoom.open_settings_toast": "%s を押してズーム設定を開きます。",
   "justzoom.options.keybind.duplicate_desc": "このキーは次の操作にも使用されています:\n%s",
   "justzoom.options.base_zoom_factor": "基本ズーム: %s",
   "justzoom.options.base_zoom_factor.desc": "ズーム開始時のズーム量を設定します。\n0% ではズームせずに開始し、100% では最大ズームの設定による制限がない限り全範囲を使用します。\nスライダーを動かすと、ワールド内で開始時のズームをリアルタイムにプレビューできます。",

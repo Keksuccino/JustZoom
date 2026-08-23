@@ -18,6 +18,7 @@
   "justzoom.options.zoom_out_keybind.desc": "缩放时用于降低放大倍率的键盘按键、鼠标按钮或滚轮方向。",
   "justzoom.options.open_options_keybind": "打开选项：%s",
   "justzoom.options.open_options_keybind.desc": "用于打开 Just Zoom 选项屏幕的键盘按键或鼠标按钮。",
+  "justzoom.open_settings_toast": "按下 %s 即可打开缩放选项。",
   "justzoom.options.keybind.duplicate_desc": "此按键还用于：\n%s",
   "justzoom.options.base_zoom_factor": "基础缩放：%s",
   "justzoom.options.base_zoom_factor.desc": "设置开始缩放时使用的缩放级别。\n0% 表示开始时不缩放；100% 表示以完整缩放开始，除非受到最大缩放限制。\n移动滑块即可在世界中实时预览初始缩放。",

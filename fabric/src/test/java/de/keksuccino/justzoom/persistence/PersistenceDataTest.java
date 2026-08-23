@@ -24,6 +24,7 @@ class PersistenceDataTest {
         PersistenceData persistenceData = this.createPersistenceData();
 
         assertEquals(4.0F, persistenceData.lastMagnification.getValueOrDefault(4.0F));
+        assertFalse(persistenceData.openSettingsToastShown.getValueOrDefault(false));
         assertFalse(Files.exists(this.getPersistenceFile()));
     }
 
@@ -32,9 +33,21 @@ class PersistenceDataTest {
         PersistenceData persistenceData = this.createPersistenceData();
 
         persistenceData.lastMagnification.setValue(6.0F);
+        persistenceData.openSettingsToastShown.setValue(true);
 
         PersistenceData reloadedData = this.createPersistenceData();
         assertEquals(6.0F, reloadedData.lastMagnification.getValueOrDefault(4.0F));
+        assertTrue(reloadedData.openSettingsToastShown.getValueOrDefault(false));
+    }
+
+    @Test
+    void savesOpenSettingsToastStateUnderItsPersistentKey() throws IOException {
+        PersistenceData persistenceData = this.createPersistenceData();
+
+        persistenceData.openSettingsToastShown.setValue(true);
+
+        JsonObject savedData = JsonParser.parseString(Files.readString(this.getPersistenceFile(), StandardCharsets.UTF_8)).getAsJsonObject();
+        assertTrue(savedData.get("open_settings_toast").getAsBoolean());
     }
 
     @Test

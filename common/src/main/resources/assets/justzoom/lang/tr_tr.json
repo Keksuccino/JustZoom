@@ -18,6 +18,7 @@
   "justzoom.options.zoom_out_keybind.desc": "Yakınlaştırma sırasında büyütmeyi azaltan tuş, fare düğmesi veya fare tekerleği yönü.",
   "justzoom.options.open_options_keybind": "Ayarları Aç: %s",
   "justzoom.options.open_options_keybind.desc": "Just Zoom ayarları ekranını açmak için kullanılan klavye tuşu veya fare düğmesi.",
+  "justzoom.open_settings_toast": "Yakınlaştırma ayarlarını açmak için %s tuşuna bas.",
   "justzoom.options.keybind.duplicate_desc": "Bu tuş ayrıca şunun için kullanılıyor:\n%s",
   "justzoom.options.base_zoom_factor": "Temel Yakınlaştırma: %s",
   "justzoom.options.base_zoom_factor.desc": "Yakınlaştırma başlarken kullanılacak yakınlaştırma seviyesini ayarlar.\n0% yakınlaştırma olmadan başlatır; 100%, Maksimum Yakınlaştırma tarafından sınırlandırılmadığı sürece tam yakınlaştırmayla başlatır.\nBaşlangıç yakınlaştırmasını dünyada canlı olarak önizlemek için kaydırıcıyı hareket ettir.",
