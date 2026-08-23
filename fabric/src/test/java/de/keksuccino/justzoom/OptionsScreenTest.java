@@ -109,61 +109,57 @@ class OptionsScreenTest {
     }
 
     @Test
-    void smoothZoomScrollSpeedSliderUsesTheCompleteRangeInPointZeroOneSteps() {
-        double sliderStep = 1.0D / 999.0D;
+    void smoothZoomScrollSpeedSliderUsesWholePercentagesAcrossTheCompleteRange() {
+        double sliderStep = 1.0D / 799.0D;
+        int minimumPercentage = Options.MINIMUM_SMOOTH_ZOOM_SCROLL_SPEED_PERCENTAGE;
+        int maximumPercentage = Options.MAXIMUM_SMOOTH_ZOOM_SCROLL_SPEED_PERCENTAGE;
+        int defaultPercentage = Options.DEFAULT_SMOOTH_ZOOM_SCROLL_SPEED_PERCENTAGE;
 
-        assertEquals(0.01F, OptionsScreen.sliderValueToSmoothZoomScrollSpeed(-1.0D));
-        assertEquals(0.01F, OptionsScreen.sliderValueToSmoothZoomScrollSpeed(0.0D));
-        assertEquals(0.02F, OptionsScreen.sliderValueToSmoothZoomScrollSpeed(sliderStep));
-        assertEquals(1.0F, OptionsScreen.sliderValueToSmoothZoomScrollSpeed(99.0D / 999.0D));
-        assertEquals(10.0F, OptionsScreen.sliderValueToSmoothZoomScrollSpeed(1.0D));
-        assertEquals(10.0F, OptionsScreen.sliderValueToSmoothZoomScrollSpeed(2.0D));
-        assertEquals(Options.DEFAULT_SMOOTH_ZOOM_SCROLL_SPEED, OptionsScreen.sliderValueToSmoothZoomScrollSpeed(Double.NaN));
+        assertEquals(1, OptionsScreen.sliderValueToRangedPercentage(-1.0D, minimumPercentage, maximumPercentage, defaultPercentage));
+        assertEquals(1, OptionsScreen.sliderValueToRangedPercentage(0.0D, minimumPercentage, maximumPercentage, defaultPercentage));
+        assertEquals(2, OptionsScreen.sliderValueToRangedPercentage(sliderStep, minimumPercentage, maximumPercentage, defaultPercentage));
+        assertEquals(100, OptionsScreen.sliderValueToRangedPercentage(99.0D / 799.0D, minimumPercentage, maximumPercentage, defaultPercentage));
+        assertEquals(800, OptionsScreen.sliderValueToRangedPercentage(1.0D, minimumPercentage, maximumPercentage, defaultPercentage));
+        assertEquals(800, OptionsScreen.sliderValueToRangedPercentage(2.0D, minimumPercentage, maximumPercentage, defaultPercentage));
+        assertEquals(defaultPercentage, OptionsScreen.sliderValueToRangedPercentage(Double.NaN, minimumPercentage, maximumPercentage, defaultPercentage));
     }
 
     @Test
     void smoothZoomScrollSpeedSliderSnapsContinuousInputAndNormalizesStoredValues() {
-        double sliderStep = 1.0D / 999.0D;
+        double sliderStep = 1.0D / 799.0D;
+        int minimumPercentage = Options.MINIMUM_SMOOTH_ZOOM_SCROLL_SPEED_PERCENTAGE;
+        int maximumPercentage = Options.MAXIMUM_SMOOTH_ZOOM_SCROLL_SPEED_PERCENTAGE;
+        int defaultPercentage = Options.DEFAULT_SMOOTH_ZOOM_SCROLL_SPEED_PERCENTAGE;
 
-        assertEquals(0.0D, OptionsScreen.smoothZoomScrollSpeedToSliderValue(-1.0F, 1.0F));
-        assertEquals(99.0D / 999.0D, OptionsScreen.smoothZoomScrollSpeedToSliderValue(1.0F, 1.0F), 0.000000001D);
-        assertEquals(1.0D, OptionsScreen.smoothZoomScrollSpeedToSliderValue(11.0F, 1.0F));
-        assertEquals(99.0D / 999.0D, OptionsScreen.smoothZoomScrollSpeedToSliderValue(Float.NaN, 1.0F), 0.000000001D);
-        assertEquals(sliderStep, OptionsScreen.snapSmoothZoomScrollSpeedSliderValue(sliderStep * 1.4D), 0.000000001D);
-        assertEquals(sliderStep * 2.0D, OptionsScreen.snapSmoothZoomScrollSpeedSliderValue(sliderStep * 1.5D), 0.000000001D);
-    }
-
-    @Test
-    void smoothZoomScrollSpeedUsesTimesNotationWithoutUnnecessaryHundredths() {
-        assertEquals("0.01", OptionsScreen.formatSmoothZoomScrollSpeed(0.01F));
-        assertEquals("1.0", OptionsScreen.formatSmoothZoomScrollSpeed(1.0F));
-        assertEquals("1.5", OptionsScreen.formatSmoothZoomScrollSpeed(1.5F));
-        assertEquals("1.23", OptionsScreen.formatSmoothZoomScrollSpeed(1.23F));
-        assertEquals("10.0", OptionsScreen.formatSmoothZoomScrollSpeed(10.0F));
+        assertEquals(0.0D, OptionsScreen.rangedPercentageToSliderValue(0, minimumPercentage, maximumPercentage));
+        assertEquals(99.0D / 799.0D, OptionsScreen.rangedPercentageToSliderValue(100, minimumPercentage, maximumPercentage), 0.000000001D);
+        assertEquals(1.0D, OptionsScreen.rangedPercentageToSliderValue(801, minimumPercentage, maximumPercentage));
+        assertEquals(sliderStep, OptionsScreen.snapRangedPercentageSliderValue(sliderStep * 1.4D, minimumPercentage, maximumPercentage, defaultPercentage), 0.000000001D);
+        assertEquals(sliderStep * 2.0D, OptionsScreen.snapRangedPercentageSliderValue(sliderStep * 1.5D, minimumPercentage, maximumPercentage, defaultPercentage), 0.000000001D);
     }
 
     @Test
     void zoomStepSizeSliderUsesWholePercentagesAcrossTheCompleteRange() {
         double sliderStep = 1.0D / 399.0D;
 
-        assertEquals(1, OptionsScreen.sliderValueToZoomStepSizePercentage(-1.0D));
-        assertEquals(1, OptionsScreen.sliderValueToZoomStepSizePercentage(0.0D));
-        assertEquals(2, OptionsScreen.sliderValueToZoomStepSizePercentage(sliderStep));
-        assertEquals(100, OptionsScreen.sliderValueToZoomStepSizePercentage(99.0D / 399.0D));
-        assertEquals(400, OptionsScreen.sliderValueToZoomStepSizePercentage(1.0D));
-        assertEquals(400, OptionsScreen.sliderValueToZoomStepSizePercentage(2.0D));
-        assertEquals(Options.DEFAULT_ZOOM_STEP_SIZE_PERCENTAGE, OptionsScreen.sliderValueToZoomStepSizePercentage(Double.NaN));
+        assertEquals(1, OptionsScreen.sliderValueToRangedPercentage(-1.0D, Options.MINIMUM_ZOOM_STEP_SIZE_PERCENTAGE, Options.MAXIMUM_ZOOM_STEP_SIZE_PERCENTAGE, Options.DEFAULT_ZOOM_STEP_SIZE_PERCENTAGE));
+        assertEquals(1, OptionsScreen.sliderValueToRangedPercentage(0.0D, Options.MINIMUM_ZOOM_STEP_SIZE_PERCENTAGE, Options.MAXIMUM_ZOOM_STEP_SIZE_PERCENTAGE, Options.DEFAULT_ZOOM_STEP_SIZE_PERCENTAGE));
+        assertEquals(2, OptionsScreen.sliderValueToRangedPercentage(sliderStep, Options.MINIMUM_ZOOM_STEP_SIZE_PERCENTAGE, Options.MAXIMUM_ZOOM_STEP_SIZE_PERCENTAGE, Options.DEFAULT_ZOOM_STEP_SIZE_PERCENTAGE));
+        assertEquals(100, OptionsScreen.sliderValueToRangedPercentage(99.0D / 399.0D, Options.MINIMUM_ZOOM_STEP_SIZE_PERCENTAGE, Options.MAXIMUM_ZOOM_STEP_SIZE_PERCENTAGE, Options.DEFAULT_ZOOM_STEP_SIZE_PERCENTAGE));
+        assertEquals(400, OptionsScreen.sliderValueToRangedPercentage(1.0D, Options.MINIMUM_ZOOM_STEP_SIZE_PERCENTAGE, Options.MAXIMUM_ZOOM_STEP_SIZE_PERCENTAGE, Options.DEFAULT_ZOOM_STEP_SIZE_PERCENTAGE));
+        assertEquals(400, OptionsScreen.sliderValueToRangedPercentage(2.0D, Options.MINIMUM_ZOOM_STEP_SIZE_PERCENTAGE, Options.MAXIMUM_ZOOM_STEP_SIZE_PERCENTAGE, Options.DEFAULT_ZOOM_STEP_SIZE_PERCENTAGE));
+        assertEquals(Options.DEFAULT_ZOOM_STEP_SIZE_PERCENTAGE, OptionsScreen.sliderValueToRangedPercentage(Double.NaN, Options.MINIMUM_ZOOM_STEP_SIZE_PERCENTAGE, Options.MAXIMUM_ZOOM_STEP_SIZE_PERCENTAGE, Options.DEFAULT_ZOOM_STEP_SIZE_PERCENTAGE));
     }
 
     @Test
     void zoomStepSizeSliderSnapsContinuousInputAndNormalizesStoredValues() {
         double sliderStep = 1.0D / 399.0D;
 
-        assertEquals(0.0D, OptionsScreen.zoomStepSizePercentageToSliderValue(0));
-        assertEquals(99.0D / 399.0D, OptionsScreen.zoomStepSizePercentageToSliderValue(100), 0.000000001D);
-        assertEquals(1.0D, OptionsScreen.zoomStepSizePercentageToSliderValue(401));
-        assertEquals(sliderStep, OptionsScreen.snapZoomStepSizeSliderValue(sliderStep * 1.4D), 0.000000001D);
-        assertEquals(sliderStep * 2.0D, OptionsScreen.snapZoomStepSizeSliderValue(sliderStep * 1.5D), 0.000000001D);
+        assertEquals(0.0D, OptionsScreen.rangedPercentageToSliderValue(0, Options.MINIMUM_ZOOM_STEP_SIZE_PERCENTAGE, Options.MAXIMUM_ZOOM_STEP_SIZE_PERCENTAGE));
+        assertEquals(99.0D / 399.0D, OptionsScreen.rangedPercentageToSliderValue(100, Options.MINIMUM_ZOOM_STEP_SIZE_PERCENTAGE, Options.MAXIMUM_ZOOM_STEP_SIZE_PERCENTAGE), 0.000000001D);
+        assertEquals(1.0D, OptionsScreen.rangedPercentageToSliderValue(401, Options.MINIMUM_ZOOM_STEP_SIZE_PERCENTAGE, Options.MAXIMUM_ZOOM_STEP_SIZE_PERCENTAGE));
+        assertEquals(sliderStep, OptionsScreen.snapRangedPercentageSliderValue(sliderStep * 1.4D, Options.MINIMUM_ZOOM_STEP_SIZE_PERCENTAGE, Options.MAXIMUM_ZOOM_STEP_SIZE_PERCENTAGE, Options.DEFAULT_ZOOM_STEP_SIZE_PERCENTAGE), 0.000000001D);
+        assertEquals(sliderStep * 2.0D, OptionsScreen.snapRangedPercentageSliderValue(sliderStep * 1.5D, Options.MINIMUM_ZOOM_STEP_SIZE_PERCENTAGE, Options.MAXIMUM_ZOOM_STEP_SIZE_PERCENTAGE, Options.DEFAULT_ZOOM_STEP_SIZE_PERCENTAGE), 0.000000001D);
     }
 
     @Test

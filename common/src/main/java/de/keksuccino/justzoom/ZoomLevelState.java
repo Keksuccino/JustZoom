@@ -67,7 +67,7 @@ final class ZoomLevelState {
         this.usingBaseMagnification = true;
     }
 
-    void tick(boolean zooming, boolean smooth, float smoothZoomScrollSpeed, float startZoomingAnimationSpeed, float stopZoomingAnimationSpeed, double maximumMagnification) {
+    void tick(boolean zooming, boolean smooth, int smoothZoomScrollSpeedPercentage, float startZoomingAnimationSpeed, float stopZoomingAnimationSpeed, double maximumMagnification) {
         this.updateToggleTransition(zooming, smooth, startZoomingAnimationSpeed, stopZoomingAnimationSpeed);
         this.previousSmoothedActiveMagnification = normalize(this.smoothedActiveMagnification, this.getTargetMagnification(maximumMagnification), maximumMagnification);
         if (!smooth) {
@@ -79,9 +79,10 @@ final class ZoomLevelState {
         double activeTarget = this.getTargetMagnification(maximumMagnification);
         this.smoothedActiveMagnification = normalize(this.smoothedActiveMagnification, activeTarget, maximumMagnification);
         if (zooming) {
-            // Magnification is followed in logarithmic space, so exponentiating the base rate makes the configured value a true speed multiplier.
-            float normalizedScrollSpeed = Options.normalizeSmoothZoomScrollSpeed(smoothZoomScrollSpeed, Options.DEFAULT_SMOOTH_ZOOM_SCROLL_SPEED);
-            double changeMultiplier = Math.pow(WHEEL_MAGNIFICATION_CHANGE_PER_TICK, normalizedScrollSpeed);
+            // Magnification is followed in logarithmic space, so exponentiating the base rate makes the percentage a true speed multiplier.
+            int normalizedPercentage = Options.normalizeSmoothZoomScrollSpeedPercentage(smoothZoomScrollSpeedPercentage);
+            double speedMultiplier = normalizedPercentage / (double) Options.DEFAULT_SMOOTH_ZOOM_SCROLL_SPEED_PERCENTAGE;
+            double changeMultiplier = Math.pow(WHEEL_MAGNIFICATION_CHANGE_PER_TICK, speedMultiplier);
             this.smoothedActiveMagnification = ZoomMath.moveMagnificationTowards(this.smoothedActiveMagnification, activeTarget, changeMultiplier);
         }
 

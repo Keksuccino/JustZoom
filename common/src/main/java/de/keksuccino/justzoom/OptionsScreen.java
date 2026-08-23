@@ -81,8 +81,7 @@ public class OptionsScreen extends Screen {
     private boolean zoomPreviewActive;
     private final List<Button> optionButtons = new ArrayList<>();
     private final List<AnimationSpeedSlider> animationSpeedSliders = new ArrayList<>();
-    private final List<SmoothZoomScrollSpeedSlider> smoothZoomScrollSpeedSliders = new ArrayList<>();
-    private final List<ZoomStepSizeSlider> zoomStepSizeSliders = new ArrayList<>();
+    private final List<RangedPercentageSlider> rangedPercentageSliders = new ArrayList<>();
     private final List<ZoomFactorSlider> zoomFactorSliders = new ArrayList<>();
     private final List<OptionControl> optionControls = new ArrayList<>();
     private final List<KeybindControl> keybindControls = new ArrayList<>();
@@ -99,8 +98,7 @@ public class OptionsScreen extends Screen {
         this.layout.removeChildren();
         this.optionButtons.clear();
         this.animationSpeedSliders.clear();
-        this.smoothZoomScrollSpeedSliders.clear();
-        this.zoomStepSizeSliders.clear();
+        this.rangedPercentageSliders.clear();
         this.zoomFactorSliders.clear();
         this.optionControls.clear();
         this.keybindControls.clear();
@@ -151,10 +149,10 @@ public class OptionsScreen extends Screen {
         this.addZoomFactorSlider(tab, JustZoom.getOptions().baseZoomFactor, "justzoom.options.base_zoom_factor", ZoomPreviewTarget.BASE_ZOOM);
         this.addZoomFactorSlider(tab, JustZoom.getOptions().maximumZoomFactor, "justzoom.options.maximum_zoom_factor", ZoomPreviewTarget.MAXIMUM_ZOOM);
         this.addToggleOption(tab, JustZoom.getOptions().resetZoomFactorOnStopZooming, "justzoom.options.reset_zoom_factor_when_stop_zooming");
-        this.addZoomStepSizeSlider(tab, JustZoom.getOptions().zoomStepSize, "justzoom.options.zoom_step_size");
+        this.addRangedPercentageSlider(tab, JustZoom.getOptions().zoomStepSize, "justzoom.options.zoom_step_size", Options.MINIMUM_ZOOM_STEP_SIZE_PERCENTAGE, Options.MAXIMUM_ZOOM_STEP_SIZE_PERCENTAGE);
         this.addAnimationSpeedSlider(tab, JustZoom.getOptions().startZoomingAnimationSpeed, "justzoom.options.start_zooming_animation_speed");
         this.addAnimationSpeedSlider(tab, JustZoom.getOptions().stopZoomingAnimationSpeed, "justzoom.options.stop_zooming_animation_speed");
-        this.addSmoothZoomScrollSpeedSlider(tab, JustZoom.getOptions().smoothZoomScrollSpeed, "justzoom.options.smooth_zoom_scroll_speed");
+        this.addRangedPercentageSlider(tab, JustZoom.getOptions().smoothZoomScrollSpeedPercentage, "justzoom.options.smooth_zoom_scroll_speed", Options.MINIMUM_SMOOTH_ZOOM_SCROLL_SPEED_PERCENTAGE, Options.MAXIMUM_SMOOTH_ZOOM_SCROLL_SPEED_PERCENTAGE);
         return tab;
     }
 
@@ -179,18 +177,10 @@ public class OptionsScreen extends Screen {
         tab.addChild(this.buildControlRowLayout(slider, resetButton));
     }
 
-    protected void addSmoothZoomScrollSpeedSlider(@NotNull OptionsTab tab, @NotNull ConfigValue<Float> option, @NotNull String labelBaseKey) {
-        SmoothZoomScrollSpeedSlider slider = new SmoothZoomScrollSpeedSlider(option, labelBaseKey, this.getButtonWidth());
+    protected void addRangedPercentageSlider(@NotNull OptionsTab tab, @NotNull ConfigValue<Integer> option, @NotNull String labelBaseKey, int minimumPercentage, int maximumPercentage) {
+        RangedPercentageSlider slider = new RangedPercentageSlider(option, labelBaseKey, minimumPercentage, maximumPercentage, this.getButtonWidth());
         Button resetButton = this.buildResetButton(option, slider::getMessage, slider::refreshFromOption);
-        this.smoothZoomScrollSpeedSliders.add(slider);
-        this.optionControls.add(new OptionControl(() -> isOptionDefault(option), resetButton));
-        tab.addChild(this.buildControlRowLayout(slider, resetButton));
-    }
-
-    protected void addZoomStepSizeSlider(@NotNull OptionsTab tab, @NotNull ConfigValue<Integer> option, @NotNull String labelBaseKey) {
-        ZoomStepSizeSlider slider = new ZoomStepSizeSlider(option, labelBaseKey, this.getButtonWidth());
-        Button resetButton = this.buildResetButton(option, slider::getMessage, slider::refreshFromOption);
-        this.zoomStepSizeSliders.add(slider);
+        this.rangedPercentageSliders.add(slider);
         this.optionControls.add(new OptionControl(() -> isOptionDefault(option), resetButton));
         tab.addChild(this.buildControlRowLayout(slider, resetButton));
     }
@@ -283,10 +273,7 @@ public class OptionsScreen extends Screen {
         for (AnimationSpeedSlider slider : this.animationSpeedSliders) {
             slider.setWidth(controlWidth);
         }
-        for (SmoothZoomScrollSpeedSlider slider : this.smoothZoomScrollSpeedSliders) {
-            slider.setWidth(controlWidth);
-        }
-        for (ZoomStepSizeSlider slider : this.zoomStepSizeSliders) {
+        for (RangedPercentageSlider slider : this.rangedPercentageSliders) {
             slider.setWidth(controlWidth);
         }
         for (ZoomFactorSlider slider : this.zoomFactorSliders) {
@@ -428,67 +415,33 @@ public class OptionsScreen extends Screen {
         return step / (double) stepCount;
     }
 
-    static float sliderValueToSmoothZoomScrollSpeed(double sliderValue) {
-        double fallback = smoothZoomScrollSpeedToSliderValue(Options.DEFAULT_SMOOTH_ZOOM_SCROLL_SPEED, Options.DEFAULT_SMOOTH_ZOOM_SCROLL_SPEED);
-        double safeSliderValue = Double.isFinite(sliderValue) ? sliderValue : fallback;
+    static int sliderValueToRangedPercentage(double sliderValue, int minimumPercentage, int maximumPercentage, int fallbackPercentage) {
+        double fallbackSliderValue = rangedPercentageToSliderValue(fallbackPercentage, minimumPercentage, maximumPercentage);
+        double safeSliderValue = Double.isFinite(sliderValue) ? sliderValue : fallbackSliderValue;
         double clampedSliderValue = Math.max(0.0D, Math.min(1.0D, safeSliderValue));
-        int minimumStep = Math.round(Options.MIN_SMOOTH_ZOOM_SCROLL_SPEED * Options.SMOOTH_ZOOM_SCROLL_SPEED_STEPS_PER_MULTIPLIER);
-        int maximumStep = Math.round(Options.MAX_SMOOTH_ZOOM_SCROLL_SPEED * Options.SMOOTH_ZOOM_SCROLL_SPEED_STEPS_PER_MULTIPLIER);
-        int step = minimumStep + (int) Math.round(clampedSliderValue * (maximumStep - minimumStep));
-        return step / (float) Options.SMOOTH_ZOOM_SCROLL_SPEED_STEPS_PER_MULTIPLIER;
+        return minimumPercentage + (int) Math.round(clampedSliderValue * (maximumPercentage - minimumPercentage));
     }
 
-    static double smoothZoomScrollSpeedToSliderValue(float speedMultiplier, float fallback) {
-        float normalizedSpeed = Options.normalizeSmoothZoomScrollSpeed(speedMultiplier, fallback);
-        int minimumStep = Math.round(Options.MIN_SMOOTH_ZOOM_SCROLL_SPEED * Options.SMOOTH_ZOOM_SCROLL_SPEED_STEPS_PER_MULTIPLIER);
-        int maximumStep = Math.round(Options.MAX_SMOOTH_ZOOM_SCROLL_SPEED * Options.SMOOTH_ZOOM_SCROLL_SPEED_STEPS_PER_MULTIPLIER);
-        int step = Math.round(normalizedSpeed * Options.SMOOTH_ZOOM_SCROLL_SPEED_STEPS_PER_MULTIPLIER);
-        return (step - minimumStep) / (double) (maximumStep - minimumStep);
+    static double rangedPercentageToSliderValue(int percentage, int minimumPercentage, int maximumPercentage) {
+        int normalizedPercentage = Math.max(minimumPercentage, Math.min(maximumPercentage, percentage));
+        return (normalizedPercentage - minimumPercentage) / (double) (maximumPercentage - minimumPercentage);
     }
 
-    static double snapSmoothZoomScrollSpeedSliderValue(double sliderValue) {
-        float speedMultiplier = sliderValueToSmoothZoomScrollSpeed(sliderValue);
-        return smoothZoomScrollSpeedToSliderValue(speedMultiplier, Options.DEFAULT_SMOOTH_ZOOM_SCROLL_SPEED);
-    }
-
-    @NotNull
-    static String formatSmoothZoomScrollSpeed(float speedMultiplier) {
-        float normalizedSpeed = Options.normalizeSmoothZoomScrollSpeed(speedMultiplier, Options.DEFAULT_SMOOTH_ZOOM_SCROLL_SPEED);
-        String formattedSpeed = String.format(Locale.ROOT, "%.2f", normalizedSpeed);
-        return formattedSpeed.endsWith("0") ? formattedSpeed.substring(0, formattedSpeed.length() - 1) : formattedSpeed;
-    }
-
-    static int sliderValueToZoomStepSizePercentage(double sliderValue) {
-        double fallback = zoomStepSizePercentageToSliderValue(Options.DEFAULT_ZOOM_STEP_SIZE_PERCENTAGE);
-        double safeSliderValue = Double.isFinite(sliderValue) ? sliderValue : fallback;
-        double clampedSliderValue = Math.max(0.0D, Math.min(1.0D, safeSliderValue));
-        int percentageRange = Options.MAXIMUM_ZOOM_STEP_SIZE_PERCENTAGE - Options.MINIMUM_ZOOM_STEP_SIZE_PERCENTAGE;
-        int percentage = Options.MINIMUM_ZOOM_STEP_SIZE_PERCENTAGE + (int) Math.round(clampedSliderValue * percentageRange);
-        return Options.normalizeZoomStepSizePercentage(percentage);
-    }
-
-    static double zoomStepSizePercentageToSliderValue(int percentage) {
-        int normalizedPercentage = Options.normalizeZoomStepSizePercentage(percentage);
-        int percentageRange = Options.MAXIMUM_ZOOM_STEP_SIZE_PERCENTAGE - Options.MINIMUM_ZOOM_STEP_SIZE_PERCENTAGE;
-        return (normalizedPercentage - Options.MINIMUM_ZOOM_STEP_SIZE_PERCENTAGE) / (double) percentageRange;
-    }
-
-    static double snapZoomStepSizeSliderValue(double sliderValue) {
-        return zoomStepSizePercentageToSliderValue(sliderValueToZoomStepSizePercentage(sliderValue));
+    static double snapRangedPercentageSliderValue(double sliderValue, int minimumPercentage, int maximumPercentage, int fallbackPercentage) {
+        int percentage = sliderValueToRangedPercentage(sliderValue, minimumPercentage, maximumPercentage, fallbackPercentage);
+        return rangedPercentageToSliderValue(percentage, minimumPercentage, maximumPercentage);
     }
 
     static int sliderValueToZoomFactorPercentage(double sliderValue) {
-        double safeSliderValue = Double.isFinite(sliderValue) ? sliderValue : 1.0D;
-        double clampedSliderValue = Math.max(0.0D, Math.min(1.0D, safeSliderValue));
-        return Options.normalizeZoomFactorPercentage((int) Math.round(clampedSliderValue * Options.MAXIMUM_ZOOM_FACTOR_PERCENTAGE));
+        return sliderValueToRangedPercentage(sliderValue, Options.MINIMUM_ZOOM_FACTOR_PERCENTAGE, Options.MAXIMUM_ZOOM_FACTOR_PERCENTAGE, Options.DEFAULT_MAXIMUM_ZOOM_FACTOR_PERCENTAGE);
     }
 
     static double zoomFactorPercentageToSliderValue(int percentage) {
-        return Options.normalizeZoomFactorPercentage(percentage) / (double) Options.MAXIMUM_ZOOM_FACTOR_PERCENTAGE;
+        return rangedPercentageToSliderValue(percentage, Options.MINIMUM_ZOOM_FACTOR_PERCENTAGE, Options.MAXIMUM_ZOOM_FACTOR_PERCENTAGE);
     }
 
     static double snapZoomFactorSliderValue(double sliderValue) {
-        return zoomFactorPercentageToSliderValue(sliderValueToZoomFactorPercentage(sliderValue));
+        return snapRangedPercentageSliderValue(sliderValue, Options.MINIMUM_ZOOM_FACTOR_PERCENTAGE, Options.MAXIMUM_ZOOM_FACTOR_PERCENTAGE, Options.DEFAULT_MAXIMUM_ZOOM_FACTOR_PERCENTAGE);
     }
 
     static boolean shouldActivateZoomPreview(boolean inWorld, boolean advancedTabSelected, boolean sliderRecentlyMoved) {
@@ -727,82 +680,39 @@ public class OptionsScreen extends Screen {
 
     }
 
-    protected class SmoothZoomScrollSpeedSlider extends AbstractSliderButton {
-
-        private final ConfigValue<Float> option;
-        private final String labelBaseKey;
-
-        protected SmoothZoomScrollSpeedSlider(@NotNull ConfigValue<Float> option, @NotNull String labelBaseKey, int width) {
-            super(0, 0, width, BUTTON_HEIGHT, CommonComponents.EMPTY, smoothZoomScrollSpeedToSliderValue(option.getValue(), option.getDefaultValue()));
-            this.option = option;
-            this.labelBaseKey = labelBaseKey;
-            this.setTooltip(Tooltip.create(Component.translatable(labelBaseKey + ".desc")));
-            this.updateMessage();
-        }
-
-        @Override
-        protected void updateMessage() {
-            String speedMultiplier = formatSmoothZoomScrollSpeed(sliderValueToSmoothZoomScrollSpeed(this.value));
-            this.setMessage(Component.translatable(this.labelBaseKey, Component.literal("x" + speedMultiplier)));
-        }
-
-        @Override
-        protected void setValue(double newValue) {
-            super.setValue(snapSmoothZoomScrollSpeedSliderValue(newValue));
-        }
-
-        @Override
-        protected void applyValue() {
-            float speedMultiplier = sliderValueToSmoothZoomScrollSpeed(this.value);
-            if (Float.compare(this.option.getValue(), speedMultiplier) != 0) {
-                this.option.setValue(speedMultiplier);
-            }
-            OptionsScreen.this.updateOptionResetButtons();
-        }
-
-        @Override
-        public boolean keyPressed(@NotNull KeyEvent event) {
-            if (!this.canChangeValue || !event.isLeft() && !event.isRight()) return super.keyPressed(event);
-            double sliderStep = Options.SMOOTH_ZOOM_SCROLL_SPEED_STEP / (Options.MAX_SMOOTH_ZOOM_SCROLL_SPEED - Options.MIN_SMOOTH_ZOOM_SCROLL_SPEED);
-            this.setValue(this.value + (event.isLeft() ? -sliderStep : sliderStep));
-            return true;
-        }
-
-        protected void refreshFromOption() {
-            this.value = smoothZoomScrollSpeedToSliderValue(this.option.getValue(), this.option.getDefaultValue());
-            this.updateMessage();
-        }
-
-    }
-
-    protected class ZoomStepSizeSlider extends AbstractSliderButton {
+    protected class RangedPercentageSlider extends AbstractSliderButton {
 
         private final ConfigValue<Integer> option;
         private final String labelBaseKey;
+        private final int minimumPercentage;
+        private final int maximumPercentage;
 
-        protected ZoomStepSizeSlider(@NotNull ConfigValue<Integer> option, @NotNull String labelBaseKey, int width) {
-            super(0, 0, width, BUTTON_HEIGHT, CommonComponents.EMPTY, zoomStepSizePercentageToSliderValue(option.getValue()));
+        protected RangedPercentageSlider(@NotNull ConfigValue<Integer> option, @NotNull String labelBaseKey, int minimumPercentage, int maximumPercentage, int width) {
+            super(0, 0, width, BUTTON_HEIGHT, CommonComponents.EMPTY, rangedPercentageToSliderValue(option.getValue(), minimumPercentage, maximumPercentage));
+            if (minimumPercentage >= maximumPercentage) throw new IllegalArgumentException("Percentage slider maximum must be greater than its minimum.");
             this.option = option;
             this.labelBaseKey = labelBaseKey;
+            this.minimumPercentage = minimumPercentage;
+            this.maximumPercentage = maximumPercentage;
             this.setTooltip(Tooltip.create(Component.translatable(labelBaseKey + ".desc")));
             this.updateMessage();
         }
 
         @Override
         protected void updateMessage() {
-            int percentage = sliderValueToZoomStepSizePercentage(this.value);
+            int percentage = this.getPercentage();
             this.setMessage(Component.translatable(this.labelBaseKey, Component.literal(percentage + "%")));
         }
 
         @Override
         protected void setValue(double newValue) {
             // Snap before vanilla compares and applies the value so dragging and keyboard input can never store partial percentages.
-            super.setValue(snapZoomStepSizeSliderValue(newValue));
+            super.setValue(snapRangedPercentageSliderValue(newValue, this.minimumPercentage, this.maximumPercentage, this.option.getDefaultValue()));
         }
 
         @Override
         protected void applyValue() {
-            int percentage = sliderValueToZoomStepSizePercentage(this.value);
+            int percentage = this.getPercentage();
             if (this.option.getValue() != percentage) {
                 this.option.setValue(percentage);
             }
@@ -812,14 +722,18 @@ public class OptionsScreen extends Screen {
         @Override
         public boolean keyPressed(@NotNull KeyEvent event) {
             if (!this.canChangeValue || !event.isLeft() && !event.isRight()) return super.keyPressed(event);
-            double sliderStep = 1.0D / (Options.MAXIMUM_ZOOM_STEP_SIZE_PERCENTAGE - Options.MINIMUM_ZOOM_STEP_SIZE_PERCENTAGE);
+            double sliderStep = 1.0D / (this.maximumPercentage - this.minimumPercentage);
             this.setValue(this.value + (event.isLeft() ? -sliderStep : sliderStep));
             return true;
         }
 
         protected void refreshFromOption() {
-            this.value = zoomStepSizePercentageToSliderValue(this.option.getValue());
+            this.value = rangedPercentageToSliderValue(this.option.getValue(), this.minimumPercentage, this.maximumPercentage);
             this.updateMessage();
+        }
+
+        private int getPercentage() {
+            return sliderValueToRangedPercentage(this.value, this.minimumPercentage, this.maximumPercentage, this.option.getDefaultValue());
         }
 
     }

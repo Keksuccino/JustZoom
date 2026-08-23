@@ -10,7 +10,7 @@ public class Options extends JsonConfig {
 
     public static final int DEFAULT_BASE_ZOOM_FACTOR_PERCENTAGE = 75;
     public static final int DEFAULT_ZOOM_STEP_SIZE_PERCENTAGE = 100;
-    public static final float DEFAULT_SMOOTH_ZOOM_SCROLL_SPEED = 1.0F;
+    public static final int DEFAULT_SMOOTH_ZOOM_SCROLL_SPEED_PERCENTAGE = 100;
     public static final float DEFAULT_START_ZOOMING_ANIMATION_SPEED = 0.30F;
     public static final float DEFAULT_STOP_ZOOMING_ANIMATION_SPEED = 0.2F;
     public static final int DEFAULT_MAXIMUM_ZOOM_FACTOR_PERCENTAGE = 100;
@@ -18,14 +18,12 @@ public class Options extends JsonConfig {
     public static final int MAXIMUM_ZOOM_FACTOR_PERCENTAGE = 100;
     public static final int MINIMUM_ZOOM_STEP_SIZE_PERCENTAGE = 1;
     public static final int MAXIMUM_ZOOM_STEP_SIZE_PERCENTAGE = 400;
+    public static final int MINIMUM_SMOOTH_ZOOM_SCROLL_SPEED_PERCENTAGE = 1;
+    public static final int MAXIMUM_SMOOTH_ZOOM_SCROLL_SPEED_PERCENTAGE = 800;
     public static final float MIN_ANIMATION_SPEED = 0.0F;
     public static final float MAX_ANIMATION_SPEED = 5.0F;
     public static final int ANIMATION_SPEED_STEPS_PER_SECOND = 20;
     public static final float ANIMATION_SPEED_STEP = 1.0F / ANIMATION_SPEED_STEPS_PER_SECOND;
-    public static final float MIN_SMOOTH_ZOOM_SCROLL_SPEED = 0.01F;
-    public static final float MAX_SMOOTH_ZOOM_SCROLL_SPEED = 10.0F;
-    public static final int SMOOTH_ZOOM_SCROLL_SPEED_STEPS_PER_MULTIPLIER = 100;
-    public static final float SMOOTH_ZOOM_SCROLL_SPEED_STEP = 1.0F / SMOOTH_ZOOM_SCROLL_SPEED_STEPS_PER_MULTIPLIER;
 
     private final ConfigSection zoom = this.section("zoom");
     private final ConfigSection spyglass = this.section("spyglass");
@@ -35,7 +33,7 @@ public class Options extends JsonConfig {
     public final ConfigValue<Boolean> smoothZoomInOut = this.zoom.option("smooth_zoom_in_out", true);
     public final ConfigValue<Float> startZoomingAnimationSpeed = this.zoom.option("start_zooming_animation_speed", DEFAULT_START_ZOOMING_ANIMATION_SPEED);
     public final ConfigValue<Float> stopZoomingAnimationSpeed = this.zoom.option("stop_zooming_animation_speed", DEFAULT_STOP_ZOOMING_ANIMATION_SPEED);
-    public final ConfigValue<Float> smoothZoomScrollSpeed = this.zoom.option("smooth_zoom_scroll_speed", DEFAULT_SMOOTH_ZOOM_SCROLL_SPEED);
+    public final ConfigValue<Integer> smoothZoomScrollSpeedPercentage = this.zoom.option("smooth_zoom_scroll_speed_percentage", DEFAULT_SMOOTH_ZOOM_SCROLL_SPEED_PERCENTAGE);
     public final ConfigValue<Integer> maximumZoomFactor = this.zoom.option("maximum_zoom_factor", DEFAULT_MAXIMUM_ZOOM_FACTOR_PERCENTAGE);
     public final ConfigValue<Boolean> smoothCameraOnZoom = this.zoom.option("smooth_camera_movement_on_zoom", false);
     public final ConfigValue<Boolean> normalizeMouseSensitivityOnZoom = this.zoom.option("normalize_mouse_sensitivity_on_zoom", true);
@@ -64,19 +62,16 @@ public class Options extends JsonConfig {
         return MIN_ANIMATION_SPEED + step / (float) ANIMATION_SPEED_STEPS_PER_SECOND;
     }
 
-    static float normalizeSmoothZoomScrollSpeed(float speedMultiplier, float fallback) {
-        float safeFallback = Float.isFinite(fallback) ? Math.max(MIN_SMOOTH_ZOOM_SCROLL_SPEED, Math.min(MAX_SMOOTH_ZOOM_SCROLL_SPEED, fallback)) : DEFAULT_SMOOTH_ZOOM_SCROLL_SPEED;
-        float clampedMultiplier = Math.max(MIN_SMOOTH_ZOOM_SCROLL_SPEED, Math.min(MAX_SMOOTH_ZOOM_SCROLL_SPEED, Float.isFinite(speedMultiplier) ? speedMultiplier : safeFallback));
-        int step = Math.round(clampedMultiplier * SMOOTH_ZOOM_SCROLL_SPEED_STEPS_PER_MULTIPLIER);
-        return step / (float) SMOOTH_ZOOM_SCROLL_SPEED_STEPS_PER_MULTIPLIER;
-    }
-
     static int normalizeZoomFactorPercentage(int percentage) {
         return Math.max(MINIMUM_ZOOM_FACTOR_PERCENTAGE, Math.min(MAXIMUM_ZOOM_FACTOR_PERCENTAGE, percentage));
     }
 
     static int normalizeZoomStepSizePercentage(int percentage) {
         return Math.max(MINIMUM_ZOOM_STEP_SIZE_PERCENTAGE, Math.min(MAXIMUM_ZOOM_STEP_SIZE_PERCENTAGE, percentage));
+    }
+
+    static int normalizeSmoothZoomScrollSpeedPercentage(int percentage) {
+        return Math.max(MINIMUM_SMOOTH_ZOOM_SCROLL_SPEED_PERCENTAGE, Math.min(MAXIMUM_SMOOTH_ZOOM_SCROLL_SPEED_PERCENTAGE, percentage));
     }
 
 }

@@ -27,7 +27,7 @@
   "justzoom.options.stop_zooming_animation_speed": "Animationsdauer beim Zoomstopp: %s",
   "justzoom.options.stop_zooming_animation_speed.desc": "Die Dauer der Animation beim Stoppen des Zoomens in Sekunden.\n0,00 Sekunden lassen die Animation sofort ablaufen.\nGilt nur, wenn „Smoothes Zoomen“ aktiviert ist; andernfalls endet das Zoomen sofort.",
   "justzoom.options.smooth_zoom_scroll_speed": "Scroll-Geschwindigkeit für sanften Zoom: %s",
-  "justzoom.options.smooth_zoom_scroll_speed.desc": "Steuert, wie schnell der sanfte Zoom auf Zoomänderungen mit dem Mausrad reagiert.\nHöhere Multiplikatoren lassen den Zoomfaktor die gewählte Stufe schneller erreichen.",
+  "justzoom.options.smooth_zoom_scroll_speed.desc": "Steuert, wie schnell der sanfte Zoom auf Zoomänderungen mit dem Mausrad reagiert.\n100 % ist die normale Geschwindigkeit.\n50 % ist halb so schnell; 200 % ist doppelt so schnell.",
   "justzoom.options.maximum_zoom_factor": "Maximaler Zoom: %s",
   "justzoom.options.maximum_zoom_factor.desc": "Begrenzt, wie weit Just Zoom hineinzoomen kann.\n0 % verhindert das Zoomen vollständig; 100 % erlaubt den vollen Bereich.\nBewege den Regler, um die Grenze live in der Welt zu sehen.",
   "justzoom.options.seconds": "%s s",

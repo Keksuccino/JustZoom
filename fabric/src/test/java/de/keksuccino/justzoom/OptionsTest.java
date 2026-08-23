@@ -85,14 +85,14 @@ class OptionsTest {
     }
 
     @Test
-    void defaultsSmoothZoomScrollSpeedToOneTimes() throws IOException {
+    void defaultsSmoothZoomScrollSpeedToOneHundredPercent() throws IOException {
         Path configFile = this.temporaryDirectory.resolve("smooth-zoom-scroll-speed-default.json");
 
         Options options = new Options(configFile.toFile());
 
-        assertEquals(Options.DEFAULT_SMOOTH_ZOOM_SCROLL_SPEED, options.smoothZoomScrollSpeed.getValue());
+        assertEquals(Options.DEFAULT_SMOOTH_ZOOM_SCROLL_SPEED_PERCENTAGE, options.smoothZoomScrollSpeedPercentage.getValue());
         JsonObject storedZoomOptions = JsonParser.parseString(Files.readString(configFile, StandardCharsets.UTF_8)).getAsJsonObject().getAsJsonObject("zoom");
-        assertEquals(Options.DEFAULT_SMOOTH_ZOOM_SCROLL_SPEED, storedZoomOptions.get("smooth_zoom_scroll_speed").getAsFloat());
+        assertEquals(Options.DEFAULT_SMOOTH_ZOOM_SCROLL_SPEED_PERCENTAGE, storedZoomOptions.get("smooth_zoom_scroll_speed_percentage").getAsInt());
     }
 
     @Test
@@ -206,14 +206,27 @@ class OptionsTest {
         Path configFile = this.temporaryDirectory.resolve("smooth-zoom-scroll-speed.json");
         Options options = new Options(configFile.toFile());
 
-        options.smoothZoomScrollSpeed.setValue(2.75F);
+        options.smoothZoomScrollSpeedPercentage.setValue(275);
         options.startZoomingAnimationSpeed.setValue(0.35F);
         options.stopZoomingAnimationSpeed.setValue(4.75F);
         Options reloadedOptions = new Options(configFile.toFile());
 
-        assertEquals(2.75F, reloadedOptions.smoothZoomScrollSpeed.getValue());
+        assertEquals(275, reloadedOptions.smoothZoomScrollSpeedPercentage.getValue());
         assertEquals(0.35F, reloadedOptions.startZoomingAnimationSpeed.getValue());
         assertEquals(4.75F, reloadedOptions.stopZoomingAnimationSpeed.getValue());
+    }
+
+    @Test
+    void doesNotCarryOverRetiredSmoothZoomScrollSpeedMultiplier() throws IOException {
+        Path configFile = this.temporaryDirectory.resolve("retired-smooth-zoom-scroll-speed.json");
+        Files.writeString(configFile, "{\"zoom\":{\"smooth_zoom_scroll_speed\":2.75}}", StandardCharsets.UTF_8);
+
+        Options options = new Options(configFile.toFile());
+
+        assertEquals(Options.DEFAULT_SMOOTH_ZOOM_SCROLL_SPEED_PERCENTAGE, options.smoothZoomScrollSpeedPercentage.getValue());
+        JsonObject storedZoomOptions = JsonParser.parseString(Files.readString(configFile, StandardCharsets.UTF_8)).getAsJsonObject().getAsJsonObject("zoom");
+        assertEquals(2.75F, storedZoomOptions.get("smooth_zoom_scroll_speed").getAsFloat());
+        assertEquals(Options.DEFAULT_SMOOTH_ZOOM_SCROLL_SPEED_PERCENTAGE, storedZoomOptions.get("smooth_zoom_scroll_speed_percentage").getAsInt());
     }
 
     @Test
@@ -227,14 +240,12 @@ class OptionsTest {
     }
 
     @Test
-    void normalizesSmoothZoomScrollSpeedToItsSupportedRangeAndStep() {
-        assertEquals(0.01F, Options.normalizeSmoothZoomScrollSpeed(-1.0F, 1.0F));
-        assertEquals(0.01F, Options.normalizeSmoothZoomScrollSpeed(0.01F, 1.0F));
-        assertEquals(1.23F, Options.normalizeSmoothZoomScrollSpeed(1.234F, 1.0F));
-        assertEquals(1.24F, Options.normalizeSmoothZoomScrollSpeed(1.235F, 1.0F));
-        assertEquals(10.0F, Options.normalizeSmoothZoomScrollSpeed(11.0F, 1.0F));
-        assertEquals(2.75F, Options.normalizeSmoothZoomScrollSpeed(Float.NaN, 2.75F));
-        assertEquals(1.0F, Options.normalizeSmoothZoomScrollSpeed(Float.POSITIVE_INFINITY, 1.0F));
+    void normalizesSmoothZoomScrollSpeedToPercentageRange() {
+        assertEquals(1, Options.normalizeSmoothZoomScrollSpeedPercentage(0));
+        assertEquals(1, Options.normalizeSmoothZoomScrollSpeedPercentage(1));
+        assertEquals(100, Options.normalizeSmoothZoomScrollSpeedPercentage(100));
+        assertEquals(800, Options.normalizeSmoothZoomScrollSpeedPercentage(800));
+        assertEquals(800, Options.normalizeSmoothZoomScrollSpeedPercentage(801));
     }
 
     @Test
