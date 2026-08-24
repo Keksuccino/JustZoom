@@ -1,24 +1,39 @@
-
 CHANGELOG | JUST ZOOM v3.0.0 [ W I P !!! NOT PUBLIC YET !!! ]
 
-- Reworked the Settings screen
-- The settings can now be opened via Mod Menu on Fabric (was already possible before), and on NeoForge via its Mods menu (was NOT possible before)
-- Removed the icon button in the Pause screen that opened the Settings screen (only way now is via the Mods menus)
-- Just Zoom now by default also replaces the normal logic of the spyglass with the Just Zoom logic (can be disabled in settings)
-- There's a setting now to configure when the spyglass overlay should be visible (only spyglass, only keybind zoom, both, never; default is "only spyglass")
-- You can now configure when spyglass sounds should play, and they will play by default when zooming with they keybind now (can be changed in settings)
-- It's now possible to zoom in even more than before
-- Just Zoom now makes the spyglass work in third-person view, when enabled in the settings
-- Added setting to control when to show the HUD while zooming (only spyglass, only keybind zoom, both, never; default is "never")
-- Improved the smooth zoom speed and feel
-- Improved the mouse sensitivity normalization
-- Added configurable keybinds for zoom in/out actions
-- It is now possible to turn off the improved third-person zoom (automatically going into first-person while zooming) (#51, #43)
-- The "Allow Zoom in Mirrored View" setting got removed, and instead it is now always possible to zoom while in mirrored view (#51)
-- There are settings for configuring the start/stop zooming animation speeds now
-- Added setting to adjust the maximum zoom factor (how far you can zoom in) (#5)
-- Fixed max zoom level is capped to the spyglass zoom level when smooth zooming is enabled
-- Fixed mod creating config folders in the system root when loaded server-side (#46)
-- Fixed "Hide Hand" setting not working when Iris shaders are enabled (#42)
-
-
+- Completely reworked the Settings screen
+  - Organized the Settings screen into General, Advanced, and Controls tabs
+  - Improved the Settings screen's layout, scrolling, descriptions, terminology, and support for smaller window sizes
+  - All Just Zoom keybinds can now be configured directly from the Settings screen, including mouse-wheel directions
+  - Added individual reset buttons for every setting and keybind
+- The settings can be opened through Mod Menu on Fabric and through the Mods menu on NeoForge
+- Added a configurable keybind for opening the Settings screen (`B` by default)
+- Added a one-time tutorial toast that explains how to open the Settings screen when zooming is first used
+- Removed the icon button from the Pause screen that opened Just Zoom's Settings screen
+- Changed the configuration format from `config.txt` to `config.json`
+- Just Zoom now replaces the normal spyglass zoom logic with its own logic by default (can be disabled in settings)
+- Added a setting to configure when the spyglass overlay should be visible: only while using a spyglass, only while using keybind zoom, during both, or never (default is "Only Spyglass")
+- Added a setting to configure when spyglass sounds should play: only while using a spyglass, only while using keybind zoom, during both, or never (default is "Spyglass & Keybind Zoom")
+- Spyglass sounds now also play when zooming with the normal zoom keybind by default
+- Just Zoom now makes the spyglass work in third-person view when Spyglass Integration is enabled
+- Added a setting to control when the HUD should remain visible while zooming: only while using a spyglass, only while using keybind zoom, during both, or never (default is "Never")
+- It is now possible to zoom in significantly further than before
+- Added a setting to adjust the maximum zoom factor (how far it is possible to zoom in) (#5)
+- Base Zoom and Maximum Zoom are now percentage sliders
+- Base Zoom and Maximum Zoom can now be previewed live in the world while adjusting their sliders
+- Reworked zoom calculations around optical magnification, providing more consistent and symmetrical Zoom In/Out steps at different FOV values
+- The last manually selected zoom level is now remembered across game restarts when "Reset Zoom" is disabled
+- Added configurable keybinds for the Zoom In and Zoom Out actions (Mouse Wheel Up and Mouse Wheel Down by default)
+- Added a "Zoom Step Size" setting for controlling the strength of each Zoom In or Zoom Out input
+- Added a "Smooth Zoom Scroll Speed" setting for controlling how quickly smooth zooming reacts to Zoom In and Zoom Out inputs
+- Improved the smooth zoom speed, responsiveness, and overall feel
+- Zoom start and stop animations now have consistent durations regardless of the selected zoom level
+- Added separate settings for configuring the start and stop zooming animation durations
+- Improved mouse sensitivity normalization so camera movement remains proportional to the visible magnification
+- It is now possible to turn off the improved third-person zoom that automatically switches to the first-person camera while zooming (#51, #43)
+- Removed the "Allow Zoom in Mirrored View" setting; zooming is now always possible in mirrored view (#51)
+- "Hide Hand" is now enabled by default
+- Added homepage and issue-tracker links to the Fabric and NeoForge mod information screens
+- Removed the incorrect "Library" badge from Just Zoom's Mod Menu entry
+- Fixed the maximum zoom level being capped to the vanilla spyglass zoom level when smooth zooming was enabled
+- Fixed the mod creating configuration folders in the system root when loaded server-side (#46)
+- Fixed the "Hide Hand" setting not working when Iris shaders were enabled (#42)
