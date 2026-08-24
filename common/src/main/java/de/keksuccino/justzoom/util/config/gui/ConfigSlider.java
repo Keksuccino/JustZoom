@@ -1,5 +1,6 @@
-package de.keksuccino.justzoom.util.config;
+package de.keksuccino.justzoom.util.config.gui;
 
+import de.keksuccino.justzoom.util.config.ConfigValue;
 import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.CommonComponents;

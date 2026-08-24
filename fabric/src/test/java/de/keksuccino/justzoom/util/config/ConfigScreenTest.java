@@ -1,6 +1,7 @@
 package de.keksuccino.justzoom.util.config;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import de.keksuccino.justzoom.util.config.gui.ConfigScreen;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.resources.Identifier;
 import org.junit.jupiter.api.Test;

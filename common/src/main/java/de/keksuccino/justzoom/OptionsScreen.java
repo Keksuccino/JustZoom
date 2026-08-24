@@ -1,7 +1,7 @@
 package de.keksuccino.justzoom;
 
-import de.keksuccino.justzoom.util.config.ConfigScreen;
-import de.keksuccino.justzoom.util.config.ConfigSlider;
+import de.keksuccino.justzoom.util.config.gui.ConfigScreen;
+import de.keksuccino.justzoom.util.config.gui.ConfigSlider;
 import de.keksuccino.justzoom.util.config.ConfigValue;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;

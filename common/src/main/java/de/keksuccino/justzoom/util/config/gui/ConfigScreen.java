@@ -1,7 +1,8 @@
-package de.keksuccino.justzoom.util.config;
+package de.keksuccino.justzoom.util.config.gui;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import de.keksuccino.justzoom.platform.Services;
+import de.keksuccino.justzoom.util.config.ConfigValue;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
