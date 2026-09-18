@@ -6,7 +6,7 @@
     "client.MixinAbstractClientPlayer",
     "client.MixinCamera",
     "client.MixinCameraType",
-    "client.MixinGameRenderer",
+    "client.MixinFirstPersonHandsAndItemsRenderer",
     "client.MixinKeyMapping_Category",
     "client.MixinMouseHandler",
     "client.MixinPauseScreen"

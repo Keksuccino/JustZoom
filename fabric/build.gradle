@@ -20,6 +20,9 @@ dependencies {
     include(implementation(annotationProcessor("io.github.llamalad7:mixinextras-fabric:${mixin_extras_version}")))
     implementation "maven.modrinth:konkrete:${konkrete_version}-${minecraft_version}-fabric"
     implementation "maven.modrinth:modmenu:${modmenu_version}"
+    testImplementation "org.junit.jupiter:junit-jupiter:5.10.2"
+    testRuntimeOnly "org.junit.platform:junit-platform-launcher:1.10.2"
+    testImplementation "org.ow2.asm:asm-tree:${asm_version}"
 
 }
 
@@ -46,15 +49,14 @@ loom {
     }
 }
 
-tasks.withType(JavaCompile).configureEach {
+tasks.named("compileJava", JavaCompile).configure {
     source(project(":common").sourceSets.main.allSource)
 }
 tasks.withType(Javadoc).configureEach {
     source(project(":common").sourceSets.main.allJava)
 }
 tasks.withType(Test).configureEach {
-    // Allow builds when there are test sources but no matching tests.
-    failOnNoDiscoveredTests = false
+    useJUnitPlatform()
 }
 tasks.named("sourcesJar", Jar) {
     from(project(":common").sourceSets.main.allSource)
