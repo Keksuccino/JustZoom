@@ -1,5 +1,7 @@
 package de.keksuccino.justzoom.mixin.mixins.common.client;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import de.keksuccino.justzoom.JustZoom;
 import de.keksuccino.justzoom.ZoomHandler;
 import net.minecraft.client.Camera;
@@ -10,6 +12,17 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Camera.class)
 public class MixinCamera {
+
+    /** @reason Let Just Zoom's smooth FOV interpolation reach below the vanilla spyglass limit without changing vanilla's upper limit. */
+    @WrapOperation(method = "tickFov", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/Mth;clamp(FFF)F"))
+    private float wrap_clamp_in_tickFov_JustZoom(float value, float min, float max, Operation<Float> original) {
+        if (ZoomHandler.isZooming() && ZoomHandler.shouldZoomInOutSmooth()) {
+            // Use a fixed positive floor: clamping to the requested zoom factor would
+            // skip interpolation when scrolling back out from a stronger zoom.
+            min = Math.min(min, ZoomHandler.MIN_FOV_MODIFIER);
+        }
+        return original.call(value, min, max);
+    }
 
     @Inject(method = "calculateFov", at = @At("RETURN"), cancellable = true)
     private void return_calculateFov_JustZoom(float partialTicks, CallbackInfoReturnable<Float> info) {
@@ -26,7 +39,7 @@ public class MixinCamera {
             ZoomHandler.cachedNormalFov = normalFov;
             ZoomHandler.cachedModifiedFov = modifiedFov;
             info.setReturnValue(modifiedFov);
-        } else if (JustZoom.getOptions().resetZoomFactorOnStopZooming.getValue()) {
+        } else if (!ZoomHandler.isZooming() && JustZoom.getOptions().resetZoomFactorOnStopZooming.getValue()) {
             ZoomHandler.zoomModifier = JustZoom.getOptions().baseZoomFactor.getValue();
         }
 

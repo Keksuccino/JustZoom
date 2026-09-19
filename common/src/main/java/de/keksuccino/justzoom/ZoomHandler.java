@@ -9,6 +9,8 @@ public class ZoomHandler {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
+    public static final float MIN_FOV_MODIFIER = 0.0000000001F;
+
     public static float zoomModifier = JustZoom.getOptions().baseZoomFactor.getValue();
     public static float cachedNormalFov = 0.0F;
     public static float cachedModifiedFov = 0.0F;
@@ -39,7 +41,7 @@ public class ZoomHandler {
         //To not zoom out further than normal FOV
         if (zoomModifier > 1.0F) zoomModifier = 1.0F;
         //To not break FOV calculations
-        if (zoomModifier <= 0.0F) zoomModifier = 0.0000000001F;
+        if (zoomModifier <= 0.0F) zoomModifier = MIN_FOV_MODIFIER;
 
         return zoomModifier;
 
