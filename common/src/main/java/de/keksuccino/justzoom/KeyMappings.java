@@ -2,9 +2,44 @@ package de.keksuccino.justzoom;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
+import org.jetbrains.annotations.NotNull;
 
-public class KeyMappings {
+public final class KeyMappings {
 
-    public static final KeyMapping KEY_TOGGLE_ZOOM = new KeyMapping("justzoom.keybinds.keybind.zoom", InputConstants.KEY_Z, "justzoom.keybinds.category");
+    // InputConstants serializes arbitrary mouse values as key.mouse.N. The values after GLFW's last real button can therefore
+    // represent wheel directions without colliding with physical button events.
+    private static final int MOUSE_WHEEL_UP_KEY_VALUE = org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LAST + 1;
+    private static final int MOUSE_WHEEL_DOWN_KEY_VALUE = org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LAST + 2;
+
+    public static final String JUST_ZOOM_KEYMAPPING_CATEGORY = "justzoom.keybinds.category";
+
+    public static final KeyMapping KEY_TOGGLE_ZOOM = new KeyMapping("justzoom.keybinds.keybind.zoom", InputConstants.KEY_Z, JUST_ZOOM_KEYMAPPING_CATEGORY);
+    public static final KeyMapping KEY_ZOOM_IN = new KeyMapping("justzoom.keybinds.keybind.zoom_in", InputConstants.Type.MOUSE, MOUSE_WHEEL_UP_KEY_VALUE, JUST_ZOOM_KEYMAPPING_CATEGORY);
+    public static final KeyMapping KEY_ZOOM_OUT = new KeyMapping("justzoom.keybinds.keybind.zoom_out", InputConstants.Type.MOUSE, MOUSE_WHEEL_DOWN_KEY_VALUE, JUST_ZOOM_KEYMAPPING_CATEGORY);
+    public static final KeyMapping KEY_OPEN_OPTIONS = new KeyMapping("justzoom.keybinds.keybind.open_options", InputConstants.KEY_B, JUST_ZOOM_KEYMAPPING_CATEGORY);
+
+    private KeyMappings() {
+    }
+
+    public static boolean isZoomAdjustment(@NotNull KeyMapping keyMapping) {
+        return keyMapping == KEY_ZOOM_IN || keyMapping == KEY_ZOOM_OUT;
+    }
+
+    public static boolean hasMouseWheelDirection(double deltaY) {
+        return Double.isFinite(deltaY) && deltaY != 0.0D;
+    }
+
+    public static boolean matchesMouseWheel(@NotNull KeyMapping keyMapping, double deltaY) {
+        if (!hasMouseWheelDirection(deltaY)) return false;
+        return keyMapping.saveString().equals(getMouseWheelKey(deltaY).getName());
+    }
+
+    @NotNull
+    public static InputConstants.Key getMouseWheelKey(double deltaY) {
+        if (!Double.isFinite(deltaY)) return InputConstants.UNKNOWN;
+        if (deltaY > 0.0D) return InputConstants.Type.MOUSE.getOrCreate(MOUSE_WHEEL_UP_KEY_VALUE);
+        if (deltaY < 0.0D) return InputConstants.Type.MOUSE.getOrCreate(MOUSE_WHEEL_DOWN_KEY_VALUE);
+        return InputConstants.UNKNOWN;
+    }
 
 }

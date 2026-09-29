@@ -11,9 +11,10 @@ subprojects {
     java.toolchain.languageVersion = JavaLanguageVersion.of(17)
     java.withSourcesJar()
 //    java.withJavadocJar()
-        
-    jar {
-        from(rootProject.file("LICENSE")) {
+
+    // Include the license in regular, source, and bundled loader artifacts alike.
+    tasks.withType(Jar).configureEach {
+        from(rootProject.file("LICENSE.md")) {
             rename { "${it}_${mod_name}" }
         }
         manifest {
@@ -32,13 +33,18 @@ subprojects {
         }
     }
 
-    sourcesJar {
-        from(rootProject.file("LICENSE")) {
-            rename { "${it}_${mod_name}" }
-        }
-    }
 
     repositories {
+        // Mojang's patched macOS FreeType native is not published to Maven Central.
+        exclusiveContent {
+            forRepository {
+                maven {
+                    url = 'https://libraries.minecraft.net'
+                    metadataSources { artifact() }
+                }
+            }
+            filter { includeModule('org.lwjgl', 'lwjgl-freetype') }
+        }
         mavenCentral()
         maven {
             name = 'Sponge / Mixin'
@@ -78,6 +84,8 @@ subprojects {
                 "mod_description": mod_description,
                 "mod_license": mod_license,
                 "mod_authors": mod_authors,
+                "mod_website": mod_website,
+                "mod_issues": mod_issues,
                 "minecraft_version": minecraft_version,
                 "fabric_version": fabric_version,
                 "fabric_short_version": fabric_short_version,

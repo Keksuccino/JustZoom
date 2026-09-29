@@ -5,16 +5,18 @@
   "client": [
     "client.MixinAbstractClientPlayer",
     "client.MixinCameraType",
+    "client.MixinEditBox",
     "client.MixinGameRenderer",
+    "client.MixinGui",
+    "client.MixinItemInHandRenderer",
+    "client.MixinMinecraft",
     "client.MixinMouseHandler",
-    "client.MixinPauseScreen"
+    "client.MixinSpyglassItem"
   ],
-  "mixins": [
-  ],
+  "mixins": [],
   "injectors": {
     "defaultRequire": 1
   },
-  "refmap": "justzoom.refmap.json",
   "plugin": "de.keksuccino.justzoom.mixin.JustZoomMixinPlugin",
   "minVersion": "0.8"
 }
