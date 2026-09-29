@@ -1,0 +1,34 @@
+package de.keksuccino.justzoom.mixin.mixins.common.client;
+
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.resources.ResourceLocation;
+import org.junit.jupiter.api.Test;
+
+import java.lang.reflect.Method;
+import java.util.Arrays;
+
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+class MixinWidgetOpacityTargetTest {
+
+    private static final String BLIT_SPRITE_TARGET = "Lnet/minecraft/client/gui/GuiGraphics;blitSprite(Lnet/minecraft/resources/ResourceLocation;IIII)V";
+
+    @Test
+    void opacityMixinsTargetTheExistingFourCoordinateBlitSpriteOverload() {
+        assertDoesNotThrow(() -> GuiGraphics.class.getDeclaredMethod("blitSprite", ResourceLocation.class, int.class, int.class, int.class, int.class));
+        assertWrapTarget(MixinEditBox.class, "wrap_blitSprite_in_renderWidget_JustZoom");
+        assertWrapTarget(MixinTabButton.class, "wrap_blitSprite_in_renderWidget_JustZoom");
+    }
+
+    private static void assertWrapTarget(Class<?> mixinClass, String handlerName) {
+        Method handler = Arrays.stream(mixinClass.getDeclaredMethods()).filter(method -> method.getName().equals(handlerName)).findFirst().orElseThrow();
+        WrapOperation wrapOperation = handler.getAnnotation(WrapOperation.class);
+        assertNotNull(wrapOperation);
+        assertEquals(1, wrapOperation.at().length);
+        assertEquals(BLIT_SPRITE_TARGET, wrapOperation.at()[0].target());
+    }
+
+}

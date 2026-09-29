@@ -1,16 +1,10 @@
 package de.keksuccino.justzoom.mixin.mixins.common.client;
 
-import com.llamalad7.mixinextras.injector.WrapWithCondition;
-import de.keksuccino.justzoom.JustZoom;
 import de.keksuccino.justzoom.ZoomHandler;
+import de.keksuccino.justzoom.ZoomMath;
 import net.minecraft.client.Camera;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.world.entity.Entity;
-import org.joml.Matrix4f;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -19,56 +13,22 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(GameRenderer.class)
 public class MixinGameRenderer {
 
-    @Shadow private float fov;
-    @Shadow private float oldFov;
+    @Inject(method = "tickFov", at = @At("RETURN"))
+    private void after_tickFov_JustZoom(CallbackInfo info) {
+        ZoomHandler.onCameraTick();
+    }
 
     @Inject(method = "getFov", at = @At("RETURN"), cancellable = true)
-    private void return_getFov_JustZoom(Camera c, float partial, boolean useFOVSetting, CallbackInfoReturnable<Double> info) {
-
-        if (ZoomHandler.isZooming()) {
-            double normalFov = info.getReturnValue();
-            if (normalFov > 170.0D) normalFov = 170.0D;
-            if (normalFov < 1.0D) normalFov = 1.0D;
-            double modifiedFov = normalFov;
-            ZoomHandler.cachedNormalFov = normalFov;
-            modifiedFov = modifiedFov * ZoomHandler.getFovModifier();
-            if (modifiedFov > 170.0D) modifiedFov = 170.0D;
-            if (modifiedFov < 1.0D) modifiedFov = 1.0D;
-            ZoomHandler.cachedModifiedFov = modifiedFov;
-            if (!ZoomHandler.shouldZoomInOutSmooth()) {
-                info.setReturnValue(modifiedFov);
-            } else {
-                info.setReturnValue(normalFov);
-            }
-        } else if (JustZoom.getOptions().resetZoomFactorOnStopZooming.getValue()) {
-            ZoomHandler.zoomModifier = JustZoom.getOptions().baseZoomFactor.getValue();
+    private void after_getFov_JustZoom(Camera camera, float partialTicks, boolean useFovSetting, CallbackInfoReturnable<Double> info) {
+        // Vanilla also queries the hand projection with useFovSetting=false; only zoom the world projection.
+        if (!useFovSetting) return;
+        float normalFov = info.getReturnValue().floatValue();
+        double magnification = ZoomHandler.getRenderedMagnification(partialTicks, normalFov);
+        float modifiedFov = magnification > ZoomMath.MIN_MAGNIFICATION ? ZoomMath.calculateZoomedFov(normalFov, magnification) : normalFov;
+        ZoomHandler.updateRenderedFov(normalFov, modifiedFov);
+        if (modifiedFov != normalFov) {
+            info.setReturnValue((double) modifiedFov);
         }
-
-    }
-
-    @Inject(method = "tickFov", at = @At("HEAD"), cancellable = true)
-    private void head_tickFov_JustZoom(CallbackInfo info) {
-
-        if (ZoomHandler.isZooming()) {
-
-            info.cancel();
-
-            float f = 1.0F;
-            Entity entity = Minecraft.getInstance().getCameraEntity();
-            if (entity instanceof AbstractClientPlayer abstractclientplayer) {
-                f = abstractclientplayer.getFieldOfViewModifier();
-            }
-
-            this.oldFov = this.fov;
-            this.fov += (f - this.fov) * 0.5F;
-
-        }
-
-    }
-
-    @WrapWithCondition(method = "renderLevel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GameRenderer;renderItemInHand(Lnet/minecraft/client/Camera;FLorg/joml/Matrix4f;)V"))
-    private boolean wrap_renderItemInHand_JustZoom(GameRenderer instance, Camera camera, float f, Matrix4f matrix4f) {
-        return !ZoomHandler.shouldHideArmsWhenZooming();
     }
 
 }

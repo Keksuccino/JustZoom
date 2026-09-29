@@ -73,4 +73,9 @@ public class ForgePlatformHelper implements IPlatformHelper {
         return keyMapping.getKey();
     }
 
+    @Override
+    public void setKeyMappingKey(KeyMapping keyMapping, InputConstants.Key key) {
+        keyMapping.setKeyModifierAndCode(net.minecraftforge.client.settings.KeyModifier.NONE, key);
+    }
+
 }
