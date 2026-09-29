@@ -6,6 +6,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import java.io.File;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Objects;
@@ -14,18 +15,26 @@ public class GameDirectoryUtils {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
+    @NotNull
     public static File getGameDirectory() {
         try {
             if (Services.PLATFORM.isOnClient()) {
-                return Minecraft.getInstance().gameDirectory;
+                Minecraft minecraft = Minecraft.getInstance();
+                if ((minecraft != null) && (minecraft.gameDirectory != null)) {
+                    return minecraft.gameDirectory;
+                }
             } else {
                 Path path = Paths.get("server.properties");
                 return path.toAbsolutePath().getParent().toFile();
             }
         } catch (Exception ex) {
-            LOGGER.error("[FANCYMENU] Failed to get game directory!", ex);
+            LOGGER.error("[JUST ZOOM] Failed to get game directory!", ex);
         }
-        return new File("");
+        Path workingDirectory = Paths.get("").toAbsolutePath().normalize();
+        if (Files.isDirectory(workingDirectory)) {
+            return workingDirectory.toFile();
+        }
+        throw new RuntimeException("Just Zoom failed to resolve the game/instance directory.");
     }
 
     public static boolean isExistingGameDirectoryPath(@NotNull String path) {
@@ -46,8 +55,8 @@ public class GameDirectoryUtils {
                 if (path.startsWith("/")) path = path.substring(1);
                 return gameDir + "/" + path;
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ex) {
+            LOGGER.error("[JUST ZOOM] Failed to get absolute game directory path!", ex);
         }
         return path;
     }

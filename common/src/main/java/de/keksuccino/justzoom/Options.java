@@ -1,28 +1,77 @@
 package de.keksuccino.justzoom;
 
-import de.keksuccino.justzoom.util.AbstractOptions;
-import de.keksuccino.konkrete.config.Config;
+import de.keksuccino.justzoom.util.config.ConfigSection;
+import de.keksuccino.justzoom.util.config.ConfigValue;
+import de.keksuccino.justzoom.util.config.JsonConfig;
+import org.jetbrains.annotations.NotNull;
+import java.io.File;
 
-public class Options extends AbstractOptions {
+public class Options extends JsonConfig {
 
-    protected final Config config = new Config(JustZoom.MOD_DIR.getAbsolutePath().replace("\\", "/") + "/config.txt");
+    public static final int DEFAULT_BASE_ZOOM_FACTOR_PERCENTAGE = 75;
+    public static final int DEFAULT_ZOOM_STEP_SIZE_PERCENTAGE = 100;
+    public static final int DEFAULT_SMOOTH_ZOOM_SCROLL_SPEED_PERCENTAGE = 100;
+    public static final float DEFAULT_START_ZOOMING_ANIMATION_SPEED = 0.30F;
+    public static final float DEFAULT_STOP_ZOOMING_ANIMATION_SPEED = 0.2F;
+    public static final int DEFAULT_MAXIMUM_ZOOM_FACTOR_PERCENTAGE = 100;
+    public static final int MINIMUM_ZOOM_FACTOR_PERCENTAGE = 0;
+    public static final int MAXIMUM_ZOOM_FACTOR_PERCENTAGE = 100;
+    public static final int MINIMUM_ZOOM_STEP_SIZE_PERCENTAGE = 1;
+    public static final int MAXIMUM_ZOOM_STEP_SIZE_PERCENTAGE = 400;
+    public static final int MINIMUM_SMOOTH_ZOOM_SCROLL_SPEED_PERCENTAGE = 1;
+    public static final int MAXIMUM_SMOOTH_ZOOM_SCROLL_SPEED_PERCENTAGE = 800;
+    public static final float MIN_ANIMATION_SPEED = 0.0F;
+    public static final float MAX_ANIMATION_SPEED = 5.0F;
+    public static final int ANIMATION_SPEED_STEPS_PER_SECOND = 20;
+    public static final float ANIMATION_SPEED_STEP = 1.0F / ANIMATION_SPEED_STEPS_PER_SECOND;
 
-    public final Option<Float> baseZoomFactor = new Option<>(config, "base_zoom_modifier", 0.25F, "zoom");
-    public final Option<Float> zoomInPerScroll = new Option<>(config, "zoom_in_change_modifier_per_scroll", 0.05F, "zoom");
-    public final Option<Float> zoomOutPerScroll = new Option<>(config, "zoom_out_change_modifier_per_scroll", 0.05F, "zoom");
-    public final Option<Boolean> smoothZoomInOut = new Option<>(config, "smooth_zoom_in_out", true, "zoom");
-    public final Option<Boolean> smoothCameraOnZoom = new Option<>(config, "smooth_camera_movement_on_zoom", false, "zoom");
-    public final Option<Boolean> normalizeMouseSensitivityOnZoom = new Option<>(config, "normalize_mouse_sensitivity_on_zoom", true, "zoom");
-    public final Option<Boolean> allowZoomInMirroredView = new Option<>(config, "allow_zoom_in_mirrored_view", false, "zoom");
-    public final Option<Boolean> hideArmsWhenZooming = new Option<>(config, "hide_arms_when_zooming", false, "zoom");
-    public final Option<Boolean> resetZoomFactorOnStopZooming = new Option<>(config, "reset_zoom_factor_when_stop_zooming", false, "zoom");
-    // New option for button corner position (0=BOTTOM_LEFT, 1=BOTTOM_RIGHT, 2=TOP_LEFT, 3=TOP_RIGHT)
-    public final Option<Integer> optionsButtonCorner = new Option<>(config, "options_button_corner", 0, "gui");
-    public final Option<Boolean> showOptionsButtonInPauseScreen = new Option<>(config, "show_options_button_in_pause_screen", true, "gui");
+    private final ConfigSection zoom = this.section("zoom");
+    private final ConfigSection spyglass = this.section("spyglass");
+
+    public final ConfigValue<Integer> baseZoomFactor = this.zoom.option("base_zoom_factor", DEFAULT_BASE_ZOOM_FACTOR_PERCENTAGE);
+    public final ConfigValue<Integer> zoomStepSize = this.zoom.option("zoom_step_size", DEFAULT_ZOOM_STEP_SIZE_PERCENTAGE);
+    public final ConfigValue<Boolean> smoothZoomInOut = this.zoom.option("smooth_zoom_in_out", true);
+    public final ConfigValue<Float> startZoomingAnimationSpeed = this.zoom.option("start_zooming_animation_speed", DEFAULT_START_ZOOMING_ANIMATION_SPEED);
+    public final ConfigValue<Float> stopZoomingAnimationSpeed = this.zoom.option("stop_zooming_animation_speed", DEFAULT_STOP_ZOOMING_ANIMATION_SPEED);
+    public final ConfigValue<Integer> smoothZoomScrollSpeedPercentage = this.zoom.option("smooth_zoom_scroll_speed_percentage", DEFAULT_SMOOTH_ZOOM_SCROLL_SPEED_PERCENTAGE);
+    public final ConfigValue<Integer> maximumZoomFactor = this.zoom.option("maximum_zoom_factor", DEFAULT_MAXIMUM_ZOOM_FACTOR_PERCENTAGE);
+    public final ConfigValue<Boolean> smoothCameraOnZoom = this.zoom.option("smooth_camera_movement_on_zoom", false);
+    public final ConfigValue<Boolean> normalizeMouseSensitivityOnZoom = this.zoom.option("normalize_mouse_sensitivity_on_zoom", true);
+    public final ConfigValue<Boolean> improveThirdPersonZoom = this.zoom.option("improve_third_person_zoom", true);
+    public final ConfigValue<Boolean> hideArmsWhenZooming = this.zoom.option("hide_arms_when_zooming", true);
+    public final ConfigValue<ShowHudMode> showHud = this.zoom.option("show_hud", ShowHudMode.NEVER);
+    public final ConfigValue<Boolean> resetZoomFactorOnStopZooming = this.zoom.option("reset_zoom_factor_when_stop_zooming", false);
+    public final ConfigValue<Boolean> useJustZoomForSpyglass = this.spyglass.option("use_just_zoom_for_spyglass", true);
+    public final ConfigValue<SpyglassOverlayMode> spyglassOverlay = this.spyglass.option("spyglass_overlay", SpyglassOverlayMode.ONLY_SPYGLASS);
+    public final ConfigValue<SpyglassSoundsMode> spyglassSounds = this.spyglass.option("spyglass_sounds", SpyglassSoundsMode.SPYGLASS_AND_KEYBIND_ZOOM);
 
     public Options() {
-        this.config.syncConfig();
-        this.config.clearUnusedValues();
+        this(JustZoom.OPTIONS_FILE);
+    }
+
+    Options(@NotNull File file) {
+        super(file);
+        // DO NOT CLEAR/DELETE OLD CONFIG VALUES! JUST KEEP THEM IN THE FILE.
+        this.save();
+    }
+
+    static float normalizeAnimationSpeed(float seconds, float fallback) {
+        float safeFallback = Float.isFinite(fallback) ? Math.max(MIN_ANIMATION_SPEED, Math.min(MAX_ANIMATION_SPEED, fallback)) : DEFAULT_START_ZOOMING_ANIMATION_SPEED;
+        float clampedSeconds = Math.max(MIN_ANIMATION_SPEED, Math.min(MAX_ANIMATION_SPEED, Float.isFinite(seconds) ? seconds : safeFallback));
+        int step = Math.round((clampedSeconds - MIN_ANIMATION_SPEED) * ANIMATION_SPEED_STEPS_PER_SECOND);
+        return MIN_ANIMATION_SPEED + step / (float) ANIMATION_SPEED_STEPS_PER_SECOND;
+    }
+
+    static int normalizeZoomFactorPercentage(int percentage) {
+        return Math.max(MINIMUM_ZOOM_FACTOR_PERCENTAGE, Math.min(MAXIMUM_ZOOM_FACTOR_PERCENTAGE, percentage));
+    }
+
+    static int normalizeZoomStepSizePercentage(int percentage) {
+        return Math.max(MINIMUM_ZOOM_STEP_SIZE_PERCENTAGE, Math.min(MAXIMUM_ZOOM_STEP_SIZE_PERCENTAGE, percentage));
+    }
+
+    static int normalizeSmoothZoomScrollSpeedPercentage(int percentage) {
+        return Math.max(MINIMUM_SMOOTH_ZOOM_SCROLL_SPEED_PERCENTAGE, Math.min(MAXIMUM_SMOOTH_ZOOM_SCROLL_SPEED_PERCENTAGE, percentage));
     }
 
 }

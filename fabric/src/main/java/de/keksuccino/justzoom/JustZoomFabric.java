@@ -5,7 +5,7 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 
 public class JustZoomFabric implements ModInitializer {
-    
+
     @Override
     public void onInitialize() {
 
@@ -14,6 +14,9 @@ public class JustZoomFabric implements ModInitializer {
         if (Services.PLATFORM.isOnClient()) {
 
             KeyMappingHelper.registerKeyMapping(KeyMappings.KEY_TOGGLE_ZOOM);
+            KeyMappingHelper.registerKeyMapping(KeyMappings.KEY_ZOOM_IN);
+            KeyMappingHelper.registerKeyMapping(KeyMappings.KEY_ZOOM_OUT);
+            KeyMappingHelper.registerKeyMapping(KeyMappings.KEY_OPEN_OPTIONS);
 
         }
 

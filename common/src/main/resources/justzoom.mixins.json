@@ -1,18 +1,23 @@
 {
   "required": true,
   "package": "de.keksuccino.justzoom.mixin.mixins.common",
-  "compatibilityLevel": "JAVA_${java_version}",
+  "compatibilityLevel": "JAVA_17",
   "client": [
+    "client.AccessorMixinKeyBindsScreen",
     "client.MixinAbstractClientPlayer",
     "client.MixinCamera",
     "client.MixinCameraType",
+    "client.MixinEditBox",
+    "client.MixinHud",
     "client.MixinFirstPersonHandsAndItemsRenderer",
     "client.MixinKeyMapping_Category",
+    "client.MixinMinecraft",
+    "client.MixinMenuTabBar",
+    "client.MixinMenuTabButton",
     "client.MixinMouseHandler",
-    "client.MixinPauseScreen"
+    "client.MixinSpyglassItem"
   ],
-  "mixins": [
-  ],
+  "mixins": [],
   "injectors": {
     "defaultRequire": 1
   },

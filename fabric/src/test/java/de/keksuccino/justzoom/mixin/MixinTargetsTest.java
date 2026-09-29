@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class MixinTargetsTest {
 
-    private static final List<String> INJECTORS = List.of("Lorg/spongepowered/asm/mixin/injection/Inject;", "Lcom/llamalad7/mixinextras/injector/wrapoperation/WrapOperation;", "Lcom/llamalad7/mixinextras/injector/v2/WrapWithCondition;");
+    private static final List<String> INJECTORS = List.of("Lorg/spongepowered/asm/mixin/injection/Inject;", "Lcom/llamalad7/mixinextras/injector/wrapoperation/WrapOperation;", "Lcom/llamalad7/mixinextras/injector/v2/WrapWithCondition;", "Lcom/llamalad7/mixinextras/injector/wrapmethod/WrapMethod;", "Lcom/llamalad7/mixinextras/injector/ModifyExpressionValue;", "Lorg/spongepowered/asm/mixin/injection/ModifyVariable;");
 
     // Inspect bytecode without loading Minecraft or starting Mixin. Java compilation cannot
     // validate method names and descriptors stored in injection annotations.
@@ -42,7 +42,20 @@ class MixinTargetsTest {
                 List<Type> targets = annotationValue(annotation, "value");
                 for (Type target : targets) {
                     ClassNode targetClass = readClass(target.getInternalName());
+                    for (var field : mixin.fields) {
+                        if (annotations(field.visibleAnnotations, field.invisibleAnnotations).anyMatch(value -> value.desc.equals("Lorg/spongepowered/asm/mixin/Shadow;"))) {
+                            tests.add(DynamicTest.dynamicTest(entry.getAsString() + "." + field.name, () -> assertTrue(hasField(targetClass, field.name, field.desc))));
+                        }
+                    }
                     for (MethodNode handler : mixin.methods) {
+                        for (AnnotationNode memberAnnotation : annotations(handler.visibleAnnotations, handler.invisibleAnnotations).toList()) {
+                            if (memberAnnotation.desc.equals("Lorg/spongepowered/asm/mixin/gen/Accessor;")) {
+                                String fieldName = annotationValue(memberAnnotation, "value");
+                                tests.add(DynamicTest.dynamicTest(entry.getAsString() + "." + handler.name, () -> assertTrue(hasField(targetClass, fieldName, Type.getReturnType(handler.desc).getDescriptor()))));
+                            } else if (memberAnnotation.desc.equals("Lorg/spongepowered/asm/mixin/Shadow;")) {
+                                tests.add(DynamicTest.dynamicTest(entry.getAsString() + "." + handler.name, () -> assertTrue(hasMethod(targetClass, handler.name, handler.desc))));
+                            }
+                        }
                         annotations(handler.visibleAnnotations, handler.invisibleAnnotations).filter(value -> INJECTORS.contains(value.desc)).forEach(injector -> {
                             tests.add(DynamicTest.dynamicTest(entry.getAsString() + "." + handler.name, () -> verifyInjection(targetClass, injector)));
                         });
@@ -58,7 +71,7 @@ class MixinTargetsTest {
         List<String> selectors = annotationValue(injector, "method");
         assertNotNull(selectors);
         Object atValue = annotationValue(injector, "at");
-        List<?> injectionPoints = atValue instanceof List<?> list ? list : List.of(atValue);
+        List<?> injectionPoints = atValue == null ? List.of() : atValue instanceof List<?> list ? list : List.of(atValue);
         for (String selector : selectors) {
             List<MethodNode> methods = targetClass.methods.stream().filter(method -> selector.equals(method.name) || selector.equals(method.name + method.desc)).toList();
             assertFalse(methods.isEmpty(), () -> "Missing target " + targetClass.name + "." + selector);
@@ -68,7 +81,7 @@ class MixinTargetsTest {
                 String member = annotationValue(at, "target");
                 if ("HEAD".equals(kind)) {
                     assertTrue(methods.stream().allMatch(method -> method.instructions.size() > 0));
-                } else if ("RETURN".equals(kind)) {
+                } else if (("RETURN".equals(kind) || "TAIL".equals(kind))) {
                     assertTrue(methods.stream().anyMatch(method -> Stream.of(method.instructions.toArray()).anyMatch(instruction -> instruction.getOpcode() >= Opcodes.IRETURN && instruction.getOpcode() <= Opcodes.RETURN)));
                 } else if ("INVOKE".equals(kind)) {
                     assertTrue(methods.stream().anyMatch(method -> Stream.of(method.instructions.toArray()).anyMatch(instruction -> instruction instanceof MethodInsnNode call && member.equals("L" + call.owner + ";" + call.name + call.desc))), () -> "Missing invocation " + member + " in " + targetClass.name + "." + selector);
@@ -79,6 +92,16 @@ class MixinTargetsTest {
                 }
             }
         }
+    }
+
+    private static boolean hasField(ClassNode owner, String name, String descriptor) throws IOException {
+        if (owner.fields.stream().anyMatch(field -> field.name.equals(name) && field.desc.equals(descriptor))) return true;
+        return owner.superName != null && hasField(readClass(owner.superName), name, descriptor);
+    }
+
+    private static boolean hasMethod(ClassNode owner, String name, String descriptor) throws IOException {
+        if (owner.methods.stream().anyMatch(method -> method.name.equals(name) && method.desc.equals(descriptor))) return true;
+        return owner.superName != null && hasMethod(readClass(owner.superName), name, descriptor);
     }
 
     private static ClassNode readClass(String name) throws IOException {
