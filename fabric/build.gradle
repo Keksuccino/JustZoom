@@ -10,7 +10,25 @@ base {
     archivesName = "${mod_id}"
 }
 
+configurations {
+    compatibilityMods {
+        canBeConsumed = false
+        transitive = false
+    }
+}
+
 dependencies {
+    // Development-only compatibility coverage; Iris 1.10.7 requires Sodium 0.8.12 or earlier.
+    compatibilityMods "maven.modrinth:AANobbMI:NFkjnzWE" // Sodium
+    compatibilityMods "maven.modrinth:PtjYWJkn:zmsIDdn6" // Sodium Extra
+    compatibilityMods "maven.modrinth:gvQqBUqZ:Ow7wA0kG" // Lithium
+    compatibilityMods "maven.modrinth:YL57xq9U:fDpuVzVr" // Iris
+    compatibilityMods "maven.modrinth:5ZwdcRci:4EwhsTu7" // ImmediatelyFast
+    compatibilityMods "maven.modrinth:NNAgCjsB:CFBkR8Vm" // Entity Culling
+
+    testImplementation "org.junit.jupiter:junit-jupiter:5.10.2"
+    testRuntimeOnly "org.junit.platform:junit-platform-launcher:1.10.2"
+    testImplementation "org.ow2.asm:asm-tree:9.10.1"
 
     minecraft "com.mojang:minecraft:${minecraft_version}"
     mappings loom.layered() {
@@ -20,7 +38,7 @@ dependencies {
     modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
     implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
-    implementation project(":common")
+    compileOnly project(":common")
     include(implementation(annotationProcessor("io.github.llamalad7:mixinextras-fabric:${mixin_extras_version}")))
     modImplementation "maven.modrinth:konkrete:1.9.14-1.21.11-fabric"
     modImplementation "maven.modrinth:modmenu:17.0.0-beta.1"
@@ -40,7 +58,7 @@ loom {
             client()
             setConfigName("Fabric Client")
             ideConfigGenerated(true)
-            runDir("run_client")
+            runDir("../run_client")
         }
         server {
             server()
@@ -81,4 +99,23 @@ publishing {
             url "file://" + System.getenv("local_maven")
         }
     }
+}
+
+tasks.withType(Test).configureEach {
+    useJUnitPlatform()
+}
+
+// Modrinth's Maven metadata does not list jar-in-jar libraries. Loom removes nested jars while
+// remapping, so explicitly remap those dependencies too (Iris parsers, ImmediatelyFast Reflect,
+// and Entity Culling's helper mods). Everything stays development-only and outside our artifact.
+def compatibilityJars = new LinkedHashSet<File>()
+def collectCompatibilityJars
+collectCompatibilityJars = { File jar ->
+    if (compatibilityJars.add(jar)) {
+        zipTree(jar).matching { include 'META-INF/jars/*.jar' }.files.each { collectCompatibilityJars(it) }
+    }
+}
+configurations.compatibilityMods.files.each { collectCompatibilityJars(it) }
+dependencies {
+    compatibilityJars.each { modLocalRuntime files(it) }
 }

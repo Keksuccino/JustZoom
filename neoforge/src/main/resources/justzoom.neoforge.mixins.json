@@ -7,10 +7,12 @@
   "client": [
     "client.MixinMinecraft"
   ],
+  "server": [
+    "server.MixinDedicatedServer"
+  ],
   "injectors": {
     "defaultRequire": 1
   },
-  "refmap": "justzoom.refmap.json",
   "plugin": "de.keksuccino.justzoom.mixin.JustZoomMixinPlugin",
   "minVersion": "0.8"
 }
