@@ -128,7 +128,6 @@ subprojects {
                 "mod_website": mod_website,
                 "mod_issues": mod_issues,
                 "minecraft_version": minecraft_version,
-                "minecraft_version_upper_bound": minecraft_version_upper_bound,
                 "java_version": java_version,
                 "fabric_version": fabric_version,
                 "fabric_short_version": fabric_short_version,
