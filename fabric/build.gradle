@@ -11,12 +11,23 @@ base {
 }
 
 dependencies {
+    // Development-only compatibility coverage; these mods are not bundled with Just Zoom.
+    runtimeOnly "maven.modrinth:AANobbMI:uGvVQBnw" // Sodium
+    runtimeOnly "maven.modrinth:PtjYWJkn:1bz3AMCV" // Sodium Extra
+    runtimeOnly "maven.modrinth:gvQqBUqZ:Oqq8TOAV" // Lithium
+    runtimeOnly "maven.modrinth:YL57xq9U:MwcLS51S" // Iris
+    runtimeOnly "maven.modrinth:5ZwdcRci:xOA9hbpf" // ImmediatelyFast
+    runtimeOnly "maven.modrinth:NNAgCjsB:YDFyjf5b" // Entity Culling
+
+    testImplementation "org.junit.jupiter:junit-jupiter:5.10.2"
+    testRuntimeOnly "org.junit.platform:junit-platform-launcher:1.10.2"
+    testImplementation "org.ow2.asm:asm-tree:9.10.1"
 
     minecraft "com.mojang:minecraft:${minecraft_version}"
     implementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
     implementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
     implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
-    implementation project(":common")
+    compileOnly project(":common")
     include(implementation(annotationProcessor("io.github.llamalad7:mixinextras-fabric:${mixin_extras_version}")))
     implementation "maven.modrinth:konkrete:1.9.19-26.1.1-fabric"
     implementation "maven.modrinth:modmenu:18.0.0-alpha.8"
@@ -27,7 +38,6 @@ loom {
     mods {
         "${mod_id}" {
             sourceSet sourceSets.main
-            sourceSet("main", ":common")
         }
     }
     runs {
@@ -35,7 +45,7 @@ loom {
             client()
             setConfigName("Fabric Client")
             ideConfigGenerated(true)
-            runDir("run_client")
+            runDir("../run_client")
         }
         server {
             server()
@@ -76,4 +86,8 @@ publishing {
             url "file://" + System.getenv("local_maven")
         }
     }
+}
+
+tasks.withType(Test).configureEach {
+    useJUnitPlatform()
 }

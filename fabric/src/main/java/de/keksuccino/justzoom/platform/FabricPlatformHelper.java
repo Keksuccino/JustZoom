@@ -71,4 +71,9 @@ public class FabricPlatformHelper implements IPlatformHelper {
         return KeyMappingHelper.getBoundKeyOf(keyMapping);
     }
 
+    @Override
+    public void setKeyMappingKey(KeyMapping keyMapping, InputConstants.Key key) {
+        keyMapping.setKey(key);
+    }
+
 }
