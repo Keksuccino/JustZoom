@@ -3,11 +3,15 @@ package de.keksuccino.justzoom.mixin.mixins.common.client;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import de.keksuccino.justzoom.JustZoom;
+import de.keksuccino.justzoom.KeyMappings;
 import de.keksuccino.justzoom.ZoomHandler;
+import de.keksuccino.justzoom.platform.Services;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.MouseHandler;
-import net.minecraft.client.OptionInstance;
 import net.minecraft.client.Options;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.controls.KeyBindsScreen;
+import net.minecraft.client.player.LocalPlayer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -17,6 +21,28 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MixinMouseHandler {
 
     /**
+     * @reason Vanilla keybind screens do not model wheel directions. Capture wheel input only while one of Just Zoom's wheel-capable mappings is selected, then preserve Vanilla's mapping refresh flow.
+     */
+    @WrapOperation(method = "onScroll", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;mouseScrolled(DDD)Z"))
+    private boolean wrap_mouseScrolled_in_onScroll_JustZoom(Screen instance, double mouseX, double mouseY, double deltaY, Operation<Boolean> original) {
+        if (instance instanceof KeyBindsScreen keyBindsScreen && keyBindsScreen.selectedKey != null && KeyMappings.isZoomAdjustment(keyBindsScreen.selectedKey) && KeyMappings.hasMouseWheelDirection(deltaY)) {
+            Services.PLATFORM.setKeyMappingKey(keyBindsScreen.selectedKey, KeyMappings.getMouseWheelKey(deltaY));
+            keyBindsScreen.selectedKey = null;
+            ((AccessorMixinKeyBindsScreen) keyBindsScreen).get_keyBindsList_JustZoom().resetMappingAndUpdateButtons();
+            return true;
+        }
+        return original.call(instance, mouseX, mouseY, deltaY);
+    }
+
+    /**
+     * @reason Vanilla applies its own spyglass sensitivity reduction. When the spyglass uses Just Zoom, skipping that branch makes sensitivity follow the same configurable normalization path as the zoom keybind.
+     */
+    @WrapOperation(method = "turnPlayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;isScoping()Z"))
+    private boolean wrap_isScoping_in_turnPlayer_JustZoom(LocalPlayer instance, Operation<Boolean> original) {
+        return !ZoomHandler.shouldUseJustZoomForSpyglass() && original.call(instance);
+    }
+
+    /**
      * @reason This is a basic "Mouse Scroll Event" implementation for Just Zoom. It is cancelable to stop the hotbar slot from changing while using the mouse wheel to adjust the zoom factor.
      */
     @Inject(method = "onScroll", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;isSpectator()Z"), cancellable = true)
@@ -24,48 +50,21 @@ public class MixinMouseHandler {
 
         boolean discreteScroll = Minecraft.getInstance().options.discreteMouseScroll().get();
         double sensitivity = Minecraft.getInstance().options.mouseWheelSensitivity().get();
-        double deltaX = (discreteScroll ? Math.signum($$1) : $$1) * sensitivity;
         double deltaY = (discreteScroll ? Math.signum($$2) : $$2) * sensitivity;
 
         ZoomHandler.MouseScrollFeedback feedback = new ZoomHandler.MouseScrollFeedback();
-        ZoomHandler.onMouseScroll(feedback, deltaX, deltaY);
+        ZoomHandler.onMouseScroll(feedback, deltaY);
         if (feedback.cancel) info.cancel();
 
     }
 
     /**
-     * @reason This implements a highly aggressive mouse sensitivity normalization for Just Zoom
-     * to ensure consistent feel at all zoom levels, especially at extreme zoom.
+     * @reason Scaling the completed vanilla turn delta avoids the non-zero floor in Minecraft's sensitivity formula and keeps on-screen camera motion proportional at every magnification.
      */
-    @WrapOperation(method = "turnPlayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/OptionInstance;get()Ljava/lang/Object;"))
-    private Object wrap_get_sensitivity_in_turnPlayer_JustZoom(OptionInstance<?> instance, Operation<?> original) {
-        if ((instance == Minecraft.getInstance().options.sensitivity()) && ZoomHandler.isZooming() && JustZoom.getOptions().normalizeMouseSensitivityOnZoom.getValue()) {
-            Object sensitivityObj = original.call(instance);
-            if (sensitivityObj instanceof Double sensitivity) {
-                // Calculate zoom ratio (smaller = more zoomed in)
-                double zoomRatio = ZoomHandler.getFovModifier(); // This is the actual zoom factor
-
-                // Use a direct linear relationship with the zoom factor
-                // This is the simplest and most predictable approach
-                double scale = zoomRatio;
-
-                // Apply additional quadratic scaling for extreme zoom levels
-                // This makes the sensitivity reduction much more aggressive as zoom increases
-                if (zoomRatio < 0.5) {
-                    // Square the zoom ratio for a stronger effect at high zoom levels
-                    scale = zoomRatio * zoomRatio;
-                }
-
-                // For very extreme zoom (near maximum zoom), apply even more aggressive reduction
-                if (zoomRatio < 0.1) {
-                    // Apply cubic scaling for extreme zoom
-                    scale = Math.pow(zoomRatio, 3);
-                }
-
-                return sensitivity * scale; // Dramatically reduced sensitivity at high zoom
-            }
-        }
-        return original.call(instance);
+    @WrapOperation(method = "turnPlayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;turn(DD)V"))
+    private void wrap_turn_in_turnPlayer_JustZoom(LocalPlayer instance, double deltaX, double deltaY, Operation<Void> original) {
+        double scale = JustZoom.getOptions().normalizeMouseSensitivityOnZoom.getValue() ? ZoomHandler.getMouseSensitivityScale() : 1.0D;
+        original.call(instance, deltaX * scale, deltaY * scale);
     }
 
     /**

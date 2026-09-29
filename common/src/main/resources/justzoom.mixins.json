@@ -3,18 +3,25 @@
   "package": "de.keksuccino.justzoom.mixin.mixins.common",
   "compatibilityLevel": "JAVA_17",
   "client": [
+    "client.AccessorMixinAbstractWidget",
+    "client.AccessorMixinAbstractSliderButton",
+    "client.AccessorMixinKeyBindsScreen",
     "client.MixinAbstractClientPlayer",
     "client.MixinCameraType",
+    "client.MixinEditBox",
     "client.MixinGameRenderer",
+    "client.MixinGui",
+    "client.MixinItemInHandRenderer",
+    "client.MixinMinecraft",
+    "client.MixinTabNavigationBar",
+    "client.MixinTabButton",
     "client.MixinMouseHandler",
-    "client.MixinPauseScreen"
+    "client.MixinSpyglassItem"
   ],
-  "mixins": [
-  ],
+  "mixins": [],
   "injectors": {
     "defaultRequire": 1
   },
-  "refmap": "justzoom.refmap.json",
   "plugin": "de.keksuccino.justzoom.mixin.JustZoomMixinPlugin",
   "minVersion": "0.8"
 }
