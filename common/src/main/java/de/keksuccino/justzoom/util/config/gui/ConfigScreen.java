@@ -1,6 +1,7 @@
 package de.keksuccino.justzoom.util.config.gui;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import com.mojang.blaze3d.systems.RenderSystem;
 import de.keksuccino.justzoom.platform.Services;
 import de.keksuccino.justzoom.util.config.ConfigValue;
 import net.minecraft.ChatFormatting;
@@ -15,12 +16,14 @@ import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.tabs.Tab;
 import net.minecraft.client.gui.components.tabs.TabManager;
 import net.minecraft.client.gui.components.tabs.TabNavigationBar;
+import net.minecraft.client.gui.layouts.HeaderAndFooterLayout;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
+import net.minecraft.resources.ResourceLocation;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -69,10 +72,12 @@ public abstract class ConfigScreen extends Screen {
     /** Preferred value color for cycle states that represent disabled or equivalent behavior. */
     protected static final ChatFormatting DISABLED_OPTION_VALUE_COLOR = ChatFormatting.RED;
     protected static final int RESET_BUTTON_WIDTH = 50;
+    protected static final ResourceLocation TAB_HEADER_BACKGROUND = ResourceLocation.withDefaultNamespace("textures/gui/tab_header_background.png");
 
     @Nullable
     protected Screen parent;
     private final String translationPrefix;
+    private HeaderAndFooterLayout layout;
     private List<OptionsTab> tabs = List.of();
     private final TabManager tabManager = new TabManager(this::addRenderableWidget, widget -> {
         if (this.getFocused() == widget) this.setFocused(null);
@@ -102,6 +107,8 @@ public abstract class ConfigScreen extends Screen {
 
     @Override
     protected final void init() {
+        // Widget rebuilds must discard the old footer children along with the old tabs.
+        this.layout = new HeaderAndFooterLayout(this);
         this.primaryControls.clear();
         this.inputControls.clear();
         this.optionControls.clear();
@@ -115,13 +122,16 @@ public abstract class ConfigScreen extends Screen {
         for (OptionsTab tab : this.tabs) tabBuilder.addTabs(tab);
         this.tabNavigationBar = tabBuilder.build();
         this.addRenderableWidget(this.tabNavigationBar);
-        this.tabNavigationBar.arrangeElements();
-        this.tabManager.setTabArea(new ScreenRectangle(0, 28, this.width, Math.max(BUTTON_HEIGHT, this.height - 61)));
-        this.addRenderableWidget(Button.builder(CommonComponents.GUI_DONE, ignored -> this.onClose()).bounds((this.width - 150) / 2, this.height - 26, 150, BUTTON_HEIGHT).build());
+        this.layout.addToFooter(Button.builder(CommonComponents.GUI_DONE, ignored -> this.onClose()).size(150, BUTTON_HEIGHT).build());
+        this.layout.visitWidgets(widget -> {
+            widget.setTabOrderGroup(1);
+            this.addRenderableWidget(widget);
+        });
         this.updateControlWidths();
         this.updateOptionResetButtons();
         this.updateKeybindButtons();
         this.tabNavigationBar.selectTab(0, false);
+        this.repositionElements();
         this.afterBuildTabs();
     }
 
@@ -380,15 +390,34 @@ public abstract class ConfigScreen extends Screen {
     }
 
     @Override
+    protected void repositionElements() {
+        if (this.tabNavigationBar == null) return;
+        this.tabNavigationBar.setWidth(this.width);
+        this.tabNavigationBar.arrangeElements();
+        int tabAreaTop = this.tabNavigationBar.getRectangle().bottom();
+        this.tabManager.setTabArea(new ScreenRectangle(0, tabAreaTop, this.width, Math.max(0, this.height - this.layout.getFooterHeight() - tabAreaTop)));
+        this.layout.setHeaderHeight(tabAreaTop);
+        this.layout.arrangeElements();
+    }
+
+    @Override
     public void render(@NotNull GuiGraphics graphics, int mouseX, int mouseY, float a) {
         super.render(graphics, mouseX, mouseY, a);
         if (this.shouldRenderFooterSeparator()) {
-            graphics.fill(0, this.height - 33, this.width, this.height - 32, 0x80000000);
+            RenderSystem.enableBlend();
+            graphics.blit(Screen.FOOTER_SEPARATOR, 0, this.height - this.layout.getFooterHeight() - 2, 0.0F, 0.0F, this.width, 2, 32, 2);
+            RenderSystem.disableBlend();
         }
     }
 
     protected boolean shouldRenderFooterSeparator() {
         return true;
+    }
+
+    @Override
+    protected void renderMenuBackground(@NotNull GuiGraphics graphics) {
+        graphics.blit(TAB_HEADER_BACKGROUND, 0, 0, 0.0F, 0.0F, this.width, this.layout.getHeaderHeight(), 16, 16);
+        this.renderMenuBackground(graphics, 0, this.layout.getHeaderHeight(), this.width, this.height);
     }
 
     @Override
