@@ -52,6 +52,34 @@ class ConfigOptionsListTest {
         assertEquals(0.0D, list.getScrollAmount());
     }
 
+    @Test
+    void resizingPreservesAValidScrollOffset() {
+        ConfigOptionsList wrapper = new ConfigOptionsList(null, 320, 40, 0, 280);
+        wrapper.setRows(rows(10));
+        AbstractSelectionList<?> list = (AbstractSelectionList<?>) wrapper.children().get(0);
+        list.setScrollAmount(52.0D);
+
+        wrapper.setBounds(480, 100, 24, 360);
+
+        assertEquals(52.0D, list.getScrollAmount());
+    }
+
+    @Test
+    void growingTheViewportClampsScrollingToTheRemainingContent() {
+        ConfigOptionsList wrapper = new ConfigOptionsList(null, 320, 40, 0, 280);
+        wrapper.setRows(rows(10));
+        AbstractSelectionList<?> list = (AbstractSelectionList<?>) wrapper.children().get(0);
+        list.setScrollAmount(list.getMaxScroll());
+
+        wrapper.setBounds(480, 200, 24, 360);
+
+        assertEquals((double) list.getMaxScroll(), list.getScrollAmount());
+
+        wrapper.setBounds(480, 400, 24, 360);
+
+        assertEquals(0.0D, list.getScrollAmount());
+    }
+
     private static List<ConfigOptionsList.Row> rows(int count) {
         return IntStream.range(0, count).mapToObj(index -> new ConfigOptionsList.Row(List.of())).toList();
     }

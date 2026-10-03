@@ -48,6 +48,8 @@ final class ConfigOptionsList extends AbstractWidget implements ContainerEventHa
         this.setY(top);
         this.list.rowWidth = rowWidth;
         this.list.updateSize(width, height + top, top, top + height);
+        // Legacy updateSize does not clamp scrolling when the viewport grows.
+        this.list.setScrollAmount(this.list.getScrollAmount());
     }
 
     @Override

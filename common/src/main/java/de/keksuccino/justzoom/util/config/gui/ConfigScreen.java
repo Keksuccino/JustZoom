@@ -15,12 +15,16 @@ import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.tabs.Tab;
 import net.minecraft.client.gui.components.tabs.TabManager;
 import net.minecraft.client.gui.components.tabs.TabNavigationBar;
+import net.minecraft.client.gui.layouts.FrameLayout;
+import net.minecraft.client.gui.layouts.GridLayout;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
+import net.minecraft.util.Mth;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -69,10 +73,12 @@ public abstract class ConfigScreen extends Screen {
     /** Preferred value color for cycle states that represent disabled or equivalent behavior. */
     protected static final ChatFormatting DISABLED_OPTION_VALUE_COLOR = ChatFormatting.RED;
     protected static final int RESET_BUTTON_WIDTH = 50;
+    protected static final int FOOTER_HEIGHT = 36;
 
     @Nullable
     protected Screen parent;
     private final String translationPrefix;
+    private GridLayout bottomButtons;
     private List<OptionsTab> tabs = List.of();
     private final TabManager tabManager = new TabManager(this::addRenderableWidget, widget -> {
         if (this.getFocused() == widget) this.setFocused(null);
@@ -115,13 +121,17 @@ public abstract class ConfigScreen extends Screen {
         for (OptionsTab tab : this.tabs) tabBuilder.addTabs(tab);
         this.tabNavigationBar = tabBuilder.build();
         this.addRenderableWidget(this.tabNavigationBar);
-        this.tabNavigationBar.arrangeElements();
-        this.tabManager.setTabArea(new ScreenRectangle(0, 28, this.width, Math.max(BUTTON_HEIGHT, this.height - 61)));
-        this.addRenderableWidget(Button.builder(CommonComponents.GUI_DONE, ignored -> this.onClose()).bounds((this.width - 150) / 2, this.height - 26, 150, BUTTON_HEIGHT).build());
+        this.bottomButtons = new GridLayout();
+        this.bottomButtons.addChild(Button.builder(CommonComponents.GUI_DONE, ignored -> this.onClose()).size(150, BUTTON_HEIGHT).build(), 0, 0);
+        this.bottomButtons.visitWidgets(widget -> {
+            widget.setTabOrderGroup(1);
+            this.addRenderableWidget(widget);
+        });
         this.updateControlWidths();
         this.updateOptionResetButtons();
         this.updateKeybindButtons();
         this.tabNavigationBar.selectTab(0, false);
+        this.repositionElements();
         this.afterBuildTabs();
     }
 
@@ -380,16 +390,33 @@ public abstract class ConfigScreen extends Screen {
     }
 
     @Override
+    protected void repositionElements() {
+        if (this.tabNavigationBar == null || this.bottomButtons == null) return;
+        this.tabNavigationBar.setWidth(this.width);
+        this.tabNavigationBar.arrangeElements();
+        this.bottomButtons.arrangeElements();
+        FrameLayout.centerInRectangle(this.bottomButtons, 0, this.height - FOOTER_HEIGHT, this.width, FOOTER_HEIGHT);
+        int tabAreaTop = this.tabNavigationBar.getRectangle().bottom();
+        // Unlike Create World's fixed grid, scrolling rows must stop before the footer background.
+        this.tabManager.setTabArea(new ScreenRectangle(0, tabAreaTop, this.width, Math.max(0, this.height - FOOTER_HEIGHT - tabAreaTop)));
+    }
+
+    @Override
     public void render(@NotNull GuiGraphics graphics, int mouseX, int mouseY, float a) {
         this.renderBackground(graphics);
         super.render(graphics, mouseX, mouseY, a);
         if (this.shouldRenderFooterSeparator()) {
-            graphics.fill(0, this.height - 33, this.width, this.height - 32, 0x80000000);
+            graphics.blit(CreateWorldScreen.FOOTER_SEPERATOR, 0, Mth.roundToward(this.height - FOOTER_HEIGHT - 2, 2), 0.0F, 0.0F, this.width, 2, 32, 2);
         }
     }
 
     protected boolean shouldRenderFooterSeparator() {
         return true;
+    }
+
+    @Override
+    public void renderDirtBackground(@NotNull GuiGraphics graphics) {
+        graphics.blit(CreateWorldScreen.LIGHT_DIRT_BACKGROUND, 0, 0, 0, 0.0F, 0.0F, this.width, this.height, 32, 32);
     }
 
     @Override
