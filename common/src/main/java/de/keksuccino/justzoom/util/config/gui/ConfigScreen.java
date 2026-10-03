@@ -426,7 +426,7 @@ public abstract class ConfigScreen extends Screen {
     public void render(@NotNull GuiGraphics graphics, int mouseX, int mouseY, float a) {
         super.render(graphics, mouseX, mouseY, a);
         if (this.shouldRenderFooterSeparator()) {
-            graphics.blit(RenderPipelines.GUI_TEXTURED, Screen.FOOTER_SEPARATOR, 0, this.height - this.layout.getFooterHeight(), 0.0F, 0.0F, this.width, 2, 32, 2);
+            graphics.blit(RenderPipelines.GUI_TEXTURED, Screen.FOOTER_SEPARATOR, 0, this.height - this.layout.getFooterHeight() - 2, 0.0F, 0.0F, this.width, 2, 32, 2);
         }
     }
 
