@@ -1,6 +1,5 @@
-package de.keksuccino.justzoom.util.config;
+package de.keksuccino.justzoom.util.config.gui;
 
-import de.keksuccino.justzoom.util.config.gui.ConfigSlider;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
