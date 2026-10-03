@@ -36,14 +36,18 @@ subprojects {
 
     repositories {
         // Mojang's patched macOS FreeType native is not published to Maven Central.
-        exclusiveContent {
-            forRepository {
-                maven {
-                    url = 'https://libraries.minecraft.net'
-                    metadataSources { artifact() }
+        // VanillaGradle already provides an exclusive Minecraft repository in common;
+        // overlapping exclusive filters would exclude each other's FreeType repository.
+        if (project.name != 'common') {
+            exclusiveContent {
+                forRepository {
+                    maven {
+                        url = 'https://libraries.minecraft.net'
+                        metadataSources { artifact() }
+                    }
                 }
+                filter { includeModule('org.lwjgl', 'lwjgl-freetype') }
             }
-            filter { includeModule('org.lwjgl', 'lwjgl-freetype') }
         }
         mavenCentral()
         maven {

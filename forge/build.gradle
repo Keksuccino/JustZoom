@@ -84,7 +84,7 @@ dependencies {
     compileOnly project(":common")
 }
 
-tasks.withType(JavaCompile).configureEach {
+tasks.named("compileJava", JavaCompile).configure {
     source(project(":common").sourceSets.main.allSource)
 }
 tasks.withType(Javadoc).configureEach {

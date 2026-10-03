@@ -113,3 +113,9 @@ configurations.compatibilityMods.files.each { collectCompatibilityJars(it) }
 dependencies {
     compatibilityJars.each { modLocalRuntime files(it) }
 }
+
+// Exercise the release artifact too: development mappings can hide a missing Mixin refmap.
+tasks.named("test", Test) {
+    dependsOn tasks.named("remapJar")
+    systemProperty "justzoom.releaseJar", tasks.named("remapJar").get().archiveFile.get().asFile.absolutePath
+}
