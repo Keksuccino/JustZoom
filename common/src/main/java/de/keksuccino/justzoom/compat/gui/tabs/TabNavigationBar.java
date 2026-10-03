@@ -23,7 +23,7 @@ public final class TabNavigationBar extends AbstractContainerEventHandler implem
     private final TabManager manager;
     private final List<Tab> tabs;
     private final List<TabButton> buttons;
-    private final int width;
+    private int width;
     private final Component narrationUsage;
     private final java.util.function.BiFunction<Integer, Integer, Component> narrationPosition;
 
@@ -39,6 +39,16 @@ public final class TabNavigationBar extends AbstractContainerEventHandler implem
 
     public static Builder builder(TabManager manager, int width) {
         return new Builder(manager, width);
+    }
+
+    public void setWidth(int width) {
+        this.width = width;
+    }
+
+    public Tab.Area getRectangle() {
+        TabButton first = this.buttons.get(0);
+        TabButton last = this.buttons.get(this.buttons.size() - 1);
+        return new Tab.Area(first.x, first.y, last.x + last.getWidth() - first.x, first.getHeight());
     }
 
     public void arrangeElements() {

@@ -12,6 +12,7 @@ import de.keksuccino.justzoom.compat.gui.ConfigButton;
 import net.minecraft.client.gui.components.EditBox;
 import de.keksuccino.justzoom.compat.gui.ConfigLabel;
 import de.keksuccino.justzoom.compat.gui.ConfigTooltip;
+import de.keksuccino.justzoom.compat.gui.TabRenderUtils;
 import de.keksuccino.justzoom.compat.gui.tabs.Tab;
 import de.keksuccino.justzoom.compat.gui.tabs.TabManager;
 import de.keksuccino.justzoom.compat.gui.tabs.TabNavigationBar;
@@ -69,6 +70,7 @@ public abstract class ConfigScreen extends Screen {
     /** Preferred value color for cycle states that represent disabled or equivalent behavior. */
     protected static final ChatFormatting DISABLED_OPTION_VALUE_COLOR = ChatFormatting.RED;
     protected static final int RESET_BUTTON_WIDTH = 50;
+    protected static final int FOOTER_HEIGHT = 33;
 
     @Nullable
     protected Screen parent;
@@ -84,6 +86,7 @@ public abstract class ConfigScreen extends Screen {
         this.removeWidget(widget);
     });
     private TabNavigationBar tabNavigationBar;
+    private ConfigButton doneButton;
     private final List<AbstractWidget> primaryControls = new ArrayList<>();
     private final List<InputControl> inputControls = new ArrayList<>();
     private final List<OptionControl> optionControls = new ArrayList<>();
@@ -117,13 +120,12 @@ public abstract class ConfigScreen extends Screen {
         for (OptionsTab tab : this.tabs) tabBuilder.addTabs(tab);
         this.tabNavigationBar = tabBuilder.build();
         this.addRenderableWidget(this.tabNavigationBar);
-        this.tabNavigationBar.arrangeElements();
-        this.tabManager.setTabArea(new Area(0, 28, this.width, Math.max(BUTTON_HEIGHT, this.height - 61)));
-        this.addRenderableWidget(ConfigButton.builder(CommonComponents.GUI_DONE, ignored -> this.onClose()).bounds((this.width - 150) / 2, this.height - 26, 150, BUTTON_HEIGHT).build());
+        this.doneButton = this.addRenderableWidget(ConfigButton.builder(CommonComponents.GUI_DONE, ignored -> this.onClose()).size(150, BUTTON_HEIGHT).build());
         this.updateControlWidths();
         this.updateOptionResetButtons();
         this.updateKeybindButtons();
         this.tabNavigationBar.selectTab(0, false);
+        this.repositionElements();
         this.afterBuildTabs();
     }
 
@@ -382,20 +384,45 @@ public abstract class ConfigScreen extends Screen {
     }
 
     @Override
+    public void resize(@NotNull Minecraft minecraft, int width, int height) {
+        // Screen.resize in 1.19 rebuilds every widget. Retain the tab, scroll and input state instead.
+        this.width = width;
+        this.height = height;
+        this.repositionElements();
+    }
+
+    protected void repositionElements() {
+        if (this.tabNavigationBar == null || this.doneButton == null) return;
+        this.tabNavigationBar.setWidth(this.width);
+        this.tabNavigationBar.arrangeElements();
+        this.doneButton.x = (this.width - this.doneButton.getWidth()) / 2;
+        this.doneButton.y = this.height - FOOTER_HEIGHT + Math.round((FOOTER_HEIGHT - this.doneButton.getHeight()) / 2.0F);
+        int tabAreaTop = this.tabNavigationBar.getRectangle().bottom();
+        this.tabManager.setTabArea(new Area(0, tabAreaTop, this.width, Math.max(0, this.height - FOOTER_HEIGHT - tabAreaTop)));
+    }
+
+    @Override
     public void render(@NotNull PoseStack graphics, int mouseX, int mouseY, float a) {
         this.renderBackground(graphics);
         super.render(graphics, mouseX, mouseY, a);
-        if (mouseY >= 28 && mouseY < this.height - 33) {
+        if (mouseY >= this.tabNavigationBar.getRectangle().bottom() && mouseY < this.height - FOOTER_HEIGHT) {
             ConfigTooltip tooltip = this.findHoveredTooltip(this, mouseX, mouseY);
             if (tooltip != null) tooltip.render(this, graphics, mouseX, mouseY);
         }
         if (this.shouldRenderFooterSeparator()) {
-            net.minecraft.client.gui.GuiComponent.fill(graphics, 0, this.height - 33, this.width, this.height - 32, 0x80000000);
+            TabRenderUtils.drawFooterSeparator(graphics, 0, this.width, this.height - FOOTER_HEIGHT - 2, 1.0F);
         }
     }
 
     protected boolean shouldRenderFooterSeparator() {
         return true;
+    }
+
+    @Override
+    public void renderBackground(@NotNull PoseStack graphics) {
+        super.renderBackground(graphics);
+        int tabAreaTop = this.tabNavigationBar.getRectangle().bottom();
+        TabRenderUtils.drawContentBackground(graphics, 0, tabAreaTop, this.width, this.height - tabAreaTop, 1.0F);
     }
 
     @Override
