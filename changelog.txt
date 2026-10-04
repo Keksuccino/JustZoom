@@ -1,4 +1,13 @@
 
+CHANGELOG | JUST ZOOM v3.0.1
+
+- Fixed a crash when joining worlds with Apprentice’s Codex installed (#63)
+
+%changelog:end%
+
+
+
+
 CHANGELOG | JUST ZOOM v3.0.0
 
 - Completely reworked the Settings screen
