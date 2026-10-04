@@ -18,7 +18,7 @@ public class JustZoomMixinPlugin implements IMixinConfigPlugin {
 
     @Override
     public String getRefMapperConfig() {
-        // Fabric and older Forge releases need the generated map in packaged jars.
+        // Fabric needs the generated map in packaged jars.
         // Native-name loaders do not generate one, so retain their default behavior.
         String referenceMap = "justzoom.refmap.json";
         return JustZoomMixinPlugin.class.getResource("/" + referenceMap) != null ? referenceMap : null;

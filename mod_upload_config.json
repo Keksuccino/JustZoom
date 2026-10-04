@@ -9,9 +9,6 @@
           "fabric-api",
           "konkrete"
         ],
-        "forge": [
-          "konkrete"
-        ],
         "neoforge": [
           "konkrete"
         ]

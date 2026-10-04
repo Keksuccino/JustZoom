@@ -43,7 +43,7 @@ class JustZoomMixinPluginTest {
     private static URLClassLoader artifactClassLoader(boolean hideReferenceMap) throws Exception {
         URL artifact = Path.of(System.getProperty("justzoom.releaseJar")).toUri().toURL();
         // Isolate the production plugin and its resources from Loom's development classpath.
-        // NeoForge uses native names and does not bundle the Fabric/Forge reference map.
+        // NeoForge uses native names and does not bundle the Fabric reference map.
         return new URLClassLoader(new URL[]{artifact}, JustZoomMixinPluginTest.class.getClassLoader()) {
             @Override
             protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
