@@ -1,10 +1,19 @@
 package de.keksuccino.justzoom;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.function.BooleanSupplier;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 class ZoomHandlerTest {
 
@@ -146,22 +155,113 @@ class ZoomHandlerTest {
 
     @Test
     void usesFirstPersonCameraForImprovedRearThirdPersonZoom() {
-        assertTrue(ZoomHandler.shouldUseFirstPersonCameraWhileZooming(true, true, false));
+        assertTrue(ZoomHandler.shouldUseFirstPersonCameraWhileZooming(() -> true, true, false));
     }
 
     @Test
     void keepsRearThirdPersonCameraWhenImprovementIsDisabled() {
-        assertFalse(ZoomHandler.shouldUseFirstPersonCameraWhileZooming(true, false, false));
+        assertFalse(ZoomHandler.shouldUseFirstPersonCameraWhileZooming(() -> true, false, false));
     }
 
     @Test
     void doesNotOverrideTheCameraOutsideZoom() {
-        assertFalse(ZoomHandler.shouldUseFirstPersonCameraWhileZooming(false, true, false));
+        assertFalse(ZoomHandler.shouldUseFirstPersonCameraWhileZooming(() -> false, true, false));
     }
 
     @Test
     void doesNotOverrideTheMirroredCamera() {
-        assertFalse(ZoomHandler.shouldUseFirstPersonCameraWhileZooming(true, true, true));
+        assertFalse(ZoomHandler.shouldUseFirstPersonCameraWhileZooming(() -> true, true, true));
+    }
+
+    @Test
+    void avoidsScopeQueriesWhenTheCameraImprovementIsDisabled() {
+        assertFalse(ZoomHandler.shouldUseFirstPersonCameraWhileZooming(() -> fail(), false, false));
+    }
+
+    @Test
+    void avoidsScopeQueriesForTheMirroredCamera() {
+        assertFalse(ZoomHandler.shouldUseFirstPersonCameraWhileZooming(() -> fail(), true, true));
+    }
+
+    @ParameterizedTest
+    @CsvSource({"true, false, true", "false, false, false", "true, true, true", "false, true, true"})
+    void recursiveScopeChecksUseTheUnderlyingCamera(boolean firstPerson, boolean keybindDown, boolean expectedOverride) {
+        ScopedZoomInput zooming = new ScopedZoomInput(firstPerson, keybindDown);
+
+        assertEquals(expectedOverride, ZoomHandler.shouldUseFirstPersonCameraWhileZooming(zooming, true, false));
+        assertEquals(1, zooming.scopeChecks);
+    }
+
+    @ParameterizedTest
+    @CsvSource({"true, true", "false, false"})
+    void recursionAlsoTerminatesWhenScopeDetectionStartsTheQuery(boolean firstPerson, boolean expectedZoom) {
+        ScopedZoomInput zooming = new ScopedZoomInput(firstPerson, false);
+
+        assertEquals(expectedZoom, zooming.getAsBoolean());
+        assertEquals(2, zooming.scopeChecks);
+    }
+
+    @Test
+    void nestedQueriesKeepTheGuardActiveUntilTheOuterQueryCompletes() {
+        assertTrue(ZoomHandler.shouldUseFirstPersonCameraWhileZooming(() -> {
+            assertFalse(ZoomHandler.shouldUseFirstPersonCameraWhileZooming(() -> fail(), true, false));
+            assertFalse(ZoomHandler.shouldUseFirstPersonCameraWhileZooming(() -> fail(), true, false));
+            return true;
+        }, true, false));
+        assertTrue(ZoomHandler.shouldUseFirstPersonCameraWhileZooming(() -> true, true, false));
+    }
+
+    @Test
+    void completedInactiveQueryDoesNotBlockLaterZoom() {
+        assertFalse(ZoomHandler.shouldUseFirstPersonCameraWhileZooming(() -> false, true, false));
+        assertTrue(ZoomHandler.shouldUseFirstPersonCameraWhileZooming(() -> true, true, false));
+    }
+
+    @Test
+    void failingScopeQueryDoesNotBlockLaterZoom() {
+        IllegalStateException failure = new IllegalStateException();
+        assertSame(failure, assertThrows(IllegalStateException.class, () -> ZoomHandler.shouldUseFirstPersonCameraWhileZooming(() -> {
+            throw failure;
+        }, true, false)));
+        assertTrue(ZoomHandler.shouldUseFirstPersonCameraWhileZooming(() -> true, true, false));
+    }
+
+    @Test
+    void cameraQueriesOnDifferentThreadsDoNotSuppressEachOther() {
+        var executor = Executors.newSingleThreadExecutor();
+        try {
+            assertTrue(ZoomHandler.shouldUseFirstPersonCameraWhileZooming(() -> {
+                try {
+                    return executor.submit(() -> ZoomHandler.shouldUseFirstPersonCameraWhileZooming(() -> true, true, false)).get(10, TimeUnit.SECONDS);
+                } catch (Exception failure) {
+                    throw new AssertionError(failure);
+                }
+            }, true, false));
+        } finally {
+            executor.shutdownNow();
+        }
+    }
+
+    private static final class ScopedZoomInput implements BooleanSupplier {
+
+        private final boolean firstPerson;
+        private final boolean keybindDown;
+        private int scopeChecks;
+
+        private ScopedZoomInput(boolean firstPerson, boolean keybindDown) {
+            this.firstPerson = firstPerson;
+            this.keybindDown = keybindDown;
+        }
+
+        @Override
+        public boolean getAsBoolean() {
+            // Model Codex's scope -> camera -> Just Zoom -> scope cycle, bounding a broken
+            // implementation so this regression fails before exhausting the Java stack.
+            assertTrue(++this.scopeChecks <= 2);
+            boolean scoped = ZoomHandler.shouldUseFirstPersonCameraWhileZooming(this, true, false) || this.firstPerson;
+            return ZoomHandler.ZoomInput.isActive(this.keybindDown, scoped, true);
+        }
+
     }
 
 }
