@@ -5,10 +5,13 @@ import net.minecraft.client.Minecraft;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.function.BooleanSupplier;
+
 public class ZoomHandler {
 
     private static final float SPYGLASS_OVERLAY_INITIAL_SCALE = 0.5F;
     private static final float SPYGLASS_OVERLAY_FINAL_SCALE = 1.125F;
+    private static final ThreadLocal<Boolean> CHECKING_FIRST_PERSON_CAMERA = ThreadLocal.withInitial(() -> false);
 
     private static float cachedNormalFov = 70.0F;
     private static double cachedEffectiveMagnification = ZoomMath.MIN_MAGNIFICATION;
@@ -60,11 +63,20 @@ public class ZoomHandler {
 
     public static boolean shouldUseFirstPersonCameraWhileZooming() {
         Minecraft minecraft = Minecraft.getInstance();
-        return shouldUseFirstPersonCameraWhileZooming(isZooming(), JustZoom.getOptions().improveThirdPersonZoom.getValue(), minecraft.options.getCameraType().isMirrored());
+        return shouldUseFirstPersonCameraWhileZooming(ZoomHandler::isZooming, JustZoom.getOptions().improveThirdPersonZoom.getValue(), minecraft.options.getCameraType().isMirrored());
     }
 
-    static boolean shouldUseFirstPersonCameraWhileZooming(boolean zooming, boolean improveThirdPersonZoom, boolean mirrored) {
-        return zooming && improveThirdPersonZoom && !mirrored;
+    static boolean shouldUseFirstPersonCameraWhileZooming(@NotNull BooleanSupplier zooming, boolean improveThirdPersonZoom, boolean mirrored) {
+        if (!improveThirdPersonZoom || mirrored || CHECKING_FIRST_PERSON_CAMERA.get()) return false;
+        // Modded scope checks (e.g. Apprentice's Codex) can query CameraType.isFirstPerson again.
+        // Let nested queries use the underlying camera so scope detection cannot recurse into itself.
+        // Keep the guard per thread and clear it on failure as well as normal completion.
+        CHECKING_FIRST_PERSON_CAMERA.set(true);
+        try {
+            return zooming.getAsBoolean();
+        } finally {
+            CHECKING_FIRST_PERSON_CAMERA.set(false);
+        }
     }
 
     public static boolean shouldHideHudWhileZooming() {
