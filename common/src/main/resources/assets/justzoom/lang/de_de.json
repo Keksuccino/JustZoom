@@ -69,5 +69,6 @@
   "justzoom.options.spyglass_sounds.spyglass_and_keybind_zoom": "Fernrohr & Zoom-Taste",
   "justzoom.options.spyglass_sounds.never": "Nie",
   "justzoom.options.toggle.enabled": "Aktiviert",
-  "justzoom.options.toggle.disabled": "Deaktiviert"
+  "justzoom.options.toggle.disabled": "Deaktiviert",
+  "justzoom.server.standalone_zoom_disabled": "Dieser Server hat das Zoomen mit der Zoom-Taste deaktiviert. Benutze ein Fernrohr zum Zoomen."
 }

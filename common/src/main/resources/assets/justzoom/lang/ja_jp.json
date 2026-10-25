@@ -69,5 +69,6 @@
   "justzoom.options.spyglass_sounds.spyglass_and_keybind_zoom": "望遠鏡とズームキー",
   "justzoom.options.spyglass_sounds.never": "再生しない",
   "justzoom.options.toggle.enabled": "オン",
-  "justzoom.options.toggle.disabled": "オフ"
+  "justzoom.options.toggle.disabled": "オフ",
+  "justzoom.server.standalone_zoom_disabled": "このサーバーではズームキーによるズームが無効になっています。ズームするには望遠鏡を使用してください。"
 }

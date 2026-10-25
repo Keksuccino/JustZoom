@@ -45,6 +45,20 @@ class ZoomHandlerTest {
     }
 
     @Test
+    void activatesTheKeybindOnlyWhenTheServerAllowsStandaloneZoom() {
+        assertTrue(ZoomHandler.ZoomInput.isKeybindActive(true, true));
+        assertFalse(ZoomHandler.ZoomInput.isKeybindActive(true, false));
+        assertFalse(ZoomHandler.ZoomInput.isKeybindActive(false, true));
+        assertFalse(ZoomHandler.ZoomInput.isKeybindActive(false, false));
+    }
+
+    @Test
+    void keepsSpyglassZoomActiveWhenTheServerDisabledStandaloneZoom() {
+        assertTrue(ZoomHandler.ZoomInput.isActive(ZoomHandler.ZoomInput.isKeybindActive(true, false), true, true));
+        assertFalse(ZoomHandler.ZoomInput.isActive(ZoomHandler.ZoomInput.isKeybindActive(true, false), false, true));
+    }
+
+    @Test
     void keepsZoomAvailableForEveryCameraView() {
         assertTrue(ZoomHandler.isZoomAvailable(false));
     }
