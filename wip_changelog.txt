@@ -1,5 +1,9 @@
 CHANGELOG | JUST ZOOM v3.0.2 [ W I P !!! NOT PUBLIC YET !!! ]
 
 - Improved compatibility with other mods that change the field of view
+- When the open options key is unbound, the "Open Settings" notification now tells you to open the settings via Mod Menu (Fabric) or the Mods menu (Forge/NeoForge) (#65)
+- Opening the settings through Mod Menu or the Mods menu now also closes the "Open Settings" notification
+- Fixed the "Open Settings" notification never closing when you didn't open the settings or the open options key was unbound; it now closes after 30 seconds (#65)
+- Fixed the "Open Settings" notification text getting cut off at the notification's right edge on Minecraft 1.19.2 to 1.21.1
 - Fixed zooming not working with Simply Swords installed (pressing the zoom key only hid the HUD)
 - Fixed FOV effects from other mods, like Simply Swords' Shadow Dance, getting lost while zooming
