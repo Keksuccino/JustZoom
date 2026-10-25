@@ -71,5 +71,6 @@
   "justzoom.options.toggle.enabled": "Aktiviert",
   "justzoom.options.toggle.disabled": "Deaktiviert",
   "justzoom.gui.tab.position": "Tab %s von %s",
-  "justzoom.gui.tab.usage": "Verwende die Pfeiltasten nach links und rechts, um Tabs zu wechseln. Mit Tab erreichst du die Einstellungen des gewählten Tabs."
+  "justzoom.gui.tab.usage": "Verwende die Pfeiltasten nach links und rechts, um Tabs zu wechseln. Mit Tab erreichst du die Einstellungen des gewählten Tabs.",
+  "justzoom.server.standalone_zoom_disabled": "Dieser Server hat das Zoomen mit der Zoom-Taste deaktiviert. Benutze ein Fernrohr zum Zoomen."
 }

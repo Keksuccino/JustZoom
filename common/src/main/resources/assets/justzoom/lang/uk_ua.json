@@ -69,5 +69,6 @@
   "justzoom.options.spyglass_sounds.spyglass_and_keybind_zoom": "Підзорна труба та клавіша зуму",
   "justzoom.options.spyglass_sounds.never": "Ніколи",
   "justzoom.options.toggle.enabled": "Увімкнено",
-  "justzoom.options.toggle.disabled": "Вимкнено"
+  "justzoom.options.toggle.disabled": "Вимкнено",
+  "justzoom.server.standalone_zoom_disabled": "На цьому сервері зум клавішею зуму вимкнено. Використовуйте підзорну трубу для зуму."
 }

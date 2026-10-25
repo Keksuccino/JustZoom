@@ -71,5 +71,6 @@
   "justzoom.options.toggle.enabled": "Enabled",
   "justzoom.options.toggle.disabled": "Disabled",
   "justzoom.gui.tab.position": "Tab %s of %s",
-  "justzoom.gui.tab.usage": "Use left and right arrow keys to change tabs. Use Tab to move to the selected tab’s controls."
+  "justzoom.gui.tab.usage": "Use left and right arrow keys to change tabs. Use Tab to move to the selected tab’s controls.",
+  "justzoom.server.standalone_zoom_disabled": "This server disabled zooming with the zoom key. Use a spyglass to zoom."
 }

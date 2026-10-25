@@ -69,5 +69,6 @@
   "justzoom.options.spyglass_sounds.spyglass_and_keybind_zoom": "Dürbün ve Yakınlaştırma Tuşu",
   "justzoom.options.spyglass_sounds.never": "Asla",
   "justzoom.options.toggle.enabled": "Açık",
-  "justzoom.options.toggle.disabled": "Kapalı"
+  "justzoom.options.toggle.disabled": "Kapalı",
+  "justzoom.server.standalone_zoom_disabled": "Bu sunucu yakınlaştırma tuşuyla yakınlaştırmayı devre dışı bıraktı. Yakınlaştırmak için dürbün kullan."
 }
