@@ -1,4 +1,4 @@
-CHANGELOG | JUST ZOOM v3.0.2 [ W I P !!! NOT PUBLIC YET !!! ]
+CHANGELOG | JUST ZOOM v3.1.0 [ W I P !!! NOT PUBLIC YET !!! ]
 
 - Improved compatibility with other mods that change the field of view
 - When the open options key is unbound, the "Open Settings" notification now tells you to open the settings via Mod Menu (Fabric) or the Mods menu (Forge/NeoForge) (#65)
