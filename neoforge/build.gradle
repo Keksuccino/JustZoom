@@ -102,7 +102,12 @@ tasks.named("sourcesJar", Jar) {
 }
 
 tasks.withType(ProcessResources).matching(notNeoTask).configureEach {
-    from project(":common").sourceSets.main.resources
+    from(project(":common").sourceSets.main.resources) {
+        // NeoForge also reads the mod's pack.mcmeta as data pack metadata. For Minecraft 1.21.11's resource format 75, data packs require the
+        // legacy supported_formats field while resource packs reject it, so one file cannot be valid for both. NeoForge treats metadata without
+        // any format fields as compatible with every pack format, so neoforge/src/main/resources/pack.mcmeta replaces the common file here.
+        exclude "pack.mcmeta"
+    }
 }
 
 publishing {
