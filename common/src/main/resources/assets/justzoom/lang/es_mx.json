@@ -69,5 +69,6 @@
   "justzoom.options.spyglass_sounds.spyglass_and_keybind_zoom": "Catalejo y Tecla de Zoom",
   "justzoom.options.spyglass_sounds.never": "Nunca",
   "justzoom.options.toggle.enabled": "Activado",
-  "justzoom.options.toggle.disabled": "Desactivado"
+  "justzoom.options.toggle.disabled": "Desactivado",
+  "justzoom.server.standalone_zoom_disabled": "Este servidor desactivó el zoom con la tecla de zoom. Usa un catalejo para hacer zoom."
 }

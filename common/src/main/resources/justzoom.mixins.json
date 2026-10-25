@@ -8,6 +8,7 @@
     "client.AccessorMixinKeyBindsScreen",
     "client.MixinAbstractClientPlayer",
     "client.MixinCameraType",
+    "client.MixinClientPacketListener",
     "client.MixinEditBox",
     "client.MixinGameRenderer",
     "client.MixinGui",

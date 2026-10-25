@@ -69,5 +69,6 @@
   "justzoom.options.spyglass_sounds.spyglass_and_keybind_zoom": "Spyglass & Keybind Zoom",
   "justzoom.options.spyglass_sounds.never": "Never",
   "justzoom.options.toggle.enabled": "Enabled",
-  "justzoom.options.toggle.disabled": "Disabled"
+  "justzoom.options.toggle.disabled": "Disabled",
+  "justzoom.server.standalone_zoom_disabled": "This server disabled zooming with the zoom key. Use a spyglass to zoom."
 }

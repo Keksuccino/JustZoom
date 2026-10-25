@@ -205,6 +205,112 @@ class JsonConfigTest {
     }
 
     @Test
+    void savingKeepsValuesEditedInTheFileAfterLoading() throws IOException {
+        Path file = this.getConfigFile();
+        TestConfig config = new TestConfig(file);
+        Files.writeString(file, "{\n  \"general\": {\"count\": 1, \"enabled\": false, \"names\": [\"edited\"]},\n  \"added\": {\"value\": 3}\n}\n", StandardCharsets.UTF_8);
+
+        config.count.setValue(5);
+
+        JsonObject savedData = this.readJson(file);
+        assertEquals(5, savedData.getAsJsonObject("general").get("count").getAsInt());
+        assertFalse(savedData.getAsJsonObject("general").get("enabled").getAsBoolean());
+        assertEquals("edited", savedData.getAsJsonObject("general").getAsJsonArray("names").get(0).getAsString());
+        assertEquals(3, savedData.getAsJsonObject("added").get("value").getAsInt());
+    }
+
+    @Test
+    void removingAValueKeepsValuesEditedInTheFileAfterLoading() throws IOException {
+        Path file = this.getConfigFile();
+        TestConfig config = new TestConfig(file);
+        Files.writeString(file, "{\n  \"general\": {\"count\": 1, \"enabled\": false, \"names\": []}\n}\n", StandardCharsets.UTF_8);
+
+        config.count.remove();
+
+        JsonObject savedGeneral = this.readJson(file).getAsJsonObject("general");
+        assertFalse(savedGeneral.has("count"));
+        assertFalse(savedGeneral.get("enabled").getAsBoolean());
+        assertEquals(0, savedGeneral.getAsJsonArray("names").size());
+    }
+
+    @Test
+    void instancesSharingAFileKeepEachOthersValues() throws IOException {
+        Path file = this.getConfigFile();
+        TestConfig config = new TestConfig(file);
+        OtherSectionConfig otherConfig = new OtherSectionConfig(file);
+
+        otherConfig.flag.setValue(true);
+        config.count.setValue(8);
+        otherConfig.flag.setValue(false);
+
+        JsonObject savedData = this.readJson(file);
+        assertEquals(8, savedData.getAsJsonObject("general").get("count").getAsInt());
+        assertFalse(savedData.getAsJsonObject("other").get("flag").getAsBoolean());
+        assertEquals(8, new TestConfig(file).count.getValue());
+        assertFalse(new OtherSectionConfig(file).flag.getValue());
+    }
+
+    @Test
+    void addingMissingDefaultsKeepsExistingValues() throws IOException {
+        Path file = this.getConfigFile();
+        TestConfig config = new TestConfig(file);
+        config.count.setValue(4);
+
+        new OtherSectionConfig(file);
+
+        JsonObject savedData = this.readJson(file);
+        assertEquals(4, savedData.getAsJsonObject("general").get("count").getAsInt());
+        assertTrue(savedData.getAsJsonObject("other").get("flag").getAsBoolean());
+    }
+
+    @Test
+    void savingRewritesTheWholeDocumentWhenTheFileWasDeleted() throws IOException {
+        Path file = this.getConfigFile();
+        TestConfig config = new TestConfig(file);
+        Files.delete(file);
+
+        config.count.setValue(2);
+
+        JsonObject savedGeneral = this.readJson(file).getAsJsonObject("general");
+        assertEquals(2, savedGeneral.get("count").getAsInt());
+        assertTrue(savedGeneral.get("enabled").getAsBoolean());
+        assertEquals(2, savedGeneral.getAsJsonArray("names").size());
+    }
+
+    @Test
+    void savingRepairsAFileThatBecameUnreadable() throws IOException {
+        Path file = this.getConfigFile();
+        TestConfig config = new TestConfig(file);
+        Files.writeString(file, "{ not json", StandardCharsets.UTF_8);
+
+        config.count.setValue(3);
+
+        JsonObject savedGeneral = this.readJson(file).getAsJsonObject("general");
+        assertEquals(3, savedGeneral.get("count").getAsInt());
+        assertTrue(savedGeneral.get("enabled").getAsBoolean());
+        assertEquals(2, savedGeneral.getAsJsonArray("names").size());
+    }
+
+    @Test
+    void reloadDiscardsChangesThatCouldNotBeSaved() throws IOException {
+        Path blockedParent = this.temporaryDirectory.resolve("blocked_parent");
+        Files.writeString(blockedParent, "not a directory", StandardCharsets.UTF_8);
+        Path file = blockedParent.resolve("config.json");
+        TestConfig config = new TestConfig(file);
+        Files.delete(blockedParent);
+        Files.createDirectory(blockedParent);
+        Files.writeString(file, "{\n  \"general\": {\"count\": 6, \"enabled\": false, \"names\": []}\n}\n", StandardCharsets.UTF_8);
+
+        assertTrue(config.reload());
+        config.enabled.setValue(true);
+
+        JsonObject savedGeneral = this.readJson(file).getAsJsonObject("general");
+        assertEquals(6, savedGeneral.get("count").getAsInt());
+        assertTrue(savedGeneral.get("enabled").getAsBoolean());
+        assertEquals(0, savedGeneral.getAsJsonArray("names").size());
+    }
+
+    @Test
     void rejectsDuplicateDefinitions() {
         JsonConfig config = new JsonConfig(this.getConfigFile());
         config.option("value", 1);
@@ -238,6 +344,19 @@ class JsonConfigTest {
 
         private TestConfig(Path file, Path legacyFile) {
             super(file, legacyFile);
+            this.save();
+        }
+
+    }
+
+    private static final class OtherSectionConfig extends JsonConfig {
+
+        private final ConfigSection other = this.section("other");
+
+        private final ConfigValue<Boolean> flag = this.other.option("flag", true);
+
+        private OtherSectionConfig(Path file) {
+            super(file);
             this.save();
         }
 

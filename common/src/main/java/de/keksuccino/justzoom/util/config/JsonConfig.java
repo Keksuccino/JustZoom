@@ -27,17 +27,22 @@ import java.util.function.UnaryOperator;
 /**
  * A standalone, typed JSON store for configuration options and persistent data.
  * Values can live at the document root or inside named sections, and changes are saved immediately.
+ * Saving re-reads the file and only writes the values this instance changed, so several instances can share one file and edits made to the file while the game runs are never reverted.
  */
 public class JsonConfig {
 
     private static final Logger LOGGER = LogManager.getLogger();
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    // Serializes the read-merge-write cycle of all instances, so two instances sharing a file cannot lose each other's changes.
+    private static final Object FILE_WRITE_LOCK = new Object();
 
     private final Path file;
     @Nullable
     private final Path legacyFile;
     private final Map<ValuePath, ConfigValue<?>> registeredValues = new LinkedHashMap<>();
     private JsonObject values = new JsonObject();
+    // Values this instance changed since the last successful save. A null value marks a removed value.
+    private final Map<ValuePath, JsonElement> pendingChanges = new LinkedHashMap<>();
     private boolean dirty;
     private boolean migrationBlocked;
     private boolean migrationPending;
@@ -131,6 +136,7 @@ public class JsonConfig {
         }
         if (!this.writeDocument()) return false;
         this.dirty = false;
+        this.pendingChanges.clear();
         this.finishMigration();
         return true;
     }
@@ -140,6 +146,7 @@ public class JsonConfig {
      */
     public final synchronized boolean reload() {
         this.values = new JsonObject();
+        this.pendingChanges.clear();
         this.dirty = false;
         this.migrationBlocked = false;
         this.migrationPending = false;
@@ -163,7 +170,7 @@ public class JsonConfig {
 
     synchronized <T> void setValue(@NotNull ConfigValue<T> value, @NotNull T newValue) {
         JsonElement serializedValue = this.serialize(newValue, value.getType(), value.getPath());
-        JsonElement previousValue = this.getElement(value.getPath());
+        JsonElement previousValue = getElement(this.values, value.getPath());
         T previousStoredValue = value.getStoredValue();
         boolean wasDirty = this.dirty;
         if (serializedValue.equals(previousValue)) {
@@ -171,11 +178,13 @@ public class JsonConfig {
             return;
         }
 
-        this.putElement(value.getPath(), serializedValue);
+        boolean hadPendingChange = this.pendingChanges.containsKey(value.getPath());
+        JsonElement previousPendingChange = this.pendingChanges.get(value.getPath());
+        this.changeElement(value.getPath(), serializedValue);
         value.setStoredValue(newValue);
-        this.dirty = true;
         if (!this.save()) {
             this.restoreElement(value.getPath(), previousValue);
+            this.restorePendingChange(value.getPath(), hadPendingChange, previousPendingChange);
             value.setStoredValue(previousStoredValue);
             this.dirty = wasDirty;
         }
@@ -186,15 +195,17 @@ public class JsonConfig {
     }
 
     synchronized void removeValue(@NotNull ConfigValue<?> value) {
-        JsonElement previousValue = this.getElement(value.getPath());
+        JsonElement previousValue = getElement(this.values, value.getPath());
         if (previousValue == null) return;
         Object previousStoredValue = value.getStoredValue();
         boolean wasDirty = this.dirty;
-        this.removeElement(value.getPath());
+        boolean hadPendingChange = this.pendingChanges.containsKey(value.getPath());
+        JsonElement previousPendingChange = this.pendingChanges.get(value.getPath());
+        this.changeElement(value.getPath(), null);
         value.setStoredValue(null);
-        this.dirty = true;
         if (!this.save()) {
             this.restoreElement(value.getPath(), previousValue);
+            this.restorePendingChange(value.getPath(), hadPendingChange, previousPendingChange);
             this.restoreStoredValue(value, previousStoredValue);
             this.dirty = wasDirty;
         }
@@ -217,7 +228,7 @@ public class JsonConfig {
     }
 
     private <T> void restoreDefaultIfNeeded(@NotNull ConfigValue<T> value) {
-        JsonElement storedValue = this.getElement(value.getPath());
+        JsonElement storedValue = getElement(this.values, value.getPath());
         T deserializedValue = storedValue != null && !storedValue.isJsonNull() ? this.deserialize(storedValue, value.getType(), value.getPath()) : null;
         if (deserializedValue != null) {
             value.setStoredValue(deserializedValue);
@@ -226,9 +237,8 @@ public class JsonConfig {
         value.setStoredValue(null);
         if (!value.hasDefaultValue()) return;
         T defaultValue = value.getDefaultValue();
-        this.putElement(value.getPath(), this.serialize(defaultValue, value.getType(), value.getPath()));
+        this.changeElement(value.getPath(), this.serialize(defaultValue, value.getType(), value.getPath()));
         value.setStoredValue(defaultValue);
-        this.dirty = true;
     }
 
     @SuppressWarnings("unchecked")
@@ -264,6 +274,12 @@ public class JsonConfig {
 
     @NotNull
     private JsonObject readDocument() {
+        JsonObject document = this.readDocumentOrNull();
+        return document != null ? document : new JsonObject();
+    }
+
+    @Nullable
+    private JsonObject readDocumentOrNull() {
         try (Reader reader = Files.newBufferedReader(this.file, StandardCharsets.UTF_8)) {
             JsonElement root = JsonParser.parseReader(reader);
             if (root != null && root.isJsonObject()) return root.getAsJsonObject();
@@ -271,33 +287,55 @@ public class JsonConfig {
         } catch (IOException | RuntimeException ex) {
             LOGGER.warn("Failed to read config {}. It will be repaired when a value is next saved.", this.file, ex);
         }
-        return new JsonObject();
+        return null;
     }
 
     private boolean writeDocument() {
-        Path temporaryFile = null;
-        try {
-            Path parent = this.file.getParent();
-            Files.createDirectories(parent);
-            String temporaryPrefix = this.file.getFileName().toString();
-            // Files.createTempFile requires at least three prefix characters, including for otherwise valid one-character file names.
-            if (temporaryPrefix.length() < 3) temporaryPrefix = (temporaryPrefix + "___").substring(0, 3);
-            temporaryFile = Files.createTempFile(parent, temporaryPrefix, ".tmp");
-            Files.writeString(temporaryFile, GSON.toJson(this.values) + System.lineSeparator(), StandardCharsets.UTF_8);
-            this.replaceWith(temporaryFile);
-            return true;
-        } catch (IOException | RuntimeException ex) {
-            LOGGER.error("Failed to write config {}.", this.file, ex);
-            return false;
-        } finally {
-            if (temporaryFile != null) {
-                try {
-                    Files.deleteIfExists(temporaryFile);
-                } catch (IOException ex) {
-                    LOGGER.warn("Failed to clean up temporary config file {}.", temporaryFile, ex);
+        synchronized (FILE_WRITE_LOCK) {
+            Path temporaryFile = null;
+            try {
+                JsonObject document = this.createDocumentToWrite();
+                Path parent = this.file.getParent();
+                Files.createDirectories(parent);
+                String temporaryPrefix = this.file.getFileName().toString();
+                // Files.createTempFile requires at least three prefix characters, including for otherwise valid one-character file names.
+                if (temporaryPrefix.length() < 3) temporaryPrefix = (temporaryPrefix + "___").substring(0, 3);
+                temporaryFile = Files.createTempFile(parent, temporaryPrefix, ".tmp");
+                Files.writeString(temporaryFile, GSON.toJson(document) + System.lineSeparator(), StandardCharsets.UTF_8);
+                this.replaceWith(temporaryFile);
+                return true;
+            } catch (IOException | RuntimeException ex) {
+                LOGGER.error("Failed to write config {}.", this.file, ex);
+                return false;
+            } finally {
+                if (temporaryFile != null) {
+                    try {
+                        Files.deleteIfExists(temporaryFile);
+                    } catch (IOException ex) {
+                        LOGGER.warn("Failed to clean up temporary config file {}.", temporaryFile, ex);
+                    }
                 }
             }
         }
+    }
+
+    /**
+     * Applies this instance's pending changes to the current file content instead of writing the in-memory document as a whole.
+     * Other values in the file may have been edited by hand or written by another instance since this instance loaded the file.
+     * The in-memory document is only written as a whole when the file is missing or unreadable, which also repairs a damaged file.
+     */
+    @NotNull
+    private JsonObject createDocumentToWrite() {
+        JsonObject document = Files.exists(this.file) ? this.readDocumentOrNull() : null;
+        if (document == null) return this.values.deepCopy();
+        for (Map.Entry<ValuePath, JsonElement> change : this.pendingChanges.entrySet()) {
+            if (change.getValue() == null) {
+                removeElement(document, change.getKey());
+            } else {
+                putElement(document, change.getKey(), change.getValue().deepCopy());
+            }
+        }
+        return document;
     }
 
     private void replaceWith(@NotNull Path temporaryFile) throws IOException {
@@ -345,42 +383,63 @@ public class JsonConfig {
         }
     }
 
-    @Nullable
-    private JsonElement getElement(@NotNull ValuePath path) {
-        if (path.section == null) return this.values.get(path.key);
-        JsonElement section = this.values.get(path.section);
-        return section != null && section.isJsonObject() ? section.getAsJsonObject().get(path.key) : null;
-    }
-
-    private void putElement(@NotNull ValuePath path, @NotNull JsonElement value) {
-        if (path.section == null) {
-            this.values.add(path.key, value);
-            return;
+    /**
+     * Changes a value in memory and marks it for the next save. A null value removes it.
+     */
+    private void changeElement(@NotNull ValuePath path, @Nullable JsonElement value) {
+        if (value == null) {
+            removeElement(this.values, path);
+        } else {
+            putElement(this.values, path, value);
         }
-        JsonElement existingSection = this.values.get(path.section);
-        JsonObject section = existingSection != null && existingSection.isJsonObject() ? existingSection.getAsJsonObject() : new JsonObject();
-        section.add(path.key, value);
-        this.values.add(path.section, section);
-    }
-
-    private void removeElement(@NotNull ValuePath path) {
-        if (path.section == null) {
-            this.values.remove(path.key);
-            return;
-        }
-        JsonElement existingSection = this.values.get(path.section);
-        if (existingSection == null || !existingSection.isJsonObject()) return;
-        JsonObject section = existingSection.getAsJsonObject();
-        section.remove(path.key);
-        if (section.size() == 0) this.values.remove(path.section);
+        this.pendingChanges.put(path, value);
+        this.dirty = true;
     }
 
     private void restoreElement(@NotNull ValuePath path, @Nullable JsonElement previousValue) {
         if (previousValue == null) {
-            this.removeElement(path);
+            removeElement(this.values, path);
         } else {
-            this.putElement(path, previousValue);
+            putElement(this.values, path, previousValue);
         }
+    }
+
+    private void restorePendingChange(@NotNull ValuePath path, boolean hadPendingChange, @Nullable JsonElement previousPendingChange) {
+        if (hadPendingChange) {
+            this.pendingChanges.put(path, previousPendingChange);
+        } else {
+            this.pendingChanges.remove(path);
+        }
+    }
+
+    @Nullable
+    private static JsonElement getElement(@NotNull JsonObject document, @NotNull ValuePath path) {
+        if (path.section == null) return document.get(path.key);
+        JsonElement section = document.get(path.section);
+        return section != null && section.isJsonObject() ? section.getAsJsonObject().get(path.key) : null;
+    }
+
+    private static void putElement(@NotNull JsonObject document, @NotNull ValuePath path, @NotNull JsonElement value) {
+        if (path.section == null) {
+            document.add(path.key, value);
+            return;
+        }
+        JsonElement existingSection = document.get(path.section);
+        JsonObject section = existingSection != null && existingSection.isJsonObject() ? existingSection.getAsJsonObject() : new JsonObject();
+        section.add(path.key, value);
+        document.add(path.section, section);
+    }
+
+    private static void removeElement(@NotNull JsonObject document, @NotNull ValuePath path) {
+        if (path.section == null) {
+            document.remove(path.key);
+            return;
+        }
+        JsonElement existingSection = document.get(path.section);
+        if (existingSection == null || !existingSection.isJsonObject()) return;
+        JsonObject section = existingSection.getAsJsonObject();
+        section.remove(path.key);
+        if (section.size() == 0) document.remove(path.section);
     }
 
     private static boolean isCompatibleJsonType(@NotNull JsonElement element, @NotNull Type type) {
