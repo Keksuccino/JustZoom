@@ -41,6 +41,9 @@ public interface IPlatformHelper {
     /** If the mod is loaded client-side. **/
     boolean isOnClient();
 
+    /** If the loader has a built-in mod list that can open mod options screens. Fabric only gets one through the Mod Menu mod. **/
+    boolean hasBuiltInModList();
+
     /** Get the key of a {@link KeyMapping}. **/
     InputConstants.Key getKeyMappingKey(KeyMapping keyMapping);
 
