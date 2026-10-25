@@ -1,5 +1,7 @@
 package de.keksuccino.justzoom.mixin.mixins.common.client;
 
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import de.keksuccino.justzoom.ZoomHandler;
 import de.keksuccino.justzoom.ZoomMath;
 import net.minecraft.client.Camera;
@@ -7,7 +9,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Camera.class)
 public class MixinCamera {
@@ -17,15 +18,18 @@ public class MixinCamera {
         ZoomHandler.onCameraTick();
     }
 
-    @Inject(method = "calculateFov", at = @At("RETURN"), cancellable = true)
-    private void after_calculateFov_JustZoom(float partialTicks, CallbackInfoReturnable<Float> info) {
-        float normalFov = info.getReturnValue();
+    /**
+     * @reason Zooms the finished FOV after Vanilla, the loader and all other mods changed it. This wraps the whole method instead of injecting at RETURN:
+     * once a RETURN callback cancels the method (like Simply Swords' getFov injection does on older Minecraft versions), every RETURN callback applied after it is skipped, and the application order between mods is not stable.
+     * The wrapper runs around all injected code, so zooming can neither be skipped by other mods nor skip their FOV changes. Do not turn this back into a RETURN injection.
+     */
+    @WrapMethod(method = "calculateFov")
+    private float wrap_calculateFov_JustZoom(float partialTicks, Operation<Float> original) {
+        float normalFov = original.call(partialTicks);
         double magnification = ZoomHandler.getRenderedMagnification(partialTicks, normalFov);
         float modifiedFov = magnification > ZoomMath.MIN_MAGNIFICATION ? ZoomMath.calculateZoomedFov(normalFov, magnification) : normalFov;
         ZoomHandler.updateRenderedFov(normalFov, modifiedFov);
-        if (modifiedFov != normalFov) {
-            info.setReturnValue(modifiedFov);
-        }
+        return modifiedFov;
     }
 
 }
