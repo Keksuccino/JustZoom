@@ -50,7 +50,6 @@ public class OptionsScreen extends ConfigScreen {
         boolean pressed = false;
         while (KeyMappings.KEY_OPEN_OPTIONS.consumeClick()) pressed = true;
         if (!pressed) return;
-        OpenOptionsToastHandler.onOpenOptionsKeyPressed();
         Minecraft.getInstance().gui.setScreen(new OptionsScreen(null));
     }
 
@@ -62,6 +61,8 @@ public class OptionsScreen extends ConfigScreen {
 
     @Override
     protected void beforeBuildTabs() {
+        // Runs on every init, so the toast also gets dismissed when the screen was opened through a mod list instead of the keybind.
+        OpenOptionsToastHandler.dismissToast();
         this.advancedTab = null;
         this.activeZoomPreviewSlider = null;
         this.activeZoomPreviewTarget = null;
