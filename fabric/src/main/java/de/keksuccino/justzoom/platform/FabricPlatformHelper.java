@@ -67,6 +67,11 @@ public class FabricPlatformHelper implements IPlatformHelper {
     }
 
     @Override
+    public boolean hasBuiltInModList() {
+        return false;
+    }
+
+    @Override
     public InputConstants.Key getKeyMappingKey(KeyMapping keyMapping) {
         return KeyMappingHelper.getBoundKeyOf(keyMapping);
     }
