@@ -69,5 +69,6 @@
   "justzoom.options.spyglass_sounds.spyglass_and_keybind_zoom": "망원경 및 줌 키",
   "justzoom.options.spyglass_sounds.never": "재생 안 함",
   "justzoom.options.toggle.enabled": "활성화됨",
-  "justzoom.options.toggle.disabled": "비활성화됨"
+  "justzoom.options.toggle.disabled": "비활성화됨",
+  "justzoom.server.standalone_zoom_disabled": "이 서버에서는 줌 키로 줌할 수 없습니다. 줌하려면 망원경을 사용하세요."
 }

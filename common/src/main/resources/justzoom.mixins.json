@@ -7,6 +7,7 @@
     "client.MixinAbstractClientPlayer",
     "client.MixinCamera",
     "client.MixinCameraType",
+    "client.MixinClientPacketListener",
     "client.MixinEditBox",
     "client.MixinGameRenderer",
     "client.MixinGui",

@@ -69,5 +69,6 @@
   "justzoom.options.spyglass_sounds.spyglass_and_keybind_zoom": "望远镜和缩放按键",
   "justzoom.options.spyglass_sounds.never": "从不",
   "justzoom.options.toggle.enabled": "启用",
-  "justzoom.options.toggle.disabled": "禁用"
+  "justzoom.options.toggle.disabled": "禁用",
+  "justzoom.server.standalone_zoom_disabled": "此服务器已禁用缩放按键缩放。请使用望远镜进行缩放。"
 }
