@@ -3,6 +3,12 @@ CHANGELOG | JUST ZOOM v3.0.2 [ W I P !!! NOT PUBLIC YET !!! ]
 - Improved compatibility with other mods that change the field of view
 - When the open options key is unbound, the "Open Settings" notification now tells you to open the settings via Mod Menu (Fabric) or the Mods menu (Forge/NeoForge) (#65)
 - Opening the settings through Mod Menu or the Mods menu now also closes the "Open Settings" notification
+- Added a server-side `allow_standalone_zoom` option in the `server` section of `config/justzoom/config.json` that lets servers only allow zooming with a spyglass (#66)
+- Just Zoom can now be installed on servers to enforce their zoom rules, while staying optional on both clients and servers (#66)
+- Singleplayer and LAN worlds now use the `allow_standalone_zoom` option from the host's own config (#66)
+- Pressing the zoom key on a server that disabled standalone zoom now shows a warning in chat (#66)
+- The live zoom preview in the options screen is now disabled on servers that disabled standalone zoom (#66)
+- Fixed manual edits to the config file getting overwritten when changing options while the game is running
 - Fixed the "Open Settings" notification never closing when you didn't open the settings or the open options key was unbound; it now closes after 30 seconds (#65)
 - Fixed the "Open Settings" notification text getting cut off at the notification's right edge on Minecraft 1.19.2 to 1.21.1
 - Fixed zooming not working with Simply Swords installed (pressing the zoom key only hid the HUD)
