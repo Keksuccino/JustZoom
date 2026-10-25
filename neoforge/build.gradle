@@ -98,7 +98,10 @@ tasks.withType(Javadoc).matching(notNeoTask).configureEach {
 }
 
 tasks.named("sourcesJar", Jar) {
-    from(project(":common").sourceSets.main.allSource)
+    from(project(":common").sourceSets.main.allSource) {
+        // neoforge/src/main/resources/pack.mcmeta replaces the common file (see ProcessResources below), so only the NeoForge one may be packed.
+        exclude "pack.mcmeta"
+    }
 }
 
 tasks.withType(ProcessResources).matching(notNeoTask).configureEach {
