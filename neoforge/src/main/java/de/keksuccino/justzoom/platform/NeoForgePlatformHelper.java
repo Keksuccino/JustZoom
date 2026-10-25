@@ -69,6 +69,11 @@ public class NeoForgePlatformHelper implements IPlatformHelper {
     }
 
     @Override
+    public boolean hasBuiltInModList() {
+        return true;
+    }
+
+    @Override
     public InputConstants.Key getKeyMappingKey(KeyMapping keyMapping) {
         return keyMapping.getKey();
     }
