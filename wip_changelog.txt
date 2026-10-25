@@ -13,3 +13,5 @@ CHANGELOG | JUST ZOOM v3.0.2 [ W I P !!! NOT PUBLIC YET !!! ]
 - Fixed the "Open Settings" notification text getting cut off at the notification's right edge on Minecraft 1.19.2 to 1.21.1
 - Fixed zooming not working with Simply Swords installed (pressing the zoom key only hid the HUD)
 - Fixed FOV effects from other mods, like Simply Swords' Shadow Dance, getting lost while zooming
+- Fixed the spyglass zoom being covered by large opaque blue blocks when the HUD is hidden while zooming (Minecraft 1.19.2 and 1.20.1)
+- Fixed a "Couldn't load pack metadata" error in the log on NeoForge (Minecraft 1.21.11)
