@@ -1,5 +1,6 @@
 package de.keksuccino.justzoom.mixin.mixins.common.client;
 
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import de.keksuccino.justzoom.util.SpyglassOverlayRenderer;
@@ -14,7 +15,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(GameRenderer.class)
 public class MixinGameRenderer {
@@ -24,17 +24,21 @@ public class MixinGameRenderer {
         ZoomHandler.onCameraTick();
     }
 
-    @Inject(method = "getFov", at = @At("RETURN"), cancellable = true)
-    private void after_getFov_JustZoom(Camera camera, float partialTicks, boolean useFovSetting, CallbackInfoReturnable<Double> info) {
+    /**
+     * @reason Zooms the finished FOV after Vanilla, the loader and all other mods changed it. This wraps the whole method instead of injecting at RETURN:
+     * once a RETURN callback cancels the method (like Simply Swords' getFov injection does), every RETURN callback applied after it is skipped, and the application order between mods is not stable.
+     * The wrapper runs around all injected code, so zooming can neither be skipped by other mods nor skip their FOV changes. Do not turn this back into a RETURN injection.
+     */
+    @WrapMethod(method = "getFov")
+    private double wrap_getFov_JustZoom(Camera camera, float partialTicks, boolean useFovSetting, Operation<Double> original) {
+        double fov = original.call(camera, partialTicks, useFovSetting);
         // Vanilla also queries the hand projection with useFovSetting=false; only zoom the world projection.
-        if (!useFovSetting) return;
-        float normalFov = info.getReturnValue().floatValue();
+        if (!useFovSetting) return fov;
+        float normalFov = (float) fov;
         double magnification = ZoomHandler.getRenderedMagnification(partialTicks, normalFov);
         float modifiedFov = magnification > ZoomMath.MIN_MAGNIFICATION ? ZoomMath.calculateZoomedFov(normalFov, magnification) : normalFov;
         ZoomHandler.updateRenderedFov(normalFov, modifiedFov);
-        if (modifiedFov != normalFov) {
-            info.setReturnValue((double) modifiedFov);
-        }
+        return modifiedFov != normalFov ? modifiedFov : fov;
     }
 
     /** @reason Intercept the dispatch to Gui, since Forge replaces Gui.render and bypasses vanilla injections. */
