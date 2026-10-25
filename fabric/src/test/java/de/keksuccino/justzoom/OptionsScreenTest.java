@@ -13,10 +13,15 @@ class OptionsScreenTest {
 
     @Test
     void zoomPreviewRequiresAnInWorldSelectedAdvancedTabAndRecentSliderMovement() {
-        assertTrue(OptionsScreen.shouldActivateZoomPreview(true, true, true));
-        assertFalse(OptionsScreen.shouldActivateZoomPreview(false, true, true));
-        assertFalse(OptionsScreen.shouldActivateZoomPreview(true, false, true));
-        assertFalse(OptionsScreen.shouldActivateZoomPreview(true, true, false));
+        assertTrue(OptionsScreen.shouldActivateZoomPreview(true, true, true, true));
+        assertFalse(OptionsScreen.shouldActivateZoomPreview(false, true, true, true));
+        assertFalse(OptionsScreen.shouldActivateZoomPreview(true, false, true, true));
+        assertFalse(OptionsScreen.shouldActivateZoomPreview(true, true, false, true));
+    }
+
+    @Test
+    void zoomPreviewStaysOffWhenTheServerDisabledStandaloneZoom() {
+        assertFalse(OptionsScreen.shouldActivateZoomPreview(true, true, true, false));
     }
 
     @Test
