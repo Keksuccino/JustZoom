@@ -33,7 +33,7 @@ public final class OpenOptionsToastHandler {
         Minecraft minecraft = Minecraft.getInstance();
         if (minecraft.gui.screen() != null || minecraft.player == null) return;
 
-        boolean zoomKeyDown = KeyMappings.KEY_TOGGLE_ZOOM.isDown();
+        boolean zoomKeyDown = ZoomHandler.isKeybindZooming();
         boolean spyglassScoping = minecraft.player.isScoping();
         PersistenceData persistenceData = JustZoom.getPersistenceData();
         boolean alreadyShown = shownThisSession || persistenceData.openSettingsToastShown.getValueOrDefault(false);

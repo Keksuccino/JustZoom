@@ -5,6 +5,7 @@ import de.keksuccino.justzoom.util.GameDirectoryUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import java.io.File;
 
 public class JustZoom {
@@ -16,7 +17,9 @@ public class JustZoom {
     public static final String LOADER = Services.PLATFORM.getPlatformName().toUpperCase();
     public static final File MOD_DIR = createDirectory(new File(GameDirectoryUtils.getGameDirectory(), "/config/justzoom"));
     public static final File OPTIONS_FILE = new File(MOD_DIR, "config.json");
-    public static final File INSTANCE_DATA_DIR = createDirectory(new File(GameDirectoryUtils.getGameDirectory(), "/justzoom_instance_data"));
+    // Persistence data only exists on the client, so dedicated servers never get this directory.
+    @Nullable
+    public static final File INSTANCE_DATA_DIR = Services.PLATFORM.isOnClient() ? createDirectory(new File(GameDirectoryUtils.getGameDirectory(), "/justzoom_instance_data")) : null;
     public static final File INSTANCE_PERSISTENCE_DATA = new File(INSTANCE_DATA_DIR, "persistence_data.json");
 
     private static Options options;
@@ -24,11 +27,10 @@ public class JustZoom {
 
     public static void init() {
 
-        if (Services.PLATFORM.isOnClient()) {
-            LOGGER.info("[JUST ZOOM] Initializing version " + VERSION + " on " + Services.PLATFORM.getPlatformDisplayName() + "..");
-        } else {
-            LOGGER.warn("[JUST ZOOM] Just Zoom is a CLIENT mod. It will do nothing on a server and is not supposed to be present server-side.");
-        }
+        LOGGER.info("[JUST ZOOM] Initializing version " + VERSION + " on " + Services.PLATFORM.getPlatformDisplayName() + "..");
+
+        // Adds missing server options to the config file right away, so they can be edited before the first server or world starts.
+        ServerZoomRules.load();
 
     }
 
@@ -52,7 +54,6 @@ public class JustZoom {
     }
 
     private static File createDirectory(@NotNull File file) {
-        if (!Services.PLATFORM.isOnClient()) return null; // Do not create any directories on the server.
         if (!file.isDirectory()) {
             file.mkdirs();
         }
@@ -60,7 +61,7 @@ public class JustZoom {
     }
 
     public static void assertIsClient() {
-        if (!Services.PLATFORM.isOnClient()) throw new RuntimeException("Tried to access Just Zoom on the server-side, but it is a CLIENT mod!");
+        if (!Services.PLATFORM.isOnClient()) throw new RuntimeException("Tried to access Just Zoom's client-side features on the server-side!");
     }
 
 }

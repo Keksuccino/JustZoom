@@ -157,13 +157,16 @@ public class OptionsScreen extends ConfigScreen {
         return neverSelected ? NEVER_CYCLE_VALUE_COLOR : CYCLE_VALUE_COLOR;
     }
 
-    static boolean shouldActivateZoomPreview(boolean inWorld, boolean advancedTabSelected, boolean sliderRecentlyMoved) {
-        return inWorld && advancedTabSelected && sliderRecentlyMoved;
+    /**
+     * The in-world preview zooms without a spyglass, so it follows the server's standalone zoom rule.
+     */
+    static boolean shouldActivateZoomPreview(boolean inWorld, boolean advancedTabSelected, boolean sliderRecentlyMoved, boolean standaloneZoomAllowed) {
+        return inWorld && advancedTabSelected && sliderRecentlyMoved && standaloneZoomAllowed;
     }
 
     @Nullable
     ZoomPreviewTarget getActiveZoomPreviewTarget() {
-        boolean previewActive = shouldActivateZoomPreview(this.minecraft != null && this.minecraft.level != null, this.isTabSelected(this.advancedTab), this.zoomPreviewTimer.isActive());
+        boolean previewActive = shouldActivateZoomPreview(this.minecraft != null && this.minecraft.level != null, this.isTabSelected(this.advancedTab), this.zoomPreviewTimer.isActive(), ClientZoomRules.isStandaloneZoomAllowed());
         return previewActive && this.activeZoomPreviewSlider != null ? this.activeZoomPreviewTarget : null;
     }
 
