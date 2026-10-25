@@ -21,12 +21,12 @@ public class ZoomHandler {
         if (getActiveZoomPreviewTarget(minecraft) != null) return true;
         if (!isZoomAvailable(minecraft)) return false;
         boolean spyglassScoping = minecraft.player != null && minecraft.player.isScoping();
-        return ZoomInput.isActive(KeyMappings.KEY_TOGGLE_ZOOM.isDown(), spyglassScoping, shouldUseJustZoomForSpyglass());
+        return ZoomInput.isActive(isZoomKeyActive(), spyglassScoping, shouldUseJustZoomForSpyglass());
     }
 
     public static boolean isKeybindZooming() {
         Minecraft minecraft = Minecraft.getInstance();
-        return isZoomAvailable(minecraft) && KeyMappings.KEY_TOGGLE_ZOOM.isDown();
+        return isZoomAvailable(minecraft) && isZoomKeyActive();
     }
 
     public static boolean shouldUseJustZoomForSpyglass() {
@@ -100,8 +100,11 @@ public class ZoomHandler {
     }
 
     public static void onInputTick() {
+        // Always drain zoom key presses, so presses from before joining a server cannot trigger a warning later.
+        int zoomKeyClicks = consumeClicks(KeyMappings.KEY_TOGGLE_ZOOM);
         int zoomInClicks = consumeClicks(KeyMappings.KEY_ZOOM_IN);
         int zoomOutClicks = consumeClicks(KeyMappings.KEY_ZOOM_OUT);
+        if (zoomKeyClicks > 0) ClientZoomRules.onZoomKeyPressed();
         if (getActiveZoomPreviewTarget(Minecraft.getInstance()) != null) return;
         if (isZooming()) {
             adjustMagnification(ZoomInput.calculateKeyAdjustment(zoomInClicks, zoomOutClicks));
@@ -159,6 +162,10 @@ public class ZoomHandler {
         getZoomLevelState().adjustMagnification(adjustment, stepMultiplier, maximumMagnification);
     }
 
+    private static boolean isZoomKeyActive() {
+        return ZoomInput.isKeybindActive(KeyMappings.KEY_TOGGLE_ZOOM.isDown(), ClientZoomRules.isStandaloneZoomAllowed());
+    }
+
     private static boolean isZoomAvailable(@NotNull Minecraft minecraft) {
         return isZoomAvailable(minecraft.gui.screen() != null);
     }
@@ -204,8 +211,15 @@ public class ZoomHandler {
         private ZoomInput() {
         }
 
-        static boolean isActive(boolean keybindDown, boolean spyglassScoping, boolean useJustZoomForSpyglass) {
-            return keybindDown || spyglassScoping && useJustZoomForSpyglass;
+        static boolean isActive(boolean keybindActive, boolean spyglassScoping, boolean useJustZoomForSpyglass) {
+            return keybindActive || spyglassScoping && useJustZoomForSpyglass;
+        }
+
+        /**
+         * Servers with Just Zoom can disable the standalone zoom keybind, while zooming with a spyglass always stays available.
+         */
+        static boolean isKeybindActive(boolean keybindDown, boolean standaloneZoomAllowed) {
+            return keybindDown && standaloneZoomAllowed;
         }
 
         static int calculateKeyAdjustment(int zoomInClicks, int zoomOutClicks) {

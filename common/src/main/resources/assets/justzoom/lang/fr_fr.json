@@ -69,5 +69,6 @@
   "justzoom.options.spyglass_sounds.spyglass_and_keybind_zoom": "Longue-vue et touche de zoom",
   "justzoom.options.spyglass_sounds.never": "Jamais",
   "justzoom.options.toggle.enabled": "Activé",
-  "justzoom.options.toggle.disabled": "Désactivé"
+  "justzoom.options.toggle.disabled": "Désactivé",
+  "justzoom.server.standalone_zoom_disabled": "Ce serveur a désactivé le zoom avec la touche de zoom. Utilisez une longue-vue pour zoomer."
 }
