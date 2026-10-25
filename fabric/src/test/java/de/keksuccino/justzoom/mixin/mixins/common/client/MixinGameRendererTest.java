@@ -1,20 +1,27 @@
 package de.keksuccino.justzoom.mixin.mixins.common.client;
 
+import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import de.keksuccino.justzoom.ZoomMath;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Type;
+import org.objectweb.asm.tree.AnnotationNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodInsnNode;
+import org.objectweb.asm.tree.MethodNode;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Stream;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -22,6 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MixinGameRendererTest {
 
+    private ClassNode node;
     private Object mixin;
     private Method calculate;
     private Method tick;
@@ -33,14 +41,14 @@ public class MixinGameRendererTest {
         FakeZoomHandler.normalFov = Float.NaN;
         FakeZoomHandler.modifiedFov = Float.NaN;
         FakeZoomHandler.partialTicks = Float.NaN;
-        ClassNode node = new ClassNode();
+        this.node = new ClassNode();
         try (var stream = getClass().getResourceAsStream("/de/keksuccino/justzoom/mixin/mixins/common/client/MixinGameRenderer.class")) {
             assertNotNull(stream);
-            new ClassReader(stream).accept(node, ClassReader.SKIP_FRAMES);
+            new ClassReader(stream).accept(this.node, ClassReader.SKIP_FRAMES);
         }
         // Substitute only the runtime input/cache boundary. The production injection handlers and
         // real ZoomMath implementation execute unchanged, without loading config or native windows.
-        for (var method : node.methods) {
+        for (var method : this.node.methods) {
             for (var instruction : method.instructions) {
                 if (instruction instanceof MethodInsnNode call && call.owner.equals("de/keksuccino/justzoom/ZoomHandler")) {
                     call.owner = Type.getInternalName(FakeZoomHandler.class);
@@ -48,7 +56,7 @@ public class MixinGameRendererTest {
             }
         }
         ClassWriter writer = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
-        node.accept(writer);
+        this.node.accept(writer);
         Class<?> type = new TestClassLoader().define(writer.toByteArray());
         this.mixin = type.getConstructor().newInstance();
         this.calculate = Arrays.stream(type.getDeclaredMethods()).filter(method -> method.getName().contains("getFov")).findFirst().orElseThrow();
@@ -58,31 +66,32 @@ public class MixinGameRendererTest {
     }
 
     @Test
-    void inactiveZoomPreservesVanillaFovAndRefreshesSensitivityCache() throws ReflectiveOperationException {
-        var result = calculate(73.25F, true);
-        assertFalse(result.isCancelled());
-        assertEquals(73.25F, result.getReturnValue().floatValue());
+    void inactiveZoomReturnsFinishedFovUnchangedAndRefreshesSensitivityCache() throws ReflectiveOperationException {
+        FakeOriginal original = new FakeOriginal(73.25F);
+        assertEquals(73.25F, calculate(original, true));
+        assertEquals(1, original.calls);
+        assertArrayEquals(new Object[]{null, 0.35F, true}, original.arguments);
         assertEquals(73.25F, FakeZoomHandler.normalFov);
         assertEquals(73.25F, FakeZoomHandler.modifiedFov);
         assertEquals(0.35F, FakeZoomHandler.partialTicks);
     }
 
     @Test
-    void magnificationUsesFinishedVanillaFovAndUpdatesCache() throws ReflectiveOperationException {
+    void magnificationZoomsFovFinishedByOtherModsAndUpdatesCache() throws ReflectiveOperationException {
+        // The wrapped method includes other mods' injectors, e.g. a RETURN callback that cancels with a widened FOV.
         FakeZoomHandler.magnification = 8.0D;
-        var result = calculate(47.0F, true);
-        assertTrue(result.isCancelled());
-        assertEquals(ZoomMath.calculateZoomedFov(47.0F, 8.0D), result.getReturnValue().floatValue());
-        assertEquals(47.0F, FakeZoomHandler.normalFov);
-        assertEquals(result.getReturnValue().floatValue(), FakeZoomHandler.modifiedFov);
+        float result = calculate(new FakeOriginal(84.0F), true);
+        assertEquals(ZoomMath.calculateZoomedFov(84.0F, 8.0D), result);
+        assertEquals(84.0F, FakeZoomHandler.normalFov);
+        assertEquals(result, FakeZoomHandler.modifiedFov);
     }
 
     @Test
-    void maximumZoomReachesItsPositiveFloorAndReleaseRestoresVanilla() throws ReflectiveOperationException {
+    void maximumZoomReachesItsPositiveFloorAndReleaseRestoresFinishedFov() throws ReflectiveOperationException {
         FakeZoomHandler.magnification = ZoomMath.MAX_MAGNIFICATION;
-        assertEquals(ZoomMath.MIN_FOV, calculate(70.0F, true).getReturnValue().floatValue());
+        assertEquals(ZoomMath.MIN_FOV, calculate(new FakeOriginal(70.0F), true));
         FakeZoomHandler.magnification = 1.0D;
-        assertFalse(calculate(70.0F, true).isCancelled());
+        assertEquals(70.0F, calculate(new FakeOriginal(70.0F), true));
         assertEquals(70.0F, FakeZoomHandler.modifiedFov);
     }
 
@@ -95,17 +104,56 @@ public class MixinGameRendererTest {
     @Test
     void handProjectionNeverZoomsOrOverwritesWorldSensitivityCache() throws ReflectiveOperationException {
         FakeZoomHandler.magnification = 8.0D;
-        calculate(47.0F, true);
+        calculate(new FakeOriginal(47.0F), true);
         float cachedFov = FakeZoomHandler.modifiedFov;
-        assertFalse(calculate(70.0F, false).isCancelled());
+        FakeOriginal original = new FakeOriginal(70.0F);
+        assertEquals(70.0F, calculate(original, false));
+        assertEquals(1, original.calls);
         assertEquals(47.0F, FakeZoomHandler.normalFov);
         assertEquals(cachedFov, FakeZoomHandler.modifiedFov);
     }
 
-    private CallbackInfoReturnable<Float> calculate(float normalFov, boolean worldProjection) throws ReflectiveOperationException {
-        CallbackInfoReturnable<Float> info = new CallbackInfoReturnable<>("getFov", true, normalFov);
-        this.calculate.invoke(this.mixin, null, 0.35F, worldProjection, info);
-        return info;
+    @Test
+    void fovHookWrapsWholeMethodSoCancellingReturnCallbacksCannotSkipIt() {
+        // Once one RETURN callback cancels, Mixin skips all RETURN callbacks applied after it, and the order between mods is not stable.
+        MethodNode handler = this.node.methods.stream().filter(method -> method.name.contains("getFov")).findFirst().orElseThrow();
+        assertTrue(annotations(handler).anyMatch(annotation -> annotation.desc.equals(Type.getDescriptor(WrapMethod.class)) && List.of("getFov").equals(annotationValue(annotation, "method"))));
+        assertFalse(this.node.methods.stream().flatMap(MixinGameRendererTest::annotations).anyMatch(annotation -> annotation.desc.equals(Type.getDescriptor(Inject.class)) && List.of("getFov").equals(annotationValue(annotation, "method"))));
+    }
+
+    private float calculate(FakeOriginal original, boolean worldProjection) throws ReflectiveOperationException {
+        return (float) this.calculate.invoke(this.mixin, null, 0.35F, worldProjection, original);
+    }
+
+    private static Stream<AnnotationNode> annotations(MethodNode method) {
+        return Stream.concat(method.visibleAnnotations == null ? Stream.empty() : method.visibleAnnotations.stream(), method.invisibleAnnotations == null ? Stream.empty() : method.invisibleAnnotations.stream());
+    }
+
+    private static Object annotationValue(AnnotationNode annotation, String name) {
+        if (annotation.values == null) return null;
+        for (int i = 0; i < annotation.values.size(); i += 2) {
+            if (name.equals(annotation.values.get(i))) return annotation.values.get(i + 1);
+        }
+        return null;
+    }
+
+    private static final class FakeOriginal implements Operation<Float> {
+
+        private final float fov;
+        private int calls;
+        private Object[] arguments;
+
+        private FakeOriginal(float fov) {
+            this.fov = fov;
+        }
+
+        @Override
+        public Float call(Object... args) {
+            this.calls++;
+            this.arguments = args;
+            return this.fov;
+        }
+
     }
 
     public static final class FakeZoomHandler {
