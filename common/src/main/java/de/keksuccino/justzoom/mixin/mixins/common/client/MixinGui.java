@@ -3,6 +3,7 @@ package de.keksuccino.justzoom.mixin.mixins.common.client;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.mojang.blaze3d.systems.RenderSystem;
 import de.keksuccino.justzoom.ZoomHandler;
 import de.keksuccino.justzoom.util.SpyglassOverlayRenderer;
 import net.minecraft.client.Minecraft;
@@ -33,7 +34,12 @@ public abstract class MixinGui implements SpyglassOverlayRenderer {
         this.screenWidth = graphics.guiWidth();
         this.screenHeight = graphics.guiHeight();
         this.scopeScale = Mth.lerp(0.5F * this.minecraft.getDeltaFrameTime(), this.scopeScale, 1.125F);
+        // Vanilla only draws this overlay after Gui.render enabled blending and relies on that state. Skipping the HUD also skips that setup,
+        // and without it the nearly transparent scope glass covers the zoomed view opaquely. Newer versions enable blending the same way.
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
         this.renderSpyglassOverlay(graphics, this.scopeScale);
+        RenderSystem.disableBlend();
     }
 
     /** @reason Keybind zoom can opt into the same overlay as the physical spyglass. */
