@@ -17,7 +17,7 @@
 
 _And yes, it also allows you to zoom in on your face and the back of your head, if you, for some reason, want that._
 
-<iframe width="400" src="https://www.youtube-nocookie.com/embed/NB6pGFpioRs" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+[![youtube](https://github.com/Keksuccino/JustZoom/blob/main/assets/youtube.png?raw=true)](https://www.youtube.com/watch?v=NB6pGFpioRs)
 
 ## How to Use
 
