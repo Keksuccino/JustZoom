@@ -1,8 +1,8 @@
-## About
+# Getting Started
 
 **Just Zoom** adds lots of new features and improvements to the Spyglass, and also adds a standalone zooming mode that does not require the Spyglass to work.
 
-## What The Mod Gives You
+# What The Mod Gives You
 
 - **Full Spyglass Integration**: All of Just Zoom's features are available for both the Spyglass and the standalone zoom (can be disabled in settings).
 - **Mouse Wheel Zooming**: Adjust the zoom level by using your mouse wheel!
@@ -19,7 +19,7 @@ _And yes, it also allows you to zoom in on your face and the back of your head, 
 
 [![youtube](https://github.com/Keksuccino/JustZoom/blob/main/assets/youtube.png?raw=true)](https://www.youtube.com/watch?v=NB6pGFpioRs)
 
-## How to Use
+# How to Use
 
 Grab a **Spyglass** and zoom in, that's it. Nothing to configure, if you just need a better zooming experience.
 
@@ -29,7 +29,7 @@ Or press **Z** by default (**Y** on some keyboard layouts), for the **standalone
 
 If you want to configure the mod, press **B** by default, to open the mod's settings. You can also open the settings via Mod Menu in Fabric, and via the Mods menu on (Neo)Forge.
 
-## Disabling Standalone Zoom on Servers
+# Disabling Standalone Zoom on Servers
 
 Server owners can turn off zooming with the zoom key, so players can only zoom with a spyglass.
 
