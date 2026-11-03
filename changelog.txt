@@ -99,6 +99,114 @@ CHANGELOG | JUST ZOOM v3.0.0
 
 
 
+CHANGELOG | JUST ZOOM v2.1.7
+
+- Fixed smooth zooming not being able to zoom in further than the vanilla spyglass zoom level
+
+%changelog:metadata:start%
+"version":"2.1.7";
+"update_title":"";
+"update_release_date_timestamp":"1789794399";
+"update_release_date_string_ddmmyyyy":"19-09-2026";
+"update_supported_mod_loaders":"fabric,neoforge";
+"update_supported_minecraft_versions":"26.3";
+%changelog:metadata:end%
+%changelog:end%
+
+
+
+
+CHANGELOG | JUST ZOOM v2.1.6
+
+- Fixed Just Zoom's mod icon not showing on NeoForge
+
+%changelog:metadata:start%
+"version":"2.1.6";
+"update_title":"";
+"update_release_date_timestamp":"1789792144";
+"update_release_date_string_ddmmyyyy":"19-09-2026";
+"update_supported_mod_loaders":"fabric,neoforge";
+"update_supported_minecraft_versions":"26.3";
+%changelog:metadata:end%
+%changelog:end%
+
+
+
+
+CHANGELOG | JUST ZOOM v2.1.5
+
+- Ported the mod to Minecraft 26.2
+- Ported the mod to Minecraft 26.3
+  - Minimum required Konkrete version for MC 26.3 is v1.11.1
+
+%changelog:metadata:start%
+"version":"2.1.5";
+"update_title":"";
+"update_release_date_timestamp":"1782369878";
+"update_release_date_string_ddmmyyyy":"25-06-2026";
+"update_supported_mod_loaders":"fabric,neoforge";
+"update_supported_minecraft_versions":"26.2,26.3";
+%changelog:metadata:end%
+%changelog:end%
+
+
+
+
+CHANGELOG | JUST ZOOM v2.1.4
+
+- Ported the mod to Minecraft 26.1.1
+- Minimum required Konkrete version is now v1.9.19
+- Improved the layout of the options screen, which now shows its toggle buttons in two columns
+
+%changelog:metadata:start%
+"version":"2.1.4";
+"update_title":"";
+"update_release_date_timestamp":"1775337921";
+"update_release_date_string_ddmmyyyy":"04-04-2026";
+"update_supported_mod_loaders":"fabric,neoforge";
+"update_supported_minecraft_versions":"26.1.1,26.1.2";
+%changelog:metadata:end%
+%changelog:end%
+
+
+
+
+CHANGELOG | JUST ZOOM v2.1.3
+
+- Ported the mod to Minecraft 1.21.11
+- Fixed the mod creating configuration folders in the system root when loaded server-side (#46)
+
+%changelog:metadata:start%
+"version":"2.1.3";
+"update_title":"";
+"update_release_date_timestamp":"1766487419";
+"update_release_date_string_ddmmyyyy":"23-12-2025";
+"update_supported_mod_loaders":"fabric,neoforge";
+"update_supported_minecraft_versions":"1.21.11";
+%changelog:metadata:end%
+%changelog:end%
+
+
+
+
+CHANGELOG | JUST ZOOM v2.1.2
+
+- Dropped support for (Lex)Forge for Minecraft 1.21.10+ (NeoForge is still supported)
+- Ported the mod to Minecraft 1.21.10
+
+%changelog:metadata:start%
+"version":"2.1.2";
+"update_title":"";
+"update_release_date_timestamp":"1760585461";
+"update_release_date_string_ddmmyyyy":"16-10-2025";
+"update_supported_mod_loaders":"fabric,neoforge";
+"update_supported_minecraft_versions":"1.21.10";
+%changelog:metadata:end%
+%changelog:end%
+
+
+
+
 CHANGELOG | JUST ZOOM v2.1.1
 
 - Fixed crash in Forge on 1.20.1, 1.19.2, 1.18.2
@@ -176,5 +284,116 @@ This is a full rewrite of Just Zoom! There can be bugs, but in general everythin
 "update_release_date_string_ddmmyyyy":"06-06-2024";
 "update_supported_mod_loaders":"forge,fabric,neoforge";
 "update_supported_minecraft_versions":"1.18.2,1.19.2,1.20.1,1.20.4,1.20.6,1.21,1.21.1";
+%changelog:metadata:end%
+%changelog:end%
+
+
+
+
+CHANGELOG | JUST ZOOM v1.0.2-2
+
+- This update is only for Forge 1.16.5
+
+- Fixed crash on launch
+
+%changelog:metadata:start%
+"version":"1.0.2-2";
+"update_title":"";
+"update_release_date_timestamp":"1689461013";
+"update_release_date_string_ddmmyyyy":"15-07-2023";
+"update_supported_mod_loaders":"forge";
+"update_supported_minecraft_versions":"1.16.5";
+%changelog:metadata:end%
+%changelog:end%
+
+
+
+
+CHANGELOG | JUST ZOOM v1.0.2-1
+
+- This update is only for Forge 1.18.2
+
+- Fixed crash on launch
+
+%changelog:metadata:start%
+"version":"1.0.2-1";
+"update_title":"";
+"update_release_date_timestamp":"1689403134";
+"update_release_date_string_ddmmyyyy":"15-07-2023";
+"update_supported_mod_loaders":"forge";
+"update_supported_minecraft_versions":"1.18.2";
+%changelog:metadata:end%
+%changelog:end%
+
+
+
+
+CHANGELOG | JUST ZOOM v1.0.2
+
+- Added support for MC 1.20.1 and 1.20.2
+- Added smooth zoom (can be modified/disabled by editing the 'lerp_amount' config option) (Big thanks to EDM115 for the PR!)
+- Added config option to disable the smooth camera movement when zoomed
+- Fixed scroll-zooming in too much resulting in "ghost zooming"
+
+%changelog:metadata:start%
+"version":"1.0.2";
+"update_title":"";
+"update_release_date_timestamp":"1689225072";
+"update_release_date_string_ddmmyyyy":"13-07-2023";
+"update_supported_mod_loaders":"forge";
+"update_supported_minecraft_versions":"1.16.5,1.18.2,1.19.4,1.20.1,1.20.2";
+%changelog:metadata:end%
+%changelog:end%
+
+
+
+
+CHANGELOG | JUST ZOOM v1.0.1-1
+
+- Added support for the latest Forge 1.19 build (this will break the mod in older Forge builds, so please update to the latest Forge build)
+
+%changelog:metadata:start%
+"version":"1.0.1-1";
+"update_title":"";
+"update_release_date_timestamp":"1657560400";
+"update_release_date_string_ddmmyyyy":"11-07-2022";
+"update_supported_mod_loaders":"forge";
+"update_supported_minecraft_versions":"1.19,1.19.1,1.19.2,1.19.3";
+%changelog:metadata:end%
+%changelog:end%
+
+
+
+
+CHANGELOG | JUST ZOOM v1.0.1
+
+- Added support for MC 1.19 and 1.19.4
+- Added config option 'zoom_out_cap' to cap the maximum FOV when zooming out, so users can't zoom out more than the normal FOV (default: 'true')
+- Config option 'reset_zoom_factor' is now 'true' by default (does not affect configs from older mod versions)
+
+%changelog:metadata:start%
+"version":"1.0.1";
+"update_title":"";
+"update_release_date_timestamp":"1641857263";
+"update_release_date_string_ddmmyyyy":"10-01-2022";
+"update_supported_mod_loaders":"forge";
+"update_supported_minecraft_versions":"1.16.2,1.16.3,1.16.4,1.16.5,1.18,1.18.1,1.18.2,1.19,1.19.4";
+%changelog:metadata:end%
+%changelog:end%
+
+
+
+
+CHANGELOG | JUST ZOOM v1.0.0
+
+- Initial release
+
+%changelog:metadata:start%
+"version":"1.0.0";
+"update_title":"";
+"update_release_date_timestamp":"1640915662";
+"update_release_date_string_ddmmyyyy":"31-12-2021";
+"update_supported_mod_loaders":"forge";
+"update_supported_minecraft_versions":"1.16.2,1.16.3,1.16.4,1.16.5,1.18,1.18.1";
 %changelog:metadata:end%
 %changelog:end%
