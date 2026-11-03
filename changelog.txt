@@ -1,4 +1,3 @@
-
 CHANGELOG | JUST ZOOM v3.1.0
 
 - Improved compatibility with other mods that change the field of view
@@ -17,6 +16,14 @@ CHANGELOG | JUST ZOOM v3.1.0
 - Fixed the spyglass zoom being covered by large opaque blue blocks when the HUD is hidden while zooming (Minecraft 1.19.2 and 1.20.1)
 - Fixed a "Couldn't load pack metadata" error in the log on NeoForge (Minecraft 1.21.11)
 
+%changelog:metadata:start%
+"version":"3.1.0";
+"update_title":"";
+"update_release_date_timestamp":"1792953776";
+"update_release_date_string_ddmmyyyy":"25-10-2026";
+"update_supported_mod_loaders":"forge,fabric,neoforge";
+"update_supported_minecraft_versions":"1.19.2,1.20.1,1.21.1,1.21.11,26.1.2,26.2,26.3";
+%changelog:metadata:end%
 %changelog:end%
 
 
@@ -26,6 +33,14 @@ CHANGELOG | JUST ZOOM v3.0.1
 
 - Fixed a crash when joining worlds with Apprentice’s Codex installed (#63)
 
+%changelog:metadata:start%
+"version":"3.0.1";
+"update_title":"";
+"update_release_date_timestamp":"1791143396";
+"update_release_date_string_ddmmyyyy":"04-10-2026";
+"update_supported_mod_loaders":"forge,fabric,neoforge";
+"update_supported_minecraft_versions":"1.19.2,1.20.1,1.21.1,1.21.11,26.1.2,26.2,26.3";
+%changelog:metadata:end%
 %changelog:end%
 
 
@@ -71,6 +86,14 @@ CHANGELOG | JUST ZOOM v3.0.0
 - Fixed the mod creating configuration folders in the system root when loaded server-side (#46)
 - Fixed the "Hide Hand" setting not working when Iris shaders were enabled (#42)
 
+%changelog:metadata:start%
+"version":"3.0.0";
+"update_title":"";
+"update_release_date_timestamp":"1791065242";
+"update_release_date_string_ddmmyyyy":"03-10-2026";
+"update_supported_mod_loaders":"forge,fabric,neoforge";
+"update_supported_minecraft_versions":"1.19.2,1.20.1,1.21.1,1.21.11,26.1.2,26.2,26.3";
+%changelog:metadata:end%
 %changelog:end%
 
 
@@ -80,6 +103,14 @@ CHANGELOG | JUST ZOOM v2.1.1
 
 - Fixed crash in Forge on 1.20.1, 1.19.2, 1.18.2
 
+%changelog:metadata:start%
+"version":"2.1.1";
+"update_title":"";
+"update_release_date_timestamp":"1741647764";
+"update_release_date_string_ddmmyyyy":"10-03-2025";
+"update_supported_mod_loaders":"forge,fabric,neoforge";
+"update_supported_minecraft_versions":"1.18.2,1.19.2,1.20.1,1.21.6,1.21.7,1.21.8";
+%changelog:metadata:end%
 %changelog:end%
 
 
@@ -96,6 +127,14 @@ CHANGELOG | JUST ZOOM v2.1.0
 - Improved "Normalize Mouse Sensitivity" logic to normalize the sensitivity better on high zoom levels
 - Fixed zooming sometimes working while in screens (like inventory or when editing a sign) (#32)
 
+%changelog:metadata:start%
+"version":"2.1.0";
+"update_title":"";
+"update_release_date_timestamp":"1741646116";
+"update_release_date_string_ddmmyyyy":"10-03-2025";
+"update_supported_mod_loaders":"forge,fabric,neoforge";
+"update_supported_minecraft_versions":"1.18.2,1.19.2,1.20.1,1.21.1,1.21.4,1.21.5";
+%changelog:metadata:end%
 %changelog:end%
 
 
@@ -104,7 +143,15 @@ CHANGELOG | JUST ZOOM v2.1.0
 CHANGELOG | JUST ZOOM v2.0.1
 
 - Added support for MC 1.21.4
- 
+
+%changelog:metadata:start%
+"version":"2.0.1";
+"update_title":"";
+"update_release_date_timestamp":"1737311586";
+"update_release_date_string_ddmmyyyy":"19-01-2025";
+"update_supported_mod_loaders":"forge,fabric,neoforge";
+"update_supported_minecraft_versions":"1.21.4";
+%changelog:metadata:end%
 %changelog:end%
 
 
@@ -121,5 +168,13 @@ This is a full rewrite of Just Zoom! There can be bugs, but in general everythin
 - The mod now normalizes the mouse sensitivity when zooming (can be turned off)
 - You can turn off the cinematic/smooth camera movement when zooming now
 - There's an in-game options screen for Just Zoom now (access it by pressing the spyglass button at the bottom-left side of the Pause screen)
- 
+
+%changelog:metadata:start%
+"version":"2.0.0";
+"update_title":"";
+"update_release_date_timestamp":"1717651241";
+"update_release_date_string_ddmmyyyy":"06-06-2024";
+"update_supported_mod_loaders":"forge,fabric,neoforge";
+"update_supported_minecraft_versions":"1.18.2,1.19.2,1.20.1,1.20.4,1.20.6,1.21,1.21.1";
+%changelog:metadata:end%
 %changelog:end%
