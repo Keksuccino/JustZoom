@@ -1,0 +1,20 @@
+# Normalize all text files to LF line endings, both in the repository and in every checkout.
+* text=auto eol=lf
+
+# Windows batch scripts need CRLF line endings to run reliably on Windows.
+*.bat text eol=crlf
+
+# Binary files must never be touched by line ending conversion.
+*.jar binary
+*.class binary
+*.zip binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.ogg binary
+*.wav binary
+*.nbt binary
+*.ttf binary
+*.otf binary
