@@ -7,12 +7,15 @@
     "client.MixinCameraType",
     "client.MixinClientPacketListener",
     "client.MixinEditBox",
+    "client.MixinGLX",
     "client.MixinGameRenderer",
     "client.MixinGui",
+    "client.MixinInputConstants",
     "client.MixinItemInHandRenderer",
     "client.MixinMinecraft",
     "client.MixinMouseHandler",
-    "client.MixinSpyglassItem"
+    "client.MixinSpyglassItem",
+    "client.MixinWindow"
   ],
   "mixins": [],
   "injectors": {
