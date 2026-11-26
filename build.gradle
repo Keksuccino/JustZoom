@@ -17,8 +17,9 @@ subprojects {
     java.withSourcesJar()
 //    java.withJavadocJar()
 
-    jar {
-        from(rootProject.file("LICENSE")) {
+    // Include the license in regular, source, and bundled loader artifacts alike.
+    tasks.withType(Jar).configureEach {
+        from(rootProject.file("LICENSE.md")) {
             rename { "${it}_${mod_name}" }
         }
         manifest {
@@ -32,12 +33,6 @@ subprojects {
                     'Built-On-Java'           : "${System.getProperty('java.vm.version')} (${System.getProperty('java.vm.vendor')})",
                     'Built-On-Minecraft'      : minecraft_version
             ])
-        }
-    }
-
-    sourcesJar {
-        from(rootProject.file("LICENSE")) {
-            rename { "${it}_${mod_name}" }
         }
     }
 
