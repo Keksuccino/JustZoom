@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class MixinTargetsTest {
 
-    private static final List<String> INJECTORS = List.of("Lorg/spongepowered/asm/mixin/injection/Inject;", "Lcom/llamalad7/mixinextras/injector/wrapoperation/WrapOperation;", "Lcom/llamalad7/mixinextras/injector/v2/WrapWithCondition;", "Lcom/llamalad7/mixinextras/injector/wrapmethod/WrapMethod;", "Lcom/llamalad7/mixinextras/injector/ModifyExpressionValue;", "Lorg/spongepowered/asm/mixin/injection/ModifyVariable;");
+    private static final List<String> INJECTORS = List.of("Lorg/spongepowered/asm/mixin/injection/Inject;", "Lcom/llamalad7/mixinextras/injector/wrapoperation/WrapOperation;", "Lcom/llamalad7/mixinextras/injector/v2/WrapWithCondition;", "Lcom/llamalad7/mixinextras/injector/wrapmethod/WrapMethod;", "Lcom/llamalad7/mixinextras/injector/ModifyExpressionValue;", "Lorg/spongepowered/asm/mixin/injection/ModifyVariable;", "Lorg/spongepowered/asm/mixin/injection/ModifyArg;");
 
     // Inspect bytecode without loading Minecraft or starting Mixin. Java compilation cannot
     // validate method names and descriptors stored in injection annotations.
@@ -73,7 +73,7 @@ class MixinTargetsTest {
         Object atValue = annotationValue(injector, "at");
         List<?> injectionPoints = atValue == null ? List.of() : atValue instanceof List<?> list ? list : List.of(atValue);
         for (String selector : selectors) {
-            List<MethodNode> methods = targetClass.methods.stream().filter(method -> selector.equals(method.name) || selector.equals(method.name + method.desc)).toList();
+            List<MethodNode> methods = targetClass.methods.stream().filter(method -> matchesSelector(selector, method)).toList();
             assertFalse(methods.isEmpty(), () -> "Missing target " + targetClass.name + "." + selector);
             for (Object value : injectionPoints) {
                 AnnotationNode at = (AnnotationNode) value;
@@ -92,6 +92,12 @@ class MixinTargetsTest {
                 }
             }
         }
+    }
+
+    // Like Mixin, a selector matches by name or by name and descriptor, and a trailing "*" selects every method of that name
+    private static boolean matchesSelector(String selector, MethodNode method) {
+        if (selector.endsWith("*")) return selector.substring(0, selector.length() - 1).equals(method.name);
+        return selector.equals(method.name) || selector.equals(method.name + method.desc);
     }
 
     private static boolean hasField(ClassNode owner, String name, String descriptor) throws IOException {

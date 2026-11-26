@@ -11,12 +11,15 @@
     "client.MixinEditBox",
     "client.MixinHud",
     "client.MixinFirstPersonHandsAndItemsRenderer",
+    "client.MixinInputConstants",
     "client.MixinKeyMapping_Category",
     "client.MixinMinecraft",
     "client.MixinMenuTabBar",
     "client.MixinMenuTabButton",
     "client.MixinMouseHandler",
-    "client.MixinSpyglassItem"
+    "client.MixinRenderSystem",
+    "client.MixinSpyglassItem",
+    "client.MixinWindow"
   ],
   "mixins": [],
   "injectors": {

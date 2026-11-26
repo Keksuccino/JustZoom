@@ -15,7 +15,8 @@ runs {
         modSource project.sourceSets.main
     }
     client {
-        workingDirectory project.file('../run_client')
+        // offscreen_client.sh can point this to a separate game instance, see TESTING_GUIDELINES.md
+        workingDirectory project.file('../' + (project.findProperty('justzoom_client_run_dir') ?: 'run_client'))
         systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
         dependencies {
             //runtime "com.github.DhyanB:Open-Imaging:317b2cb6e5"
