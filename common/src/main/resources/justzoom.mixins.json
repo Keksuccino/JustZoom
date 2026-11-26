@@ -9,15 +9,18 @@
     "client.MixinCameraType",
     "client.MixinClientPacketListener",
     "client.MixinEditBox",
+    "client.MixinGLX",
     "client.MixinGameRenderer",
     "client.MixinHud",
+    "client.MixinInputConstants",
     "client.MixinItemInHandRenderer",
     "client.MixinKeyMapping_Category",
     "client.MixinMinecraft",
     "client.MixinMenuTabBar",
     "client.MixinMenuTabButton",
     "client.MixinMouseHandler",
-    "client.MixinSpyglassItem"
+    "client.MixinSpyglassItem",
+    "client.MixinWindow"
   ],
   "mixins": [
   ],
