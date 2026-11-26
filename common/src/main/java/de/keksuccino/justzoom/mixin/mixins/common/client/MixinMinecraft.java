@@ -4,6 +4,7 @@ import de.keksuccino.justzoom.OpenOptionsToastHandler;
 import de.keksuccino.justzoom.OptionsScreen;
 import de.keksuccino.justzoom.SpyglassSoundHandler;
 import de.keksuccino.justzoom.ZoomHandler;
+import de.keksuccino.justzoom.util.window.OffscreenTestClient;
 import net.minecraft.client.Minecraft;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -17,6 +18,7 @@ public class MixinMinecraft {
     private void after_tick_JustZoom(CallbackInfo info) {
         SpyglassSoundHandler.onClientTick();
         OpenOptionsToastHandler.onClientTick();
+        OffscreenTestClient.onClientTick((Minecraft)(Object)this);
     }
 
     @Inject(method = "handleKeybinds", at = @At("HEAD"))
